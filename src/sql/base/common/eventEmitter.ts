@@ -233,56 +233,6 @@ export class EventEmitter implements IEventEmitter {
 	}
 }
 
-class EmitQueueElement {
-	public target: Function;
-	public arg: any;
-
-	constructor(target: Function, arg: any) {
-		this.target = target;
-		this.arg = arg;
-	}
-}
-
-/**
- * Same as EventEmitter, but guarantees events are delivered in order to each listener
- */
-export class OrderGuaranteeEventEmitter extends EventEmitter {
-
-	private _emitQueue: EmitQueueElement[];
-
-	constructor() {
-		super();
-		this._emitQueue = [];
-	}
-
-	protected _emitToSpecificTypeListeners(eventType: string, data: any): void {
-		if (this._listeners.hasOwnProperty(eventType)) {
-			let listeners = this._listeners[eventType];
-			for (let i = 0, len = listeners.length; i < len; i++) {
-				this._emitQueue.push(new EmitQueueElement(listeners[i], data));
-			}
-		}
-	}
-
-	protected _emitToBulkListeners(events: EmitterEvent[]): void {
-		let bulkListeners = this._bulkListeners;
-		for (let i = 0, len = bulkListeners.length; i < len; i++) {
-			this._emitQueue.push(new EmitQueueElement(bulkListeners[i], events));
-		}
-	}
-
-	protected _emitEvents(events: EmitterEvent[]): void {
-		super._emitEvents(events);
-
-		while (this._emitQueue.length > 0) {
-			let queueElement = this._emitQueue.shift();
-			if (queueElement) {
-				safeInvoke1Arg(queueElement.target, queueElement.arg);
-			}
-		}
-	}
-}
-
 function safeInvokeNoArg<T>(func: Function): T | undefined {
 	try {
 		return func();

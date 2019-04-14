@@ -7,13 +7,12 @@ import { Action, IActionItem, IActionRunner } from 'vs/base/common/actions';
 import { IDisposable, dispose } from 'vs/base/common/lifecycle';
 import { IQueryModelService } from 'sql/platform/query/common/queryModel';
 import { SelectBox } from 'sql/base/browser/ui/selectBox/selectBox';
-import { EventEmitter } from 'sql/base/common/eventEmitter';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { EditDataEditor } from 'sql/parts/editData/editor/editDataEditor';
 import nls = require('vs/nls');
 import * as dom from 'vs/base/browser/dom';
 import { IContextViewService } from 'vs/platform/contextview/browser/contextView';
-import { INotificationService, INotificationActions } from 'vs/platform/notification/common/notification';
+import { INotificationService } from 'vs/platform/notification/common/notification';
 import Severity from 'vs/base/common/severity';
 import { attachSelectBoxStyler } from 'vs/platform/theme/common/styler';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
@@ -151,7 +150,7 @@ export class ChangeMaxRowsAction extends EditDataAction {
  * Action item that handles the dropdown (combobox) that lists the avaliable number of row selections
  * for an edit data session
  */
-export class ChangeMaxRowsActionItem extends EventEmitter implements IActionItem {
+export class ChangeMaxRowsActionItem implements IActionItem {
 
 	public actionRunner: IActionRunner;
 	public defaultRowCount: number;
@@ -159,7 +158,6 @@ export class ChangeMaxRowsActionItem extends EventEmitter implements IActionItem
 	private start: HTMLElement;
 	private selectBox: SelectBox;
 	private toDispose: IDisposable[];
-	private context: any;
 	private _options: string[];
 	private _currentOptionsIndex: number;
 
@@ -167,7 +165,6 @@ export class ChangeMaxRowsActionItem extends EventEmitter implements IActionItem
 		private _editor: EditDataEditor,
 		@IContextViewService contextViewService: IContextViewService,
 		@IThemeService private _themeService: IThemeService) {
-		super();
 		this._options = ['200', '1000', '10000'];
 		this._currentOptionsIndex = 0;
 		this.toDispose = [];
@@ -185,7 +182,6 @@ export class ChangeMaxRowsActionItem extends EventEmitter implements IActionItem
 	}
 
 	public setActionContext(context: any): void {
-		this.context = context;
 	}
 
 	public isEnabled(): boolean {
