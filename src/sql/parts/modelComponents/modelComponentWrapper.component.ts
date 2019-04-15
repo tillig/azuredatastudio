@@ -10,12 +10,10 @@ import {
 } from '@angular/core';
 
 import { ComponentHostDirective } from 'sql/workbench/parts/dashboard/common/componentHost.directive';
-import { error } from 'sql/base/common/log';
 import { AngularDisposable } from 'sql/base/node/lifecycle';
 import { IComponent, IComponentConfig, IComponentDescriptor, IModelStore, COMPONENT_CONFIG } from './interfaces';
 import { Extensions, IComponentRegistry } from 'sql/platform/dashboard/common/modelComponentRegistry';
 
-import { IColorTheme, IWorkbenchThemeService } from 'vs/workbench/services/themes/common/workbenchThemeService';
 import * as colors from 'vs/platform/theme/common/colorRegistry';
 import * as themeColors from 'vs/workbench/common/theme';
 import { Registry } from 'vs/platform/registry/common/platform';
@@ -24,6 +22,8 @@ import { generateUuid } from 'vs/base/common/uuid';
 import { IBootstrapParams } from 'sql/platform/bootstrap/node/bootstrapService';
 import { Event } from 'vs/base/common/event';
 import { LayoutRequestParams } from 'sql/platform/dialog/dialogContainer.component';
+import { ILogService } from 'vs/platform/log/common/log';
+import { IThemeService, ITheme } from 'vs/platform/theme/common/themeService';
 
 const componentRegistry = <IComponentRegistry>Registry.as(Extensions.ComponentContribution);
 
@@ -59,13 +59,14 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 		@Inject(forwardRef(() => ElementRef)) private _ref: ElementRef,
 		@Inject(forwardRef(() => ChangeDetectorRef)) private _changeref: ChangeDetectorRef,
 		@Inject(forwardRef(() => Injector)) private _injector: Injector,
-		@Inject(IWorkbenchThemeService) private themeService: IWorkbenchThemeService,
-		@Inject(IBootstrapParams) private _params: ModelComponentParams
+		@Inject(IThemeService) private themeService: IThemeService,
+		@Inject(IBootstrapParams) params: ModelComponentParams,
+		@Inject(ILogService) private logService: ILogService
 	) {
 		super();
-		if (_params && _params.onLayoutRequested) {
-			this._modelViewId = _params.modelViewId;
-			_params.onLayoutRequested(layoutParams => {
+		if (params && params.onLayoutRequested) {
+			this._modelViewId = params.modelViewId;
+			params.onLayoutRequested(layoutParams => {
 				if (layoutParams && (layoutParams.alwaysRefresh || layoutParams.modelViewId === this._modelViewId)) {
 					this.layout();
 				}
@@ -75,13 +76,13 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 
 	ngOnInit() {
 		let self = this;
-		this._register(self.themeService.onDidColorThemeChange((event: IColorTheme) => {
+		this._register(self.themeService.onThemeChange(event => {
 			self.updateTheme(event);
 		}));
 	}
 
 	ngAfterViewInit() {
-		this.updateTheme(this.themeService.getColorTheme());
+		this.updateTheme(this.themeService.getTheme());
 		if (this.componentHost) {
 			this.loadComponent();
 		}
@@ -115,14 +116,14 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 
 	private loadComponent(): void {
 		if (!this.descriptor || !this.descriptor.type) {
-			error('No descriptor or type defined for this component');
+			this.logService.error('No descriptor or type defined for this component');
 			return;
 		}
 
 		let selector = componentRegistry.getCtorFromId(this.descriptor.type);
 
 		if (selector === undefined) {
-			error('No selector defined for type {0}', this.descriptor.type);
+			this.logService.error('No selector defined for type {0}', this.descriptor.type);
 			return;
 		}
 
@@ -140,7 +141,7 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 			this._componentInstance.modelStore = this.modelStore;
 			this._changeref.detectChanges();
 		} catch (e) {
-			error('Error rendering component: {0}', e);
+			this.logService.error('Error rendering component: {0}', e);
 			return;
 		}
 		let el = <HTMLElement>componentRef.location.nativeElement;
@@ -150,7 +151,7 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 		el.style.position = 'relative';
 	}
 
-	private updateTheme(theme: IColorTheme): void {
+	private updateTheme(theme: ITheme): void {
 		// TODO handle theming appropriately
 		let el = <HTMLElement>this._ref.nativeElement;
 		let borderColor = theme.getColor(themeColors.SIDE_BAR_BACKGROUND, true);

@@ -6,12 +6,14 @@
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 
-import { warn } from 'sql/base/common/log';
 import { IAngularEventingService, IAngularEvent, AngularEventType } from 'sql/platform/angularEventing/common/angularEventingService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export class AngularEventingService implements IAngularEventingService {
 	public _serviceBrand: any;
 	private _angularMap = new Map<string, Subject<IAngularEvent>>();
+
+	constructor(@ILogService private logService: ILogService) { }
 
 	public onAngularEvent(uri: string, cb: (event: IAngularEvent) => void): Subscription {
 		let subject = this._angularMap.get(uri);
@@ -26,7 +28,7 @@ export class AngularEventingService implements IAngularEventingService {
 	public sendAngularEvent(uri: string, event: AngularEventType, payload?: any): void {
 		const subject = this._angularMap.get(uri);
 		if (!subject) {
-			warn('Got request to send an event to a dashboard that has not started listening');
+			this.logService.warn('Got request to send an event to a dashboard that has not started listening');
 		} else {
 			subject.next({ event, payload });
 		}

@@ -22,7 +22,6 @@ import * as actions from 'sql/parts/grid/views/gridActions';
 import * as Services from 'sql/parts/grid/services/sharedServices';
 import * as GridContentEvents from 'sql/parts/grid/common/gridContentEvents';
 import { ResultsVisibleContext, ResultsGridFocussedContext, ResultsMessagesFocussedContext, QueryEditorVisibleContext } from 'sql/parts/query/common/queryContext';
-import { error } from 'sql/base/common/log';
 import { IQueryEditorService } from 'sql/workbench/services/queryEditor/common/queryEditorService';
 import { CellSelectionModel } from 'sql/base/browser/ui/table/plugins/cellSelectionModel.plugin';
 
@@ -36,6 +35,7 @@ import { IConfigurationService } from 'vs/platform/configuration/common/configur
 import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import { INotificationService } from 'vs/platform/notification/common/notification';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export abstract class GridParentComponent {
 	// CONSTANTS
@@ -100,7 +100,8 @@ export abstract class GridParentComponent {
 		protected configurationService: IConfigurationService,
 		protected clipboardService: IClipboardService,
 		protected queryEditorService: IQueryEditorService,
-		protected notificationService: INotificationService
+		protected notificationService: INotificationService,
+		protected logService: ILogService
 	) {
 		this.toDispose = [];
 	}
@@ -165,7 +166,7 @@ export abstract class GridParentComponent {
 					self.goToNextGrid();
 					break;
 				default:
-					error('Unexpected grid content event type "' + type + '" sent');
+					this.logService.error('Unexpected grid content event type "' + type + '" sent');
 					break;
 			}
 		});

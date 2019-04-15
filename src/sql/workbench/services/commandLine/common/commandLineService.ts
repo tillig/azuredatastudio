@@ -5,7 +5,7 @@
 'use strict';
 import * as azdata from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import {ConnectionProfileGroup} from 'sql/platform/connection/common/connectionProfileGroup';
+import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { equalsIgnoreCase } from 'vs/base/common/strings';
 import { ICommandLineProcessing } from 'sql/workbench/services/commandLine/common/commandLine';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
@@ -19,12 +19,12 @@ import * as TaskUtilities from 'sql/workbench/common/taskUtilities';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { ICommandService } from 'vs/platform/commands/common/commands';
-import { warn } from 'sql/base/common/log';
-import { ipcRenderer as ipc} from 'electron';
+import { ipcRenderer as ipc } from 'electron';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { IStatusbarService, StatusbarAlignment } from 'vs/platform/statusbar/common/statusbar';
+import { IStatusbarService } from 'vs/platform/statusbar/common/statusbar';
 import { localize } from 'vs/nls';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export class CommandLineService implements ICommandLineProcessing {
 	public _serviceBrand: any;
@@ -32,34 +32,34 @@ export class CommandLineService implements ICommandLineProcessing {
 	constructor(
 		@ICapabilitiesService private _capabilitiesService: ICapabilitiesService,
 		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
-		@IEnvironmentService private _environmentService: IEnvironmentService,
+		@IEnvironmentService environmentService: IEnvironmentService,
 		@IQueryEditorService private _queryEditorService: IQueryEditorService,
 		@IObjectExplorerService private _objectExplorerService: IObjectExplorerService,
 		@IEditorService private _editorService: IEditorService,
 		@ICommandService private _commandService: ICommandService,
 		@IConfigurationService private _configurationService: IConfigurationService,
-		@IStatusbarService private _statusBarService: IStatusbarService
+		@IStatusbarService private _statusBarService: IStatusbarService,
+		@ILogService private logService: ILogService
 	) {
 		if (ipc) {
-		    ipc.on('ads:processCommandLine', (event: any, args: ParsedArgs) => this.onLaunched(args));
+			ipc.on('ads:processCommandLine', (event: any, args: ParsedArgs) => this.onLaunched(args));
 		}
 		// we only get the ipc from main during window reuse
-		if (_environmentService) {
-		    this.onLaunched(_environmentService.args);
+		if (environmentService) {
+			this.onLaunched(environmentService.args);
 		}
 	}
 
-	private onLaunched(args: ParsedArgs)
-	{
+	private onLaunched(args: ParsedArgs) {
 		const registry = platform.Registry.as<IConnectionProviderRegistry>(ConnectionProviderExtensions.ConnectionProviderContributions);
 		let sqlProvider = registry.getProperties(Constants.mssqlProviderName);
 		// We can't connect to object explorer until the MSSQL connection provider is registered
 		if (sqlProvider) {
-			this.processCommandLine(args).catch(reason => { warn('processCommandLine failed: ' + reason); });
+			this.processCommandLine(args).catch(reason => { this.logService.warn('processCommandLine failed: ' + reason); });
 		} else {
 			registry.onNewProvider(e => {
 				if (e.id === Constants.mssqlProviderName) {
-					this.processCommandLine(args).catch(reason => { warn('processCommandLine failed: ' + reason); });
+					this.processCommandLine(args).catch(reason => { this.logService.warn('processCommandLine failed: ' + reason); });
 				}
 			});
 		}
@@ -81,7 +81,7 @@ export class CommandLineService implements ICommandLineProcessing {
 			if (args.server) {
 				profile = this.readProfileFromArgs(args);
 			}
-	    }
+		}
 		let showConnectDialogOnStartup: boolean = this._configurationService.getValue('workbench.showConnectDialogOnStartup');
 		if (showConnectDialogOnStartup && !commandName && !profile && !this._connectionManagementService.hasRegisteredServers()) {
 			// prompt the user for a new connection on startup if no profiles are registered
@@ -90,9 +90,8 @@ export class CommandLineService implements ICommandLineProcessing {
 		}
 		let connectedContext: azdata.ConnectedContext = undefined;
 		if (profile) {
-			if (this._statusBarService)
-			{
-				this._statusBarService.setStatusMessage(localize('connectingLabel','Connecting:')  + profile.serverName, 2500);
+			if (this._statusBarService) {
+				this._statusBarService.setStatusMessage(localize('connectingLabel', 'Connecting:') + profile.serverName, 2500);
 			}
 			try {
 				await this._connectionManagementService.connectIfNotConnected(profile, 'connection', true);
@@ -101,19 +100,17 @@ export class CommandLineService implements ICommandLineProcessing {
 				let updatedProfile = this._connectionManagementService.getConnectionProfileById(profile.id);
 				connectedContext = { connectionProfile: new ConnectionProfile(this._capabilitiesService, updatedProfile).toIConnectionProfile() };
 			} catch (err) {
-				warn('Failed to connect due to error' + err.message);
+				this.logService.warn('Failed to connect due to error' + err.message);
 			}
 		}
 		if (commandName) {
-			if (this._statusBarService)
-			{
-				this._statusBarService.setStatusMessage(localize('runningCommandLabel','Running command:') + commandName, 2500);
+			if (this._statusBarService) {
+				this._statusBarService.setStatusMessage(localize('runningCommandLabel', 'Running command:') + commandName, 2500);
 			}
 			await this._commandService.executeCommand(commandName, connectedContext);
 		} else if (profile) {
-			if (this._statusBarService)
-			{
-				this._statusBarService.setStatusMessage(localize('openingNewQueryLabel','Opening new query:') + profile.serverName, 2500);
+			if (this._statusBarService) {
+				this._statusBarService.setStatusMessage(localize('openingNewQueryLabel', 'Opening new query:') + profile.serverName, 2500);
 			}
 			// Default to showing new query
 			try {
@@ -123,7 +120,7 @@ export class CommandLineService implements ICommandLineProcessing {
 					this._objectExplorerService,
 					this._editorService);
 			} catch (error) {
-				warn('unable to open query editor ' + error);
+				this.logService.warn('unable to open query editor ' + error);
 				// Note: we are intentionally swallowing this error.
 				// In part this is to accommodate unit testing where we don't want to set up the query stack
 			}
@@ -146,29 +143,26 @@ export class CommandLineService implements ICommandLineProcessing {
 		return this._connectionManagementService ? this.tryMatchSavedProfile(profile) : profile;
 	}
 
-	private tryMatchSavedProfile(profile: ConnectionProfile)
-	{
+	private tryMatchSavedProfile(profile: ConnectionProfile) {
 		let match: ConnectionProfile = undefined;
 		// If we can find a saved mssql provider connection that matches the args, use it
 		let groups = this._connectionManagementService.getConnectionGroups([Constants.mssqlProviderName]);
-		if (groups && groups.length > 0)
-		{
+		if (groups && groups.length > 0) {
 			let rootGroup = groups[0];
 			let connections = ConnectionProfileGroup.getConnectionsInGroup(rootGroup);
-			match = connections.find((c) => this.matchProfile(profile, c)) ;
+			match = connections.find((c) => this.matchProfile(profile, c));
 		}
 		return match ? match : profile;
 	}
 
 	// determines if the 2 profiles are a functional match
 	// profile1 is the profile generated from command line parameters
-	private matchProfile(profile1: ConnectionProfile, profile2: ConnectionProfile): boolean
-	{
-		return equalsIgnoreCase(profile1.serverName,profile2.serverName)
-		&& equalsIgnoreCase(profile1.providerName, profile2.providerName)
-		// case sensitive servers can have 2 databases whose name differs only in case
-		&& profile1.databaseName === profile2.databaseName
-		&& equalsIgnoreCase(profile1.userName, profile2.userName)
-		&& profile1.authenticationType === profile2.authenticationType;
+	private matchProfile(profile1: ConnectionProfile, profile2: ConnectionProfile): boolean {
+		return equalsIgnoreCase(profile1.serverName, profile2.serverName)
+			&& equalsIgnoreCase(profile1.providerName, profile2.providerName)
+			// case sensitive servers can have 2 databases whose name differs only in case
+			&& profile1.databaseName === profile2.databaseName
+			&& equalsIgnoreCase(profile1.userName, profile2.userName)
+			&& profile1.authenticationType === profile2.authenticationType;
 	}
 }

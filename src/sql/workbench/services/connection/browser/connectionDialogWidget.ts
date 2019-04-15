@@ -37,6 +37,7 @@ import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService
 import { SIDE_BAR_BACKGROUND } from 'vs/workbench/common/theme';
 import { IThemeService, ITheme } from 'vs/platform/theme/common/themeService';
 import { ILayoutService } from 'vs/platform/layout/browser/layoutService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export interface OnShowUIResponse {
 	selectedProviderType: string;
@@ -96,9 +97,10 @@ export class ConnectionDialogWidget extends Modal {
 		@IContextKeyService contextKeyService: IContextKeyService,
 		@IContextMenuService private _contextMenuService: IContextMenuService,
 		@IContextViewService private _contextViewService: IContextViewService,
-		@IClipboardService clipboardService: IClipboardService
+		@IClipboardService clipboardService: IClipboardService,
+		@ILogService logService: ILogService
 	) {
-		super(localize('connection', "Connection"), TelemetryKeys.Connection, telemetryService, layoutService, clipboardService, themeService, contextKeyService, { hasSpinner: true, hasErrors: true });
+		super(localize('connection', "Connection"), TelemetryKeys.Connection, telemetryService, layoutService, clipboardService, themeService, logService, contextKeyService, { hasSpinner: true, hasErrors: true });
 	}
 
 	/**

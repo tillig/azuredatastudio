@@ -11,23 +11,20 @@ import { Viewlet } from 'vs/workbench/browser/viewlet';
 import { IAction } from 'vs/base/common/actions';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
-import { attachInputBoxStyler } from 'vs/platform/theme/common/styler';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { isPromiseCanceledError } from 'vs/base/common/errors';
 import Severity from 'vs/base/common/severity';
 import { VIEWLET_ID } from 'sql/platform/connection/common/connectionManagement';
 import { ServerTreeView } from 'sql/parts/objectExplorer/viewlet/serverTreeView';
-import { InputBox } from 'vs/base/browser/ui/inputbox/inputBox';
 import { IDisposable, dispose } from 'vs/base/common/lifecycle';
-import { ClearSearchAction, AddServerAction, AddServerGroupAction, ActiveConnectionsFilterAction } from 'sql/parts/objectExplorer/viewlet/connectionTreeAction';
-import { warn } from 'sql/base/common/log';
+import { AddServerAction, AddServerGroupAction, ActiveConnectionsFilterAction } from 'sql/parts/objectExplorer/viewlet/connectionTreeAction';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
 import { INotificationService } from 'vs/platform/notification/common/notification';
-import { localize } from 'vs/nls';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IStorageService } from 'vs/platform/storage/common/storage';
 import { IConnectionsViewlet } from 'sql/workbench/parts/connection/common/connectionViewlet';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export class ConnectionViewlet extends Viewlet implements IConnectionsViewlet {
 
@@ -40,16 +37,17 @@ export class ConnectionViewlet extends Viewlet implements IConnectionsViewlet {
 
 	constructor(
 		@ITelemetryService telemetryService: ITelemetryService,
-		@IThemeService private _themeService: IThemeService,
+		@IThemeService themeService: IThemeService,
 		@IInstantiationService private _instantiationService: IInstantiationService,
 		@INotificationService private _notificationService: INotificationService,
 		@IObjectExplorerService private objectExplorerService: IObjectExplorerService,
 		@IWorkbenchLayoutService layoutService: IWorkbenchLayoutService,
 		@IConfigurationService configurationService: IConfigurationService,
-		@IStorageService storageService: IStorageService
+		@IStorageService storageService: IStorageService,
+		@ILogService private logService: ILogService
 	) {
 
-		super(VIEWLET_ID, configurationService, layoutService, telemetryService, _themeService, storageService);
+		super(VIEWLET_ID, configurationService, layoutService, telemetryService, themeService, storageService);
 
 		this._addServerAction = this._instantiationService.createInstance(AddServerAction,
 			AddServerAction.ID,
@@ -78,7 +76,7 @@ export class ConnectionViewlet extends Viewlet implements IConnectionsViewlet {
 		const viewletContainer = DOM.append(parent, DOM.$('div.server-explorer-viewlet'));
 		const viewContainer = DOM.append(viewletContainer, DOM.$('div.object-explorer-view'));
 		this._serverTreeView.renderBody(viewContainer).then(undefined, error => {
-			warn('render registered servers: ' + error);
+			this.logService.warn('render registered servers: ' + error);
 		});
 	}
 

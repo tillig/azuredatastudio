@@ -6,7 +6,7 @@
 'use strict';
 import { ITelemetryService, ITelemetryData } from 'vs/platform/telemetry/common/telemetry';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
-import { warn } from 'sql/base/common/log';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export interface IConnectionTelemetryData extends ITelemetryData {
 	provider?: string;
@@ -24,6 +24,7 @@ export interface IConnectionTelemetryData extends ITelemetryData {
 export function addTelemetry(
 	telemetryService: ITelemetryService,
 	telemetryEventName: string,
+	logService: ILogService,
 	data?: IConnectionTelemetryData,
 	connection?: IConnectionProfile): Promise<void> {
 	return new Promise<void>(resolve => {
@@ -43,14 +44,14 @@ export function addTelemetry(
 				telemetryService.publicLog(telemetryEventName, telData).then(() => {
 					resolve();
 				}, telemetryServiceError => {
-					warn(`Failed to add telemetry. error: ${telemetryServiceError}`);
+					logService.warn(`Failed to add telemetry. error: ${telemetryServiceError}`);
 					resolve();
 				});
 			} else {
 				resolve();
 			}
 		} catch (error) {
-			warn(`Failed to add telemetry. error: ${error}`);
+			logService.warn(`Failed to add telemetry. error: ${error}`);
 			resolve();
 		}
 	});

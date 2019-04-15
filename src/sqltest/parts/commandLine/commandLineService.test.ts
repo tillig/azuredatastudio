@@ -25,6 +25,7 @@ import { WorkspaceConfigurationTestService } from 'sqltest/stubs/workspaceConfig
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { assertThrowsAsync } from 'sqltest/utils/testUtils';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
+import { TestLogService } from 'vs/workbench/test/workbenchTestServices';
 
 class TestParsedArgs implements ParsedArgs {
 	[arg: string]: any;
@@ -108,6 +109,7 @@ suite('commandLineService tests', () => {
 		capabilitiesService?: ICapabilitiesService,
 		commandService?: ICommandService
 	): CommandLineService {
+		const logService = new TestLogService();
 		let service = new CommandLineService(
 			capabilitiesService,
 			connectionManagementService,
@@ -117,7 +119,8 @@ suite('commandLineService tests', () => {
 			undefined,
 			commandService,
 			configurationService,
-			undefined
+			undefined,
+			logService
 		);
 		return service;
 	}

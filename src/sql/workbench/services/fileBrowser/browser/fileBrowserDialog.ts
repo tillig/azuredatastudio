@@ -26,12 +26,13 @@ import { IContextViewService } from 'vs/platform/contextview/browser/contextView
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { attachInputBoxStyler, attachSelectBoxStyler } from 'vs/platform/theme/common/styler';
-import { IWorkbenchThemeService } from 'vs/workbench/services/themes/common/workbenchThemeService';
 import { SIDE_BAR_BACKGROUND } from 'vs/workbench/common/theme';
 import * as DOM from 'vs/base/browser/dom';
 import * as strings from 'vs/base/common/strings';
 import { IClipboardService } from 'sql/platform/clipboard/common/clipboardService';
-import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
+import { ILayoutService } from 'vs/platform/layout/browser/layoutService';
+import { IThemeService } from 'vs/platform/theme/common/themeService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export class FileBrowserDialog extends Modal {
 	private _viewModel: FileBrowserViewModel;
@@ -49,15 +50,16 @@ export class FileBrowserDialog extends Modal {
 	private _isFolderSelected: boolean;
 
 	constructor(title: string,
-		@IWorkbenchLayoutService layoutService: IWorkbenchLayoutService,
-		@IWorkbenchThemeService private _workbenchthemeService: IWorkbenchThemeService,
+		@ILayoutService layoutService: ILayoutService,
+		@IThemeService themeService: IThemeService,
 		@IInstantiationService private _instantiationService: IInstantiationService,
 		@IContextViewService private _contextViewService: IContextViewService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IContextKeyService contextKeyService: IContextKeyService,
-		@IClipboardService clipboardService: IClipboardService
+		@IClipboardService clipboardService: IClipboardService,
+		@ILogService logService: ILogService
 	) {
-		super(title, TelemetryKeys.Backup, telemetryService, layoutService, clipboardService, _workbenchthemeService, contextKeyService, { isFlyout: true, hasTitleIcon: false, hasBackButton: true, hasSpinner: true });
+		super(title, TelemetryKeys.Backup, telemetryService, layoutService, clipboardService, themeService, logService, contextKeyService, { isFlyout: true, hasTitleIcon: false, hasBackButton: true, hasSpinner: true });
 		this._viewModel = this._instantiationService.createInstance(FileBrowserViewModel);
 		this._viewModel.onAddFileTree(args => this.handleOnAddFileTree(args.rootNode, args.selectedNode, args.expandedNodes));
 		this._viewModel.onPathValidate(args => this.handleOnValidate(args.succeeded, args.message));
@@ -228,7 +230,7 @@ export class FileBrowserDialog extends Modal {
 		this._register(attachButtonStyler(this._okButton, this._themeService));
 		this._register(attachButtonStyler(this._cancelButton, this._themeService));
 
-		this._register(this._workbenchthemeService.onDidColorThemeChange(e => this.updateTheme()));
+		this._register(this._themeService.onThemeChange(e => this.updateTheme()));
 	}
 
 	// Update theming that is specific to file browser

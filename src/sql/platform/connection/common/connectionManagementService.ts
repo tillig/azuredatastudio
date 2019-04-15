@@ -24,7 +24,6 @@ import { ConnectionGlobalStatus } from 'sql/parts/connection/common/connectionGl
 import { ConnectionStatusbarItem } from 'sql/parts/connection/common/connectionStatus';
 import * as TelemetryKeys from 'sql/platform/telemetry/telemetryKeys';
 import * as TelemetryUtils from 'sql/platform/telemetry/telemetryUtilities';
-import { warn } from 'sql/base/common/log';
 import { IResourceProviderService } from 'sql/workbench/services/resourceProvider/common/resourceProviderService';
 import { IAngularEventingService, AngularEventType } from 'sql/platform/angularEventing/common/angularEventingService';
 import * as QueryConstants from 'sql/parts/query/common/constants';
@@ -55,6 +54,7 @@ import { IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
 import { IConnectionDialogService } from 'sql/workbench/services/connection/common/connectionDialogService';
 import { IEditorGroupsService } from 'vs/workbench/services/editor/common/editorGroupsService';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export class ConnectionManagementService extends Disposable implements IConnectionManagementService {
 
@@ -92,7 +92,8 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		@IStatusbarService private _statusBarService: IStatusbarService,
 		@IResourceProviderService private _resourceProviderService: IResourceProviderService,
 		@IAngularEventingService private _angularEventing: IAngularEventingService,
-		@IAccountManagementService private _accountManagementService: IAccountManagementService
+		@IAccountManagementService private _accountManagementService: IAccountManagementService,
+		@ILogService private logService: ILogService
 	) {
 		super();
 
@@ -204,7 +205,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 			self._connectionDialogService.showDialog(self, params, model, connectionResult).then(() => {
 				resolve();
 			}, dialogError => {
-				warn('failed to open the connection dialog. error: ' + dialogError);
+				this.logService.warn('failed to open the connection dialog. error: ' + dialogError);
 				reject(dialogError);
 			});
 		});
@@ -363,7 +364,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 		if (uri !== input.uri) {
 			//TODO: this should never happen. If the input is already passed, it should have the uri
-			warn(`the given uri is different that the input uri. ${uri}|${input.uri}`);
+			this.logService.warn(`the given uri is different that the input uri. ${uri}|${input.uri}`);
 		}
 		return this.tryConnect(connection, input, options);
 	}
@@ -640,7 +641,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	public saveProfileGroup(profile: IConnectionProfileGroup): Promise<string> {
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.AddServerGroup);
+		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.AddServerGroup, this.logService);
 		return new Promise<string>((resolve, reject) => {
 			this._connectionStore.saveProfileGroup(profile).then(groupId => {
 				this._onAddConnectionProfile.fire(undefined);
@@ -869,7 +870,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	private addTelemetryForConnection(connection: ConnectionManagementInfo): void {
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DatabaseConnected, {
+		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DatabaseConnected, this.logService, {
 			connectionType: connection.serverInfo ? (connection.serverInfo.isCloud ? 'Azure' : 'Standalone') : '',
 			provider: connection.connectionProfile.providerName,
 			serverVersion: connection.serverInfo ? connection.serverInfo.serverVersion : '',
@@ -881,7 +882,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	private addTelemetryForConnectionDisconnected(connection: IConnectionProfile): void {
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DatabaseDisconnected, {
+		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DatabaseDisconnected, this.logService, {
 			provider: connection.providerName
 		});
 	}
@@ -931,13 +932,13 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	public changeGroupIdForConnectionGroup(source: ConnectionProfileGroup, target: ConnectionProfileGroup): Promise<void> {
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.MoveServerConnection);
+		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.MoveServerConnection, this.logService);
 		return this._connectionStore.changeGroupIdForConnectionGroup(source, target);
 	}
 
 	public changeGroupIdForConnection(source: ConnectionProfile, targetGroupId: string): Promise<void> {
 		let id = Utils.generateUri(source);
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.MoveServerGroup);
+		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.MoveServerGroup, this.logService);
 		return this._connectionStore.changeGroupIdForConnection(source, targetGroupId).then(result => {
 			if (id && targetGroupId) {
 				source.groupId = targetGroupId;
@@ -1222,7 +1223,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 */
 	public deleteConnection(connection: ConnectionProfile): Promise<boolean> {
 
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DeleteConnection, {}, connection);
+		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DeleteConnection, this.logService, {}, connection);
 		// Disconnect if connected
 		let uri = Utils.generateUri(connection);
 		if (this.isConnected(uri) || this.isConnecting(uri)) {
@@ -1260,7 +1261,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * Disconnects a connection before removing from config. If disconnect fails, settings is not modified.
 	 */
 	public deleteConnectionGroup(group: ConnectionProfileGroup): Promise<boolean> {
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DeleteServerGroup);
+		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.DeleteServerGroup, this.logService);
 		// Get all connections for this group
 		let connections = ConnectionProfileGroup.getConnectionsInGroup(group);
 

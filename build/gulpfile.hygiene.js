@@ -124,7 +124,8 @@ const copyrightFilter = [
 	'!extensions/notebook/src/intellisense/text.ts',
 	'!extensions/mssql/src/objectExplorerNodeProvider/webhdfs.ts',
 	'!src/sql/base/browser/ui/table/plugins/checkboxSelectColumn.plugin.ts',
-	'!src/sql/base/browser/ui/table/plugins/headerFilter.plugin.ts'
+	'!src/sql/base/browser/ui/table/plugins/headerFilter.plugin.ts',
+	'!src/sql/base/browser/ui/table/plugins/autoSizeColumns.plugin.ts'
 ];
 
 const eslintFilter = [

@@ -34,6 +34,7 @@ import { AccountProviderAddedEventParams, UpdateAccountListEventParams } from 's
 import { IClipboardService } from 'sql/platform/clipboard/common/clipboardService';
 import * as TelemetryKeys from 'sql/platform/telemetry/telemetryKeys';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 class AccountPanel extends ViewletPanel {
 	public index: number;
@@ -121,7 +122,8 @@ export class AccountDialog extends Modal {
 		@IConfigurationService private _configurationService: IConfigurationService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IContextKeyService contextKeyService: IContextKeyService,
-		@IClipboardService clipboardService: IClipboardService
+		@IClipboardService clipboardService: IClipboardService,
+		@ILogService logService: ILogService
 	) {
 		super(
 			localize('linkedAccounts', 'Linked accounts'),
@@ -130,6 +132,7 @@ export class AccountDialog extends Modal {
 			layoutService,
 			clipboardService,
 			themeService,
+			logService,
 			contextKeyService,
 			{ hasSpinner: true }
 		);

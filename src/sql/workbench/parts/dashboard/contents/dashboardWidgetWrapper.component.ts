@@ -14,7 +14,6 @@ import {
 import { ComponentHostDirective } from 'sql/workbench/parts/dashboard/common/componentHost.directive';
 import { WidgetConfig, WIDGET_CONFIG, IDashboardWidget } from 'sql/workbench/parts/dashboard/common/dashboardWidget';
 import { Extensions, IInsightRegistry } from 'sql/platform/dashboard/common/insightRegistry';
-import { error } from 'sql/base/common/log';
 import { RefreshWidgetAction, ToggleMoreWidgetAction, DeleteWidgetAction, CollapseWidgetAction } from 'sql/workbench/parts/dashboard/common/actions';
 import { AngularDisposable } from 'sql/base/node/lifecycle';
 
@@ -27,7 +26,6 @@ import { WebviewWidget } from 'sql/workbench/parts/dashboard/widgets/webview/web
 
 import { CommonServiceInterface } from 'sql/platform/bootstrap/node/commonServiceInterface.service';
 
-import { IColorTheme, IWorkbenchThemeService } from 'vs/workbench/services/themes/common/workbenchThemeService';
 import * as colors from 'vs/platform/theme/common/colorRegistry';
 import * as themeColors from 'vs/workbench/common/theme';
 import { Action } from 'vs/base/common/actions';
@@ -36,6 +34,8 @@ import { ActionBar } from 'vs/base/browser/ui/actionbar/actionbar';
 import { memoize } from 'vs/base/common/decorators';
 import { generateUuid } from 'vs/base/common/uuid';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
+import { IThemeService, ITheme } from 'vs/platform/theme/common/themeService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 const componentMap: { [x: string]: Type<IDashboardWidget> } = {
 	'properties-widget': PropertiesWidgetComponent,
@@ -91,20 +91,19 @@ export class DashboardWidgetWrapper extends AngularDisposable implements OnInit 
 		@Inject(forwardRef(() => CommonServiceInterface)) private _bootstrap: CommonServiceInterface,
 		@Inject(forwardRef(() => ChangeDetectorRef)) private _changeref: ChangeDetectorRef,
 		@Inject(forwardRef(() => Injector)) private _injector: Injector,
-		@Inject(IWorkbenchThemeService) private themeService: IWorkbenchThemeService,
-		@Inject(IInstantiationService) private instantiationService: IInstantiationService
+		@Inject(IThemeService) private themeService: IThemeService,
+		@Inject(IInstantiationService) private instantiationService: IInstantiationService,
+		@Inject(ILogService) private logService: ILogService
 	) {
 		super();
 	}
 
 	ngOnInit() {
-		this._register(this.themeService.onDidColorThemeChange((event: IColorTheme) => {
-			this.updateTheme(event);
-		}));
+		this._register(this.themeService.onThemeChange((event) => this.updateTheme(event)));
 	}
 
 	ngAfterViewInit() {
-		this.updateTheme(this.themeService.getColorTheme());
+		this.updateTheme(this.themeService.getTheme());
 		if (this.componentHost) {
 			this.loadWidget();
 		}
@@ -146,13 +145,13 @@ export class DashboardWidgetWrapper extends AngularDisposable implements OnInit 
 
 	private loadWidget(): void {
 		if (Object.keys(this._config.widget).length !== 1) {
-			error('Exactly 1 widget must be defined per space');
+			this.logService.error('Exactly 1 widget must be defined per space');
 			return;
 		}
 		const key = Object.keys(this._config.widget)[0];
 		const selector = this.getOrCreateSelector(key);
 		if (selector === undefined) {
-			error('Could not find selector', key);
+			this.logService.error('Could not find selector', key);
 			return;
 		}
 
@@ -183,7 +182,7 @@ export class DashboardWidgetWrapper extends AngularDisposable implements OnInit 
 				this._changeref.detectChanges();
 			}
 		} catch (e) {
-			error('Error rendering widget', key, e);
+			this.logService.error('Error rendering widget', key, e);
 			return;
 		}
 		const el = <HTMLElement>componentRef.location.nativeElement;
@@ -215,7 +214,7 @@ export class DashboardWidgetWrapper extends AngularDisposable implements OnInit 
 		return selector;
 	}
 
-	private updateTheme(theme: IColorTheme): void {
+	private updateTheme(theme: ITheme): void {
 		const el = <HTMLElement>this._ref.nativeElement;
 		const headerEl: HTMLElement = this.header.nativeElement;
 		let borderColor = theme.getColor(themeColors.SIDE_BAR_BACKGROUND, true);

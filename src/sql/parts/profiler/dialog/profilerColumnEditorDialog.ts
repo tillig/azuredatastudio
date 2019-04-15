@@ -25,6 +25,7 @@ import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
 import { IContextViewService } from 'vs/platform/contextview/browser/contextView';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 class EventItem {
 
@@ -313,10 +314,11 @@ export class ProfilerColumnEditorDialog extends Modal {
 		@IThemeService themeService: IThemeService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IContextKeyService contextKeyService: IContextKeyService,
+		@ILogService logService: ILogService,
 		@IContextViewService private _contextViewService: IContextViewService,
 		@IClipboardService clipboardService: IClipboardService
 	) {
-		super(nls.localize('profilerColumnDialog.profiler', 'Profiler'), TelemetryKeys.Profiler, telemetryService, layoutService, clipboardService, themeService, contextKeyService);
+		super(nls.localize('profilerColumnDialog.profiler', 'Profiler'), TelemetryKeys.Profiler, telemetryService, layoutService, clipboardService, themeService, logService, contextKeyService);
 	}
 
 	public render(): void {

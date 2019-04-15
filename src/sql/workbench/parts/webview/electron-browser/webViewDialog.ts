@@ -17,8 +17,9 @@ import { localize } from 'vs/nls';
 import { IDisposable, toDisposable } from 'vs/base/common/lifecycle';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { WebviewElement } from 'vs/workbench/contrib/webview/electron-browser/webviewElement';
-import { IWorkbenchLayoutService, Parts } from 'vs/workbench/services/layout/browser/layoutService';
 import * as DOM from 'vs/base/browser/dom';
+import { ILayoutService } from 'vs/platform/layout/browser/layoutService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 export class WebViewDialog extends Modal {
 
@@ -40,12 +41,13 @@ export class WebViewDialog extends Modal {
 	constructor(
 		@IThemeService themeService: IThemeService,
 		@IClipboardService clipboardService: IClipboardService,
-		@IWorkbenchLayoutService layoutService: IWorkbenchLayoutService,
+		@ILayoutService layoutService: ILayoutService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IContextKeyService contextKeyService: IContextKeyService,
+		@ILogService logService: ILogService,
 		@IInstantiationService private _instantiationService: IInstantiationService
 	) {
-		super('', TelemetryKeys.WebView, telemetryService, layoutService, clipboardService, themeService, contextKeyService, { isFlyout: false, hasTitleIcon: true });
+		super('', TelemetryKeys.WebView, telemetryService, layoutService, clipboardService, themeService, logService, contextKeyService, { isFlyout: false, hasTitleIcon: true });
 		this._okLabel = localize('webViewDialog.ok', 'OK');
 		this._closeLabel = localize('webViewDialog.close', 'Close');
 	}
