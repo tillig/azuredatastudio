@@ -56,7 +56,7 @@ export default class QueryRunner extends Disposable {
 	public get planXml(): Thenable<string> { return this._planXml.promise; }
 
 	private _onMessage = this._register(new Emitter<azdata.IResultMessage>());
-	public readonly onMessage = this._onMessage.event;
+	public get onMessage() { return this._onMessage.event; } // this is the only way typemoq can moq this... needs investigation @todo anthonydresser 4/14/2019
 
 	private _onResultSet = this._register(new Emitter<azdata.ResultSetSummary>());
 	public readonly onResultSet = this._onResultSet.event;
@@ -68,7 +68,7 @@ export default class QueryRunner extends Disposable {
 	public readonly onQueryStart: Event<void> = this._onQueryStart.event;
 
 	private _onQueryEnd = this._register(new Emitter<string>());
-	public readonly onQueryEnd: Event<string> = this._onQueryEnd.event;
+	public get onQueryEnd(): Event<string> { return this._onQueryEnd.event; }
 
 	private _onBatchStart = this._register(new Emitter<azdata.BatchSummary>());
 	public readonly onBatchStart: Event<azdata.BatchSummary> = this._onBatchStart.event;

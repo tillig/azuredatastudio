@@ -100,6 +100,7 @@ function getPrimedQueryRunner(data: string[][], columns: string[]): IPrimedQuery
 	const emitter = new Emitter<string>();
 	const querymock = Mock.ofType(QueryRunner, MockBehavior.Strict);
 	querymock.setup(x => x.onQueryEnd).returns(x => emitter.event);
+	querymock.setup(x => x.onMessage).returns(x => new Emitter<azdata.IResultMessage>().event);
 	querymock.setup(x => x.batchSets).returns(x => {
 		return <Array<azdata.BatchSummary>>[
 			{
