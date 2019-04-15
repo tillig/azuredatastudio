@@ -7,7 +7,7 @@
 
 import * as GridContentEvents from 'sql/parts/grid/common/gridContentEvents';
 import * as LocalizedConstants from 'sql/parts/query/common/localizedConstants';
-import QueryRunner, { EventType as QREvents } from 'sql/platform/query/common/queryRunner';
+import QueryRunner from 'sql/platform/query/common/queryRunner';
 import { DataService } from 'sql/parts/grid/services/dataService';
 import { IQueryModelService, IQueryPlanInfo, IQueryEvent } from 'sql/platform/query/common/queryModel';
 import { QueryInput } from 'sql/parts/query/common/queryInput';
@@ -277,39 +277,35 @@ export class QueryModelService implements IQueryModelService {
 	}
 
 	private initQueryRunner(uri: string): QueryInfo {
-		let queryRunner = this._instantiationService.createInstance(QueryRunner, uri);
-		let info = new QueryInfo();
-		queryRunner.addListener(QREvents.RESULT_SET, e => {
-			this._fireQueryEvent(uri, 'resultSet', e);
-		});
-		queryRunner.addListener(QREvents.BATCH_START, b => {
+		const queryRunner = this._instantiationService.createInstance(QueryRunner, uri);
+		const info = new QueryInfo();
+		queryRunner.onResultSet(e => this._fireQueryEvent(uri, 'resultSet', e));
+		queryRunner.onBatchStart(e => {
 			let link = undefined;
 			let messageText = LocalizedConstants.runQueryBatchStartMessage;
-			if (b.selection) {
+			if (e.selection) {
 				if (info.selectionSnippet) {
 					// This indicates it's a query string. Do not include line information since it'll be inaccurate, but show some of the
 					// executed query text
 					messageText = nls.localize('runQueryStringBatchStartMessage', 'Started executing query "{0}"', info.selectionSnippet);
 				} else {
 					link = {
-						text: strings.format(LocalizedConstants.runQueryBatchStartLine, b.selection.startLine + 1)
+						text: strings.format(LocalizedConstants.runQueryBatchStartLine, e.selection.startLine + 1)
 					};
 				}
 			}
 			let message = {
 				message: messageText,
-				batchId: b.id,
+				batchId: e.id,
 				isError: false,
 				time: new Date().toLocaleTimeString(),
 				link: link
 			};
 			this._fireQueryEvent(uri, 'message', message);
-			info.selection.push(this._validateSelection(b.selection));
+			info.selection.push(this._validateSelection(e.selection));
 		});
-		queryRunner.addListener(QREvents.MESSAGE, m => {
-			this._fireQueryEvent(uri, 'message', m);
-		});
-		queryRunner.addListener(QREvents.COMPLETE, totalMilliseconds => {
+		queryRunner.onMessage(e => this._fireQueryEvent(uri, 'message', e));
+		queryRunner.onQueryEnd(e => {
 			this._onRunQueryComplete.fire(uri);
 
 			// fire extensibility API event
@@ -320,9 +316,10 @@ export class QueryModelService implements IQueryModelService {
 			this._onQueryEvent.fire(event);
 
 			// fire UI event
-			this._fireQueryEvent(uri, 'complete', totalMilliseconds);
+			this._fireQueryEvent(uri, 'complete', e);
 		});
-		queryRunner.addListener(QREvents.START, () => {
+
+		queryRunner.onQueryStart(() => {
 			this._onRunQueryStart.fire(uri);
 
 			// fire extensibility API event
@@ -335,15 +332,17 @@ export class QueryModelService implements IQueryModelService {
 			this._fireQueryEvent(uri, 'start');
 		});
 
-		queryRunner.addListener(QREvents.QUERY_PLAN_AVAILABLE, (planInfo) => {
-			// fire extensibility API event
-			let event: IQueryEvent = {
-				type: 'executionPlan',
-				uri: planInfo.fileUri,
-				params: planInfo
-			};
-			this._onQueryEvent.fire(event);
-		});
+		// queryRunner.
+
+		// queryRunner.addListener(QREvents.QUERY_PLAN_AVAILABLE, (planInfo) => {
+		// 	// fire extensibility API event
+		// 	let event: IQueryEvent = {
+		// 		type: 'executionPlan',
+		// 		uri: planInfo.fileUri,
+		// 		params: planInfo
+		// 	};
+		// 	this._onQueryEvent.fire(event);
+		// });
 
 		info.queryRunner = queryRunner;
 		info.dataService = this._instantiationService.createInstance(DataService, uri);
@@ -418,39 +417,35 @@ export class QueryModelService implements IQueryModelService {
 			// and map it to the results uri
 			queryRunner = this._instantiationService.createInstance(QueryRunner, ownerUri);
 			const resultSetEventType = 'resultSet';
-			queryRunner.addListener(QREvents.RESULT_SET, resultSet => {
-				this._fireQueryEvent(ownerUri, resultSetEventType, resultSet);
-			});
+			queryRunner.onResultSet(e => this._fireQueryEvent(ownerUri, resultSetEventType, e));
 			queryRunner.onResultSetUpdate(resultSetSummary => {
 				this._fireQueryEvent(ownerUri, resultSetEventType, resultSetSummary);
 			});
-			queryRunner.addListener(QREvents.BATCH_START, batch => {
+			queryRunner.onBatchStart(e => {
 				let link = undefined;
 				let messageText = LocalizedConstants.runQueryBatchStartMessage;
-				if (batch.selection) {
+				if (e.selection) {
 					if (info.selectionSnippet) {
 						// This indicates it's a query string. Do not include line information since it'll be inaccurate, but show some of the
 						// executed query text
 						messageText = nls.localize('runQueryStringBatchStartMessage', 'Started executing query "{0}"', info.selectionSnippet);
 					} else {
 						link = {
-							text: strings.format(LocalizedConstants.runQueryBatchStartLine, batch.selection.startLine + 1)
+							text: strings.format(LocalizedConstants.runQueryBatchStartLine, e.selection.startLine + 1)
 						};
 					}
 				}
 				let message = {
 					message: messageText,
-					batchId: batch.id,
+					batchId: e.id,
 					isError: false,
 					time: new Date().toLocaleTimeString(),
 					link: link
 				};
 				this._fireQueryEvent(ownerUri, 'message', message);
 			});
-			queryRunner.addListener(QREvents.MESSAGE, message => {
-				this._fireQueryEvent(ownerUri, 'message', message);
-			});
-			queryRunner.addListener(QREvents.COMPLETE, totalMilliseconds => {
+			queryRunner.onMessage(e => this._fireQueryEvent(ownerUri, 'message', e));
+			queryRunner.onQueryEnd(e => {
 				this._onRunQueryComplete.fire(ownerUri);
 				// fire extensibility API event
 				let event: IQueryEvent = {
@@ -460,9 +455,9 @@ export class QueryModelService implements IQueryModelService {
 				this._onQueryEvent.fire(event);
 
 				// fire UI event
-				this._fireQueryEvent(ownerUri, 'complete', totalMilliseconds);
+				this._fireQueryEvent(ownerUri, 'complete', e);
 			});
-			queryRunner.addListener(QREvents.START, () => {
+			queryRunner.onQueryStart(() => {
 				this._onRunQueryStart.fire(ownerUri);
 				// fire extensibility API event
 				let event: IQueryEvent = {
@@ -474,7 +469,7 @@ export class QueryModelService implements IQueryModelService {
 				// fire UI event
 				this._fireQueryEvent(ownerUri, 'start');
 			});
-			queryRunner.addListener(QREvents.EDIT_SESSION_READY, e => {
+			queryRunner.onEditSessionReady(e => {
 				this._onEditSessionReady.fire(e);
 				this._fireQueryEvent(e.ownerUri, 'editSessionReady');
 			});

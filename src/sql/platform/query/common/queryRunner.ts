@@ -3,8 +3,6 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-'use strict';
-
 import * as azdata from 'azdata';
 
 import * as Constants from 'sql/parts/query/common/constants';
@@ -18,14 +16,13 @@ import Severity from 'vs/base/common/severity';
 import * as nls from 'vs/nls';
 import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 import * as types from 'vs/base/common/types';
-import { EventEmitter } from 'sql/base/common/eventEmitter';
-import { IDisposable, Disposable } from 'vs/base/common/lifecycle';
+import { Disposable } from 'vs/base/common/lifecycle';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { Emitter, Event } from 'vs/base/common/event';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { ResultSerializer } from 'sql/platform/node/resultSerializer';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { IQueryPlanInfo } from 'sql/platform/query/common/queryModel';
+// import { IQueryPlanInfo } from 'sql/platform/query/common/queryModel';
 import { ITextResourcePropertiesService } from 'vs/editor/common/services/resourceConfiguration';
 import { URI } from 'vs/base/common/uri';
 
@@ -33,28 +30,6 @@ export interface IEditSessionReadyEvent {
 	ownerUri: string;
 	success: boolean;
 	message: string;
-}
-
-export const enum EventType {
-	START = 'start',
-	COMPLETE = 'complete',
-	MESSAGE = 'message',
-	BATCH_START = 'batchStart',
-	BATCH_COMPLETE = 'batchComplete',
-	RESULT_SET = 'resultSet',
-	EDIT_SESSION_READY = 'editSessionReady',
-	QUERY_PLAN_AVAILABLE = 'queryPlanAvailable'
-}
-
-export interface IEventType {
-	start: void;
-	complete: string;
-	message: azdata.IResultMessage;
-	batchStart: azdata.BatchSummary;
-	batchComplete: azdata.BatchSummary;
-	resultSet: azdata.ResultSetSummary;
-	editSessionReady: IEditSessionReadyEvent;
-	queryPlanAvailable: IQueryPlanInfo;
 }
 
 export interface IGridMessage extends azdata.IResultMessage {
@@ -73,7 +48,6 @@ export default class QueryRunner extends Disposable {
 	private _hasCompleted: boolean = false;
 	private _batchSets: azdata.BatchSummary[] = [];
 	private _messages: azdata.IResultMessage[] = [];
-	private _eventEmitter = new EventEmitter();
 	private registered = false;
 
 	private _isQueryPlan: boolean;
@@ -101,6 +75,9 @@ export default class QueryRunner extends Disposable {
 
 	private _onBatchEnd = this._register(new Emitter<azdata.BatchSummary>());
 	public readonly onBatchEnd: Event<azdata.BatchSummary> = this._onBatchEnd.event;
+
+	private _onEditSessionReady = this._register(new Emitter<IEditSessionReadyEvent>());
+	public readonly onEditSessionReady = this._onEditSessionReady.event;
 
 	private _queryStartTime: Date;
 	public get queryStartTime(): Date {
@@ -147,10 +124,6 @@ export default class QueryRunner extends Disposable {
 	}
 
 	// PUBLIC METHODS ======================================================
-
-	public addListener<K extends keyof IEventType>(event: K, f: (e: IEventType[K]) => void): IDisposable {
-		return this._eventEmitter.addListener(event, f);
-	}
 
 	/**
 	 * Cancels the running query, if there is one
@@ -231,7 +204,6 @@ export default class QueryRunner extends Disposable {
 		// this isn't exact, but its the best we can do
 		this._queryStartTime = new Date();
 		// The query has started, so lets fire up the result pane
-		this._eventEmitter.emit(EventType.START);
 		if (!this.registered) {
 			this.registered = true;
 			this._queryManagementService.registerRunner(this, this.uri);
@@ -271,12 +243,10 @@ export default class QueryRunner extends Disposable {
 			}
 		});
 
-		let timeStamp = Utils.parseNumAsTimeString(this._totalElapsedMilliseconds);
-
-		this._eventEmitter.emit(EventType.COMPLETE, timeStamp);
+		const timeStamp = Utils.parseNumAsTimeString(this._totalElapsedMilliseconds);
 		// We're done with this query so shut down any waiting mechanisms
 
-		let message = {
+		const message = {
 			message: nls.localize('query.message.executionTime', 'Total execution time: {0}', timeStamp),
 			isError: false,
 			time: undefined
@@ -291,7 +261,7 @@ export default class QueryRunner extends Disposable {
 	 * Handle a BatchStart from the service layer
 	 */
 	public handleBatchStart(result: azdata.QueryExecuteBatchNotificationParams): void {
-		let batch = result.batchSummary;
+		const batch = result.batchSummary;
 
 		// Recalculate the start and end lines, relative to the result line offset
 		if (batch.selection) {
@@ -305,7 +275,7 @@ export default class QueryRunner extends Disposable {
 		// Store the batch
 		this._batchSets[batch.id] = batch;
 
-		let message = {
+		const message = {
 			// account for index by 1
 			message: nls.localize('query.message.startQuery', 'Started executing query at Line {0}', batch.selection.startLine + 1),
 			time: new Date(batch.executionStart).toLocaleTimeString(),
@@ -313,7 +283,6 @@ export default class QueryRunner extends Disposable {
 			isError: false
 		};
 		this._messages.push(message);
-		this._eventEmitter.emit(EventType.BATCH_START, batch);
 		this._onMessage.fire(message);
 		this._onBatchStart.fire(batch);
 	}
@@ -322,18 +291,17 @@ export default class QueryRunner extends Disposable {
 	 * Handle a BatchComplete from the service layer
 	 */
 	public handleBatchComplete(result: azdata.QueryExecuteBatchNotificationParams): void {
-		let batch: azdata.BatchSummary = result.batchSummary;
+		const batch: azdata.BatchSummary = result.batchSummary;
 
 		// Store the batch again to get the rest of the data
 		this._batchSets[batch.id] = batch;
-		let executionTime = <number>(Utils.parseTimeString(batch.executionElapsed) || 0);
+		const executionTime = <number>(Utils.parseTimeString(batch.executionElapsed) || 0);
 		this._totalElapsedMilliseconds += executionTime;
 		if (executionTime > 0) {
 			// send a time message in the format used for query complete
 			this.sendBatchTimeMessage(batch.id, Utils.parseNumAsTimeString(executionTime));
 		}
 
-		this._eventEmitter.emit(EventType.BATCH_COMPLETE, batch);
 		this._onBatchEnd.fire(batch);
 	}
 
@@ -342,7 +310,7 @@ export default class QueryRunner extends Disposable {
 	 */
 	public handleResultSetAvailable(result: azdata.QueryExecuteResultSetNotificationParams): void {
 		if (result && result.resultSetSummary) {
-			let resultSet = result.resultSetSummary;
+			const resultSet = result.resultSetSummary;
 			let batchSet: azdata.BatchSummary;
 			if (!resultSet.batchId) {
 				// Missing the batchId. In this case, default to always using the first batch in the list
@@ -364,7 +332,7 @@ export default class QueryRunner extends Disposable {
 			// handle getting queryPlanxml if we need too
 			if (this.isQueryPlan) {
 				// check if this result has show plan, this needs work, it won't work for any other provider
-				let hasShowPlan = !!result.resultSetSummary.columnInfo.find(e => e.columnName === 'Microsoft SQL Server 2005 XML Showplan');
+				const hasShowPlan = !!result.resultSetSummary.columnInfo.find(e => e.columnName === 'Microsoft SQL Server 2005 XML Showplan');
 				if (hasShowPlan) {
 					this.getQueryRows(0, 1, result.resultSetSummary.batchId, result.resultSetSummary.id).then(e => {
 						if (e.resultSubset.rows) {
@@ -378,7 +346,6 @@ export default class QueryRunner extends Disposable {
 			if (batchSet && !batchSet.resultSetSummaries[resultSet.id]) {
 				// Store the result set in the batch and emit that a result set has completed
 				batchSet.resultSetSummaries[resultSet.id] = resultSet;
-				this._eventEmitter.emit(EventType.RESULT_SET, resultSet);
 				this._onResultSet.fire(resultSet);
 			}
 		}
@@ -400,11 +367,11 @@ export default class QueryRunner extends Disposable {
 							this._planXml.resolve(e.resultSubset.rows[0][0].displayValue);
 							// fire query plan available event if execution is completed
 							if (result.resultSetSummary.complete) {
-								this._eventEmitter.emit(EventType.QUERY_PLAN_AVAILABLE, {
-									providerId: 'MSSQL',
-									fileUri: result.ownerUri,
-									planXml: planXmlString
-								});
+								// this._eventEmitter.emit(EventType.QUERY_PLAN_AVAILABLE, {
+								// 	providerId: 'MSSQL',
+								// 	fileUri: result.ownerUri,
+								// 	planXml: planXmlString
+								// });
 							}
 						}
 					});
@@ -427,7 +394,6 @@ export default class QueryRunner extends Disposable {
 		this._messages.push(message);
 
 		// Send the message to the results pane
-		this._eventEmitter.emit(EventType.MESSAGE, message);
 		this._onMessage.fire(message);
 	}
 
@@ -463,7 +429,7 @@ export default class QueryRunner extends Disposable {
 
 		return this._queryManagementService.initializeEdit(ownerUri, schemaName, objectName, objectType, rowLimit, queryString).then(result => {
 			// The query has started, so lets fire up the result pane
-			this._eventEmitter.emit(EventType.START);
+			this._onQueryStart.fire(); // not sure why we are firing here
 			this._queryManagementService.registerRunner(this, ownerUri);
 		}, error => {
 			// Attempting to launch the query failed, show the error message
@@ -513,7 +479,7 @@ export default class QueryRunner extends Disposable {
 	}
 
 	public handleEditSessionReady(ownerUri: string, success: boolean, message: string): void {
-		this._eventEmitter.emit(EventType.EDIT_SESSION_READY, { ownerUri, success, message });
+		this._onEditSessionReady.fire({ ownerUri, success, message });
 	}
 
 	public updateCell(ownerUri: string, rowId: number, columnId: number, newValue: string): Thenable<azdata.EditUpdateCellResult> {
