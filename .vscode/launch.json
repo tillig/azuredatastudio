@@ -101,6 +101,30 @@
 			]
 		},
 		{
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch with Extension!",
+            "windows": {
+                "runtimeExecutable": "${workspaceFolder}/scripts/sql.bat"
+            },
+            "osx": {
+                "runtimeExecutable": "${workspaceFolder}/scripts/sql.sh"
+            },
+            "linux": {
+                "runtimeExecutable": "${workspaceFolder}/scripts/sql.sh"
+            },
+            "urlFilter": "*workbench.html*",
+            "runtimeArgs": [
+                "--inspect=5875",
+                "--extensionDevelopmentPath=D:\\Projects\\SqlOpsStudioExtensions\\extensions\\aris"
+            ],
+            "skipFiles": [
+                "**/winjs*.js"
+            ],
+            "webRoot": "${workspaceFolder}",
+            "timeout": 15000
+        },
+		{
 			"type": "chrome",
 			"request": "launch",
 			"name": "Launch azuredatastudio with new notebook command",
