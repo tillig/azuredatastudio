@@ -83,8 +83,8 @@ export class ServerIcon {
 
 	public static readonly default: IconInfo = {
 		path: {
-			light: `${ServerIcon.iconDir}/server_page.svg`,
-			dark: `${ServerIcon.iconDir}/server_page_inverse.svg`,
+			light: `${ServerIcon.iconDir}/default_server.svg`,
+			dark: `${ServerIcon.iconDir}/default_server_inverse.svg`,
 		},
 		widthPx: 16,
 		heightPx: 16
@@ -92,8 +92,8 @@ export class ServerIcon {
 
 	public static readonly bigDataCluster: IconInfo = {
 		path: {
-			light: `${ServerIcon.iconDir}/pin.svg`,
-			dark: `${ServerIcon.iconDir}/pin_inverse.svg`,
+			light: `${ServerIcon.iconDir}/sql_bigdata_cluster.svg`,
+			dark: `${ServerIcon.iconDir}/sql_bigdata_cluster_inverse.svg`,
 		},
 		widthPx: 16,
 		heightPx: 16
@@ -101,8 +101,8 @@ export class ServerIcon {
 
 	public static readonly cloud: IconInfo = {
 		path: {
-			light: `${ServerIcon.iconDir}/file.svg`,
-			dark: `${ServerIcon.iconDir}/file_inverse.svg`,
+			light: `${ServerIcon.iconDir}/azureDB.svg`,
+			dark: `${ServerIcon.iconDir}/azureDB_inverse.svg`,
 		},
 		widthPx: 16,
 		heightPx: 16
@@ -266,7 +266,7 @@ export class ServerStatusBadge extends BaseBadge {
 		let height: string = `${iconSizePx / 16 * 0.25}rem`;
 		let width: string = height;
 		let verticalLocation: string = `${(iconSizePx / 16 * 9) + topMarginPx}px`;
-		let horizontalLocation: string = `${(iconSizePx / 16 * 11) + leftMarginPx}px`;
+		let horizontalLocation: string = `${(iconSizePx / 16 * 14) + leftMarginPx}px`;
 		let borderWidth: string = `${iconSizePx / 16 * 0.12}rem`;
 
 		let styleIdPrefix: string = 'ServerStatusBadgeStyle_';
