@@ -2,13 +2,13 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-'use strict';
+
 import * as azdata from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { equalsIgnoreCase } from 'vs/base/common/strings';
 import { ICommandLineProcessing } from 'sql/workbench/services/commandLine/common/commandLine';
-import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
+import { IConnectionManagementService, IConnectionCompletionOptions, ConnectionType, RunQueryOnConnectionMode } from 'sql/platform/connection/common/connectionManagement';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { IEnvironmentService, ParsedArgs } from 'vs/platform/environment/common/environment';
 import * as Constants from 'sql/platform/connection/common/constants';
@@ -24,6 +24,8 @@ import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IStatusbarService } from 'vs/platform/statusbar/common/statusbar';
 import { localize } from 'vs/nls';
+import { QueryInput } from 'sql/workbench/parts/query/common/queryInput';
+import { URI } from 'vs/base/common/uri';
 import { ILogService } from 'vs/platform/log/common/log';
 
 export class CommandLineService implements ICommandLineProcessing {
@@ -68,7 +70,7 @@ export class CommandLineService implements ICommandLineProcessing {
 	// We base our logic on the combination of (server, command) values.
 	// (serverName, commandName) => Connect object explorer and execute the command, passing the connection profile to the command. Do not load query editor.
 	// (null, commandName) => Launch the command with a null connection. If the command implementation needs a connection, it will need to create it.
-	// (serverName, null) => Connect object explorer and open a new query editor
+	// (serverName, null) => Connect object explorer and open a new query editor if no file names are passed. If file names are passed, connect their editors to the server.
 	// (null, null) => Prompt for a connection unless there are registered servers
 	public async processCommandLine(args: ParsedArgs): Promise<void> {
 		let profile: IConnectionProfile = undefined;
@@ -109,20 +111,49 @@ export class CommandLineService implements ICommandLineProcessing {
 			}
 			await this._commandService.executeCommand(commandName, connectedContext);
 		} else if (profile) {
-			if (this._statusBarService) {
-				this._statusBarService.setStatusMessage(localize('openingNewQueryLabel', 'Opening new query:') + profile.serverName, 2500);
+			// If we were given a file and it was opened with the sql editor,
+			// we want to connect the given profile to to it.
+			// If more than one file was passed, only show the connection dialog error on one of them.
+			if (args._ && args._.length > 0) {
+				await args._.forEach((f, i) => this.processFile(URI.file(f).toString(), profile, i === 0));
 			}
-			// Default to showing new query
-			try {
-				await TaskUtilities.newQuery(profile,
-					this._connectionManagementService,
-					this._queryEditorService,
-					this._objectExplorerService,
-					this._editorService);
-			} catch (error) {
-				this.logService.warn('unable to open query editor ' + error);
-				// Note: we are intentionally swallowing this error.
-				// In part this is to accommodate unit testing where we don't want to set up the query stack
+			else {
+				// Default to showing new query
+				if (this._statusBarService) {
+					this._statusBarService.setStatusMessage(localize('openingNewQueryLabel', 'Opening new query:') + profile.serverName, 2500);
+				}
+				try {
+					await TaskUtilities.newQuery(profile,
+						this._connectionManagementService,
+						this._queryEditorService,
+						this._objectExplorerService,
+						this._editorService);
+				} catch (error) {
+					this.logService.warn('unable to open query editor ' + error);
+					// Note: we are intentionally swallowing this error.
+					// In part this is to accommodate unit testing where we don't want to set up the query stack
+				}
+			}
+		}
+	}
+
+	// If an open and connectable query editor exists for the given URI, attach it to the connection profile
+	private async processFile(uriString: string, profile: IConnectionProfile, warnOnConnectFailure: boolean): Promise<void> {
+		let activeEditor = this._editorService.editors.filter(v => v.getResource().toString() === uriString).pop();
+		if (activeEditor) {
+			let queryInput = activeEditor as QueryInput;
+			if (queryInput && queryInput.connectEnabled) {
+				let options: IConnectionCompletionOptions = {
+					params: { connectionType: ConnectionType.editor, runQueryOnCompletion: RunQueryOnConnectionMode.none, input: queryInput },
+					saveTheConnection: false,
+					showDashboard: false,
+					showConnectionDialogOnError: warnOnConnectFailure,
+					showFirewallRuleOnError: warnOnConnectFailure
+				};
+				if (this._statusBarService) {
+					this._statusBarService.setStatusMessage(localize('connectingQueryLabel', 'Connecting query file'), 2500);
+				}
+				await this._connectionManagementService.connect(profile, uriString, options);
 			}
 		}
 	}

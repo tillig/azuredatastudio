@@ -3,8 +3,8 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { NodeType } from 'sql/parts/objectExplorer/common/nodeType';
-import { TreeNode, TreeItemCollapsibleState } from 'sql/parts/objectExplorer/common/treeNode';
+import { NodeType } from 'sql/workbench/parts/objectExplorer/common/nodeType';
+import { TreeNode, TreeItemCollapsibleState } from 'sql/workbench/parts/objectExplorer/common/treeNode';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IDisposable, dispose } from 'vs/base/common/lifecycle';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
@@ -16,7 +16,7 @@ import * as nls from 'vs/nls';
 import * as TelemetryKeys from 'sql/platform/telemetry/telemetryKeys';
 import * as TelemetryUtils from 'sql/platform/telemetry/telemetryUtilities';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-import { ServerTreeView } from 'sql/parts/objectExplorer/viewlet/serverTreeView';
+import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { entries } from 'sql/base/common/objects';
@@ -228,7 +228,13 @@ export class ObjectExplorerService implements IObjectExplorerService {
 	 * Gets called when session is created
 	 */
 	public onSessionCreated(handle: number, session: azdata.ObjectExplorerSession): void {
-		this.handleSessionCreated(session);
+		if (session && session.success) {
+			this.handleSessionCreated(session);
+		} else {
+			let errorMessage = session && session.errorMessage ? session.errorMessage :
+				nls.localize('OeSessionFailedError', 'Failed to create Object Explorer session');
+			this.logService.error(errorMessage);
+		}
 	}
 
 	private async handleSessionCreated(session: azdata.ObjectExplorerSession): Promise<void> {
@@ -238,7 +244,7 @@ export class ObjectExplorerService implements IObjectExplorerService {
 			if (this._sessions[session.sessionId]) {
 				connection = this._sessions[session.sessionId].connection;
 
-				if (session && session.success && session.rootNode) {
+				if (session.success && session.rootNode) {
 					let server = this.toTreeNode(session.rootNode, null);
 					server.connection = connection;
 					server.session = session;

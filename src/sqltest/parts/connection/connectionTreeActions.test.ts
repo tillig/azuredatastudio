@@ -11,24 +11,24 @@ import {
 	RefreshAction, AddServerAction, DeleteConnectionAction, DisconnectConnectionAction,
 	ActiveConnectionsFilterAction, RecentConnectionsFilterAction
 }
-	from 'sql/parts/objectExplorer/viewlet/connectionTreeAction';
+	from 'sql/workbench/parts/objectExplorer/browser/connectionTreeAction';
 import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
 import { ErrorMessageServiceStub } from 'sqltest/stubs/errorMessageServiceStub';
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
-import { ServerTreeView } from 'sql/parts/objectExplorer/viewlet/serverTreeView';
-import * as Constants from 'sql/platform/connection/common/constants';
-import * as  LocalizedConstants from 'sql/parts/connection/common/localizedConstants';
+import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
+import * as  LocalizedConstants from 'sql/workbench/parts/connection/common/localizedConstants';
 import { ObjectExplorerService, ObjectExplorerNodeEventArgs } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
-import { TreeNode } from 'sql/parts/objectExplorer/common/treeNode';
-import { NodeType } from 'sql/parts/objectExplorer/common/nodeType';
+import { TreeNode } from 'sql/workbench/parts/objectExplorer/common/treeNode';
+import { NodeType } from 'sql/workbench/parts/objectExplorer/common/nodeType';
 import { Tree } from 'vs/base/parts/tree/browser/treeImpl';
-import { ServerTreeDataSource } from 'sql/parts/objectExplorer/viewlet/serverTreeDataSource';
+import { ServerTreeDataSource } from 'sql/workbench/parts/objectExplorer/browser/serverTreeDataSource';
 import { Emitter } from 'vs/base/common/event';
 import Severity from 'vs/base/common/severity';
-import { ObjectExplorerActionsContext, ManageConnectionAction } from 'sql/parts/objectExplorer/viewlet/objectExplorerActions';
+import { ObjectExplorerActionsContext, ManageConnectionAction } from 'sql/workbench/parts/objectExplorer/browser/objectExplorerActions';
 import { IConnectionResult, IConnectionParams } from 'sql/platform/connection/common/connectionManagement';
-import { TreeSelectionHandler } from 'sql/parts/objectExplorer/viewlet/treeSelectionHandler';
+import { TreeSelectionHandler } from 'sql/workbench/parts/objectExplorer/browser/treeSelectionHandler';
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { UNSAVED_GROUP_ID } from 'sql/platform/connection/common/constants';
 import { $ } from 'vs/base/browser/dom';
 
 suite('SQL Connection Tree Action tests', () => {
@@ -326,7 +326,7 @@ suite('SQL Connection Tree Action tests', () => {
 			saveProfile: true,
 			id: 'testId'
 		});
-		connection.parent = new ConnectionProfileGroup(LocalizedConstants.unsavedGroupLabel, undefined, Constants.unsavedGroupId, undefined, undefined);
+		connection.parent = new ConnectionProfileGroup(LocalizedConstants.unsavedGroupLabel, undefined, UNSAVED_GROUP_ID, undefined, undefined);
 		let connectionAction: DeleteConnectionAction = new DeleteConnectionAction(DeleteConnectionAction.ID,
 			DeleteConnectionAction.DELETE_CONNECTION_LABEL,
 			connection,
