@@ -7,8 +7,8 @@ import PieChart from './pieChart.component';
 import { ChartType } from 'sql/workbench/parts/dashboard/widgets/insights/views/charts/interfaces';
 import { ChangeDetectorRef, Inject, forwardRef } from '@angular/core';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-import { IThemeService } from 'vs/platform/theme/common/themeService';
 import { ILogService } from 'vs/platform/log/common/log';
+import { IThemeService } from 'vs/platform/theme/common/themeService';
 
 export default class DoughnutChart extends PieChart {
 	protected readonly chartType: ChartType = ChartType.Doughnut;

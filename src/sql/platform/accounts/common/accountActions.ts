@@ -35,7 +35,7 @@ export class AddAccountAction extends Action {
 	constructor(
 		private _providerId: string,
 		@IAccountManagementService private _accountManagementService: IAccountManagementService,
-		@ILogService private logService: ILogService
+		@ILogService private readonly logService: ILogService
 	) {
 		super(AddAccountAction.ID, AddAccountAction.LABEL);
 		this.class = 'add-linked-account-action';
@@ -134,7 +134,7 @@ export class RefreshAccountAction extends Action {
 
 	constructor(
 		@IAccountManagementService private _accountManagementService: IAccountManagementService,
-		@ILogService private logService: ILogService
+		@ILogService private readonly logService: ILogService
 	) {
 		super(RefreshAccountAction.ID, RefreshAccountAction.LABEL, 'refresh-account-action icon refresh');
 	}

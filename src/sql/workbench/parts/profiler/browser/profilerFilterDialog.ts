@@ -23,8 +23,8 @@ import { generateUuid } from 'vs/base/common/uuid';
 import * as DOM from 'vs/base/browser/dom';
 import { StandardKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import { ProfilerFilter, ProfilerFilterClause, ProfilerFilterClauseOperator } from 'sql/workbench/services/profiler/common/interfaces';
-import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { ILogService } from 'vs/platform/log/common/log';
+import { ILayoutService } from 'vs/platform/layout/browser/layoutService';
 
 
 const ClearText: string = localize('profilerFilterDialog.clear', "Clear All");
@@ -71,7 +71,7 @@ export class ProfilerFilterDialog extends Modal {
 	constructor(
 		@IThemeService themeService: IThemeService,
 		@IClipboardService clipboardService: IClipboardService,
-		@IWorkbenchLayoutService layoutService: IWorkbenchLayoutService,
+		@ILayoutService layoutService: ILayoutService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IContextKeyService contextKeyService: IContextKeyService,
 		@ILogService logService: ILogService,

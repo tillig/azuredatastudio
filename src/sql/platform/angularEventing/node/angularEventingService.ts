@@ -13,7 +13,9 @@ export class AngularEventingService implements IAngularEventingService {
 	public _serviceBrand: any;
 	private _angularMap = new Map<string, Subject<IAngularEvent>>();
 
-	constructor(@ILogService private logService: ILogService) { }
+	constructor(
+		@ILogService private readonly logService: ILogService
+	) { }
 
 	public onAngularEvent(uri: string, cb: (event: IAngularEvent) => void): Subscription {
 		let subject = this._angularMap.get(uri);

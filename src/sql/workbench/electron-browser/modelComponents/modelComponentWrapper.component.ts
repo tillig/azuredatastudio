@@ -21,8 +21,8 @@ import { generateUuid } from 'vs/base/common/uuid';
 import { IBootstrapParams } from 'sql/platform/bootstrap/node/bootstrapService';
 import { Event } from 'vs/base/common/event';
 import { LayoutRequestParams } from 'sql/platform/dialog/dialogContainer.component';
-import { ILogService } from 'vs/platform/log/common/log';
 import { IThemeService, ITheme } from 'vs/platform/theme/common/themeService';
+import { ILogService } from 'vs/platform/log/common/log';
 
 const componentRegistry = <IComponentRegistry>Registry.as(Extensions.ComponentContribution);
 
@@ -59,8 +59,8 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 		@Inject(forwardRef(() => ChangeDetectorRef)) private _changeref: ChangeDetectorRef,
 		@Inject(forwardRef(() => Injector)) private _injector: Injector,
 		@Inject(IThemeService) private themeService: IThemeService,
-		@Inject(IBootstrapParams) params: ModelComponentParams,
-		@Inject(ILogService) private logService: ILogService
+		@Inject(ILogService) private readonly logService: ILogService,
+		@Inject(IBootstrapParams) params: ModelComponentParams
 	) {
 		super();
 		if (params && params.onLayoutRequested) {
@@ -74,10 +74,7 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 	}
 
 	ngOnInit() {
-		let self = this;
-		this._register(self.themeService.onThemeChange(event => {
-			self.updateTheme(event);
-		}));
+		this._register(this.themeService.onThemeChange(event => this.updateTheme(event)));
 	}
 
 	ngAfterViewInit() {
@@ -153,10 +150,8 @@ export class ModelComponentWrapper extends AngularDisposable implements OnInit {
 	private updateTheme(theme: ITheme): void {
 		// TODO handle theming appropriately
 		let el = <HTMLElement>this._ref.nativeElement;
-		let borderColor = theme.getColor(themeColors.SIDE_BAR_BACKGROUND, true);
 		let backgroundColor = theme.getColor(colors.editorBackground, true);
 		let foregroundColor = theme.getColor(themeColors.SIDE_BAR_FOREGROUND, true);
-		let border = theme.getColor(colors.contrastBorder, true);
 
 		if (backgroundColor) {
 			el.style.backgroundColor = backgroundColor.toString();

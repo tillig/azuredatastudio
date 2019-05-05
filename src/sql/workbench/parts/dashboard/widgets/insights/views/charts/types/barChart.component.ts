@@ -31,7 +31,6 @@ export default class BarChart extends ChartInsight {
 		@Inject(IThemeService) themeService: IThemeService,
 		@Inject(ITelemetryService) telemetryService: ITelemetryService,
 		@Inject(ILogService) logService: ILogService
-
 	) {
 		super(_changeRef, themeService, telemetryService, logService);
 	}

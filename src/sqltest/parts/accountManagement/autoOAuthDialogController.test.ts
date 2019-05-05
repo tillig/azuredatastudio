@@ -38,7 +38,7 @@ suite('auto OAuth dialog controller tests', () => {
 		mockOnCloseEvent = new Emitter<void>();
 
 		// Create a mock auto OAuth dialog
-		let autoOAuthDialog = new AutoOAuthDialog(null, null, null, null, new ContextKeyServiceStub(), null, null);
+		let autoOAuthDialog = new AutoOAuthDialog(undefined, undefined, undefined, undefined, new ContextKeyServiceStub(), undefined, undefined);
 		mockAutoOAuthDialog = TypeMoq.Mock.ofInstance(autoOAuthDialog);
 
 		mockAutoOAuthDialog.setup(x => x.onCancel).returns(() => mockOnCancelEvent.event);

@@ -157,7 +157,7 @@ export const DashboardModule = (params, selector: string, instantiationService: 
 			@Inject(forwardRef(() => ComponentFactoryResolver)) private _resolver: ComponentFactoryResolver,
 			@Inject(forwardRef(() => Router)) private _router: Router,
 			@Inject(ITelemetryService) private telemetryService: ITelemetryService,
-			@Inject(ILogService) private logService: ILogService,
+			@Inject(ILogService) private readonly logService: ILogService,
 			@Inject(ISelector) private selector: string
 		) {
 		}
@@ -170,7 +170,7 @@ export const DashboardModule = (params, selector: string, instantiationService: 
 			this._router.events.subscribe(e => {
 				if (e instanceof NavigationEnd) {
 					this.navigations++;
-					TelemetryUtils.addTelemetry(this.telemetryService, TelemetryKeys.DashboardNavigated, this.logService, {
+					TelemetryUtils.addTelemetry(this.telemetryService, this.logService, TelemetryKeys.DashboardNavigated, {
 						numberOfNavigations: this.navigations
 					});
 				}

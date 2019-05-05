@@ -174,7 +174,7 @@ export class QueryManagementService implements IQueryManagementService {
 				displayActualQueryPlan: runOptions.displayActualQueryPlan
 			});
 		}
-		TelemetryUtils.addTelemetry(this._telemetryService, eventName, this.logService, data);
+		TelemetryUtils.addTelemetry(this._telemetryService, this.logService, eventName, data);
 	}
 
 	private _runAction<T>(uri: string, action: (handler: IQueryRequestHandler) => Thenable<T>): Thenable<T> {

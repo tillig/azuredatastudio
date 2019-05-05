@@ -55,7 +55,7 @@ export abstract class ChartInsight extends Disposable implements IInsightsView {
 		@Inject(forwardRef(() => ChangeDetectorRef)) private _changeRef: ChangeDetectorRef,
 		@Inject(IThemeService) private themeService: IThemeService,
 		@Inject(ITelemetryService) private telemetryService: ITelemetryService,
-		@Inject(ILogService) private logService: ILogService
+		@Inject(ILogService) private readonly logService: ILogService
 	) {
 		super();
 	}
@@ -76,7 +76,7 @@ export abstract class ChartInsight extends Disposable implements IInsightsView {
 			this._hasError = true;
 			this._changeRef.detectChanges();
 		}
-		TelemetryUtils.addTelemetry(this.telemetryService, TelemetryKeys.ChartCreated, this.logService, { type: this.chartType });
+		TelemetryUtils.addTelemetry(this.telemetryService, this.logService, TelemetryKeys.ChartCreated, { type: this.chartType });
 	}
 
 	/**

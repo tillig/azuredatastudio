@@ -88,7 +88,7 @@ function createInstantiationService(addAccountFailureEmitter?: Emitter<string>):
 		.returns(() => undefined);
 
 	// Create a mock account dialog
-	let accountDialog = new AccountDialog(null, null, instantiationService.object, null, null, null, null, new ContextKeyServiceStub(), null, null);
+	let accountDialog = new AccountDialog(undefined, undefined, instantiationService.object, undefined, undefined, undefined, undefined, new ContextKeyServiceStub(), undefined, undefined);
 	let mockAccountDialog = TypeMoq.Mock.ofInstance(accountDialog);
 	mockAccountDialog.setup(x => x.onAddAccountErrorEvent)
 		.returns(() => { return addAccountFailureEmitter ? addAccountFailureEmitter.event : mockEvent.event; });

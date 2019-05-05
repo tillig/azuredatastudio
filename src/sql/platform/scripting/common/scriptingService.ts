@@ -50,7 +50,7 @@ export class ScriptingService implements IScriptingService {
 	private failedScriptingOperations: { [operationId: string]: azdata.ScriptingCompleteResult } = {};
 	constructor(
 		@IConnectionManagementService private _connectionService: IConnectionManagementService,
-		@ILogService private logService: ILogService
+		@ILogService private readonly logService: ILogService
 	) { }
 
 	/**

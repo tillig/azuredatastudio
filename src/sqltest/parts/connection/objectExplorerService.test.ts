@@ -271,7 +271,6 @@ suite('SQL Object Explorer Service tests', () => {
 		};
 
 		const logService = new TestLogService();
-
 		objectExplorerService = new ObjectExplorerService(connectionManagementService.object, undefined, capabilitiesService, logService);
 		objectExplorerService.registerProvider('MSSQL', sqlOEProvider.object);
 		sqlOEProvider.setup(x => x.createNewSession(TypeMoq.It.is<azdata.ConnectionInfo>(x => x.options['serverName'] === connection.serverName))).returns(() => new Promise<any>((resolve) => {

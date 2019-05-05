@@ -25,7 +25,7 @@ export class ResourceProviderService implements IResourceProviderService {
 	constructor(
 		@ITelemetryService private _telemetryService: ITelemetryService,
 		@IInstantiationService private _instantiationService: IInstantiationService,
-		@ILogService private logService: ILogService
+		@ILogService private readonly logService: ILogService
 	) {
 	}
 
@@ -49,7 +49,7 @@ export class ResourceProviderService implements IResourceProviderService {
 		return new Promise<azdata.CreateFirewallRuleResponse>((resolve, reject) => {
 			const provider = this._providers[resourceProviderId];
 			if (provider) {
-				TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.FirewallRuleRequested, this.logService, { provider: resourceProviderId });
+				TelemetryUtils.addTelemetry(this._telemetryService, this.logService, TelemetryKeys.FirewallRuleRequested, { provider: resourceProviderId });
 				provider.createFirewallRule(selectedAccount, firewallruleInfo).then(result => {
 					resolve(result);
 				}, error => {

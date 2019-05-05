@@ -134,9 +134,9 @@ export class RestoreDialog extends Modal {
 		@IContextViewService private _contextViewService: IContextViewService,
 		@ITelemetryService telemetryService: ITelemetryService,
 		@IContextKeyService contextKeyService: IContextKeyService,
-		@ILogService logService: ILogService,
 		@IFileBrowserDialogController private fileBrowserDialogService: IFileBrowserDialogController,
 		@IClipboardService clipboardService: IClipboardService,
+		@ILogService logService: ILogService
 	) {
 		super(localize('RestoreDialogTitle', "Restore database"), TelemetryKeys.Restore, telemetryService, layoutService, clipboardService, themeService, logService, contextKeyService, { hasErrors: true, isWide: true, hasSpinner: true });
 		this._restoreTitle = localize('restoreDialog.restoreTitle', "Restore database");

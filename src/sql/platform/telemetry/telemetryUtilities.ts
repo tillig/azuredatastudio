@@ -3,7 +3,6 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-'use strict';
 import { ITelemetryService, ITelemetryData } from 'vs/platform/telemetry/common/telemetry';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ILogService } from 'vs/platform/log/common/log';
@@ -23,10 +22,11 @@ export interface IConnectionTelemetryData extends ITelemetryData {
  */
 export function addTelemetry(
 	telemetryService: ITelemetryService,
-	telemetryEventName: string,
 	logService: ILogService,
+	telemetryEventName: string,
 	data?: IConnectionTelemetryData,
-	connection?: IConnectionProfile): Promise<void> {
+	connection?: IConnectionProfile
+): Promise<void> {
 	return new Promise<void>(resolve => {
 		try {
 			let telData: ITelemetryData = data === undefined ? {} : data;

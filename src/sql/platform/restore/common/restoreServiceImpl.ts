@@ -64,7 +64,7 @@ export class RestoreService implements IRestoreService {
 		return new Promise<azdata.RestoreResponse>((resolve, reject) => {
 			const providerResult = this.getProvider(connectionUri);
 			if (providerResult) {
-				TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.RestoreRequested, this.logService, { provider: providerResult.providerName });
+				TelemetryUtils.addTelemetry(this._telemetryService, this.logService, TelemetryKeys.RestoreRequested, { provider: providerResult.providerName });
 				providerResult.provider.restore(connectionUri, restoreInfo).then(result => {
 					resolve(result);
 				}, error => {

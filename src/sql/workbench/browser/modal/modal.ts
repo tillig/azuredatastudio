@@ -354,7 +354,7 @@ export abstract class Modal extends Disposable implements IThemable {
 		});
 
 		this.layout(DOM.getTotalHeight(this._modalBodySection));
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.ModalDialogOpened, this.logService, { name: this._name });
+		TelemetryUtils.addTelemetry(this._telemetryService, this.logService, TelemetryKeys.ModalDialogOpened, { name: this._name });
 	}
 
 	/**
@@ -373,7 +373,7 @@ export abstract class Modal extends Disposable implements IThemable {
 		}
 		this._keydownListener.dispose();
 		this._resizeListener.dispose();
-		TelemetryUtils.addTelemetry(this._telemetryService, TelemetryKeys.ModalDialogClosed, this.logService, { name: this._name });
+		TelemetryUtils.addTelemetry(this._telemetryService, this.logService, TelemetryKeys.ModalDialogClosed, { name: this._name });
 	}
 
 	/**

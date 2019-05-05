@@ -97,9 +97,13 @@ suite('Dashboard Properties Widget Tests', () => {
 
 		dashboardService.setup(x => x.connectionManagementService).returns(() => singleConnectionService.object);
 
-		const logService = new NoFailLogService();
+		const testLogService = new class extends TestLogService {
+			error() {
+				assert.fail('Called console Error unexpectedly');
+			}
+		};
 
-		let testComponent = new PropertiesWidgetComponent(dashboardService.object, new TestChangeDetectorRef(), undefined, logService, widgetConfig);
+		let testComponent = new PropertiesWidgetComponent(dashboardService.object, new TestChangeDetectorRef(), undefined, testLogService, widgetConfig);
 
 		// because config parsing is done async we need to put our asserts on the thread stack
 		setTimeout(() => {
@@ -111,9 +115,3 @@ suite('Dashboard Properties Widget Tests', () => {
 		});
 	});
 });
-
-class NoFailLogService extends TestLogService {
-	error(_message: string | Error, ..._args: any[]): void {
-		assert.fail('Called console Error unexpectedly');
-	}
-}
