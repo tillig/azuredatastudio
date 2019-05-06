@@ -11,6 +11,8 @@ import { IQueryManagementService } from 'sql/platform/query/common/queryManageme
 import * as Utils from 'sql/platform/connection/common/utils';
 import { SaveFormat } from 'sql/workbench/parts/grid/common/interfaces';
 import { Deferred } from 'sql/base/common/promise';
+import { IQueryPlanInfo } from 'sql/platform/query/common/queryModel';
+import { ResultSerializer } from 'sql/platform/node/resultSerializer';
 
 import Severity from 'vs/base/common/severity';
 import * as nls from 'vs/nls';
@@ -20,9 +22,7 @@ import { Disposable } from 'vs/base/common/lifecycle';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { Emitter, Event } from 'vs/base/common/event';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
-import { ResultSerializer } from 'sql/platform/node/resultSerializer';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-// import { IQueryPlanInfo } from 'sql/platform/query/common/queryModel';
 import { ITextResourcePropertiesService } from 'vs/editor/common/services/resourceConfiguration';
 import { URI } from 'vs/base/common/uri';
 
@@ -56,7 +56,7 @@ export default class QueryRunner extends Disposable {
 	public get planXml(): Thenable<string> { return this._planXml.promise; }
 
 	private _onMessage = this._register(new Emitter<azdata.IResultMessage>());
-	public get onMessage() { return this._onMessage.event; } // this is the only way typemoq can moq this... needs investigation @todo anthonydresser 4/14/2019
+	public get onMessage(): Event<azdata.IResultMessage> { return this._onMessage.event; } // this is the only way typemoq can moq this... needs investigation @todo anthonydresser 5/2/2019
 
 	private _onResultSet = this._register(new Emitter<azdata.ResultSetSummary>());
 	public readonly onResultSet = this._onResultSet.event;
@@ -78,6 +78,9 @@ export default class QueryRunner extends Disposable {
 
 	private _onEditSessionReady = this._register(new Emitter<IEditSessionReadyEvent>());
 	public readonly onEditSessionReady = this._onEditSessionReady.event;
+
+	private _onQueryPlanAvailable = this._register(new Emitter<IQueryPlanInfo>());
+	public readonly onQueryPlanAvailable = this._onQueryPlanAvailable.event;
 
 	private _queryStartTime: Date;
 	public get queryStartTime(): Date {
@@ -367,11 +370,11 @@ export default class QueryRunner extends Disposable {
 							this._planXml.resolve(e.resultSubset.rows[0][0].displayValue);
 							// fire query plan available event if execution is completed
 							if (result.resultSetSummary.complete) {
-								// this._eventEmitter.emit(EventType.QUERY_PLAN_AVAILABLE, {
-								// 	providerId: 'MSSQL',
-								// 	fileUri: result.ownerUri,
-								// 	planXml: planXmlString
-								// });
+								this._onQueryPlanAvailable.fire({
+									providerId: 'MSSQL',
+									fileUri: result.ownerUri,
+									planXml: planXmlString
+								});
 							}
 						}
 					});

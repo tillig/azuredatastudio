@@ -146,9 +146,9 @@ export class InsightsDialogController {
 				this._errorMessageService.showDialog(Severity.Error, nls.localize('insightsError', "Insights error"), error);
 			});
 		});
-		queryRunner.onMessage(e => {
-			if (e.isError) {
-				this._errorMessageService.showDialog(Severity.Error, nls.localize('insightsError', "Insights error"), e.message);
+		queryRunner.onMessage(message => {
+			if (message.isError) {
+				this._errorMessageService.showDialog(Severity.Error, nls.localize("insightsError", "Insights error"), message.message);
 			}
 		});
 	}

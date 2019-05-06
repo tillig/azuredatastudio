@@ -316,7 +316,6 @@ export class QueryModelService implements IQueryModelService {
 			// fire UI event
 			this._fireQueryEvent(uri, 'complete', e);
 		});
-
 		queryRunner.onQueryStart(() => {
 			this._onRunQueryStart.fire(uri);
 
@@ -330,17 +329,15 @@ export class QueryModelService implements IQueryModelService {
 			this._fireQueryEvent(uri, 'start');
 		});
 
-		// queryRunner.
-
-		// queryRunner.addListener(QREvents.QUERY_PLAN_AVAILABLE, (planInfo) => {
-		// 	// fire extensibility API event
-		// 	let event: IQueryEvent = {
-		// 		type: 'executionPlan',
-		// 		uri: planInfo.fileUri,
-		// 		params: planInfo
-		// 	};
-		// 	this._onQueryEvent.fire(event);
-		// });
+		queryRunner.onQueryPlanAvailable(planInfo => {
+			// fire extensibility API event
+			let event: IQueryEvent = {
+				type: 'executionPlan',
+				uri: planInfo.fileUri,
+				params: planInfo
+			};
+			this._onQueryEvent.fire(event);
+		});
 
 		info.queryRunner = queryRunner;
 		info.dataService = this._instantiationService.createInstance(DataService, uri);
