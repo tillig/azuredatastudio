@@ -15,10 +15,10 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 import { ConnectionOptionSpecialType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 import { ConnectionWidget } from 'sql/workbench/services/connection/browser/connectionWidget';
+import { IServerGroupController } from 'sql/platform/serverGroup/common/serverGroupController';
 
 export class ConnectionController implements IConnectionComponentController {
 	private _container: HTMLElement;
-	private _connectionManagementService: IConnectionManagementService;
 	private _advancedController: AdvancedPropertiesController;
 	private _model: IConnectionProfile;
 	private _providerName: string;
@@ -28,19 +28,21 @@ export class ConnectionController implements IConnectionComponentController {
 	/* key: uri, value : list of databases */
 	protected _databaseCache = new Map<string, string[]>();
 
-	constructor(container: HTMLElement,
-		connectionManagementService: IConnectionManagementService,
+	constructor(
+		container: HTMLElement,
 		connectionProperties: ConnectionProviderProperties,
 		callback: IConnectionComponentCallbacks,
 		providerName: string,
-		@IInstantiationService protected _instantiationService: IInstantiationService) {
+		@IInstantiationService protected readonly instantiationService: IInstantiationService,
+		@IConnectionManagementService private readonly connectionManagementService: IConnectionManagementService,
+		@IServerGroupController private readonly serverGroupController: IServerGroupController
+	) {
 		this._container = container;
-		this._connectionManagementService = connectionManagementService;
 		this._callback = callback;
 		this._providerOptions = connectionProperties.connectionOptions;
 		let specialOptions = this._providerOptions.filter(
 			(property) => (property.specialValueType !== null && property.specialValueType !== undefined));
-		this._connectionWidget = this._instantiationService.createInstance(ConnectionWidget, specialOptions, {
+		this._connectionWidget = this.instantiationService.createInstance(ConnectionWidget, specialOptions, {
 			onSetConnectButton: (enable: boolean) => this._callback.onSetConnectButton(enable),
 			onCreateNewServerGroup: () => this.onCreateNewServerGroup(),
 			onAdvancedProperties: () => this.handleOnAdvancedProperties(),
@@ -61,7 +63,7 @@ export class ConnectionController implements IConnectionComponentController {
 		tempProfile.password = password;
 		tempProfile.groupFullName = '';
 		tempProfile.saveProfile = false;
-		let uri = this._connectionManagementService.getConnectionUri(tempProfile);
+		let uri = this.connectionManagementService.getConnectionUri(tempProfile);
 		return new Promise<string[]>((resolve, reject) => {
 			if (this._databaseCache.has(uri)) {
 				let cachedDatabases: string[] = this._databaseCache.get(uri);
@@ -71,9 +73,9 @@ export class ConnectionController implements IConnectionComponentController {
 					reject();
 				}
 			} else {
-				this._connectionManagementService.connect(tempProfile, uri).then(connResult => {
+				this.connectionManagementService.connect(tempProfile, uri).then(connResult => {
 					if (connResult && connResult.connected) {
-						this._connectionManagementService.listDatabases(uri).then(result => {
+						this.connectionManagementService.listDatabases(uri).then(result => {
 							if (result && result.databaseNames) {
 								this._databaseCache.set(uri, result.databaseNames);
 								resolve(result.databaseNames);
@@ -91,7 +93,7 @@ export class ConnectionController implements IConnectionComponentController {
 	}
 
 	protected onCreateNewServerGroup(): void {
-		this._connectionManagementService.showCreateServerGroupDialog({
+		this.serverGroupController.showCreateGroupDialog({
 			onAddGroup: (groupName) => this._connectionWidget.updateServerGroup(this.getAllServerGroups(), groupName),
 			onClose: () => this._connectionWidget.focusOnServerGroup()
 		});
@@ -107,7 +109,7 @@ export class ConnectionController implements IConnectionComponentController {
 
 	protected handleOnAdvancedProperties(): void {
 		if (!this._advancedController) {
-			this._advancedController = this._instantiationService.createInstance(AdvancedPropertiesController, () => this._connectionWidget.focusOnAdvancedButton());
+			this._advancedController = this.instantiationService.createInstance(AdvancedPropertiesController, () => this._connectionWidget.focusOnAdvancedButton());
 		}
 		let advancedOption = this._providerOptions.filter(
 			(property) => (property.specialValueType === undefined || property.specialValueType === null));
@@ -131,7 +133,7 @@ export class ConnectionController implements IConnectionComponentController {
 	}
 
 	private getAllServerGroups(providers?: string[]): IConnectionProfileGroup[] {
-		let connectionGroupRoot = this._connectionManagementService.getConnectionGroups(providers);
+		let connectionGroupRoot = this.connectionManagementService.getConnectionGroups(providers);
 		let connectionGroupNames: IConnectionProfileGroup[] = [];
 		if (connectionGroupRoot && connectionGroupRoot.length > 0) {
 			this.getServerGroupHelper(connectionGroupRoot[0], connectionGroupNames);

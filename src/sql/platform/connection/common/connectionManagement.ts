@@ -82,37 +82,15 @@ export interface IConnectionManagementService {
 	showConnectionDialog(params?: INewConnectionParams, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void>;
 
 	/**
-	 * Opens the add server group dialog
-	 */
-	showCreateServerGroupDialog(callbacks?: IServerGroupDialogCallbacks): Promise<void>;
-
-	/**
-	 * Opens the edit server group dialog
-	 */
-	showEditServerGroupDialog(group: ConnectionProfileGroup): Promise<void>;
-
-	/**
 	 * Load the password and opens a new connection
 	 */
 	connect(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
-
-	/**
-	 * Opens a new connection and save the profile in settings
-	 */
-	connectAndSaveProfile(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
 
 	/**
 	 * Finds existing connection for given profile and purpose is any exists.
 	 * The purpose is connection by default
 	 */
 	findExistingConnection(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile;
-
-	/**
-	 * If there's already a connection for given profile and purpose, returns the ownerUri for the connection
-	 * otherwise tries to make a connection and returns the owner uri when connection is complete
-	 * The purpose is connection by default
-	 */
-	connectIfNotConnected(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection', saveConnection?: boolean): Promise<string>;
 
 	/**
 	 * Adds the successful connection to MRU and send the connection error back to the connection handler for failed connections

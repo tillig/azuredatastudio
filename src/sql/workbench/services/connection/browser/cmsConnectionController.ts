@@ -9,23 +9,27 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 import { ConnectionController } from 'sql/workbench/services/connection/browser/connectionController';
 import { CmsConnectionWidget } from 'sql/workbench/services/connection/browser/cmsConnectionWidget';
+import { IServerGroupController } from 'sql/platform/serverGroup/common/serverGroupController';
 
 /**
  * Connection Controller for CMS Connections
  */
 export class CmsConnectionController extends ConnectionController {
 
-	constructor(container: HTMLElement,
-		connectionManagementService: IConnectionManagementService,
+	constructor(
+		container: HTMLElement,
 		connectionProperties: ConnectionProviderProperties,
 		callback: IConnectionComponentCallbacks,
 		providerName: string,
 		authTypeChanged: boolean = false,
-		@IInstantiationService _instantiationService: IInstantiationService) {
-		super(container, connectionManagementService, connectionProperties, callback, providerName, _instantiationService);
+		@IInstantiationService instantiationService: IInstantiationService,
+		@IConnectionManagementService connectionManagementService: IConnectionManagementService,
+		@IServerGroupController serverGroupController: IServerGroupController
+	) {
+		super(container, connectionProperties, callback, providerName, instantiationService, connectionManagementService, serverGroupController);
 		let specialOptions = this._providerOptions.filter(
 			(property) => (property.specialValueType !== null && property.specialValueType !== undefined));
-		this._connectionWidget = this._instantiationService.createInstance(CmsConnectionWidget, specialOptions, {
+		this._connectionWidget = this.instantiationService.createInstance(CmsConnectionWidget, specialOptions, {
 			onSetConnectButton: (enable: boolean) => this._callback.onSetConnectButton(enable),
 			onCreateNewServerGroup: () => this.onCreateNewServerGroup(),
 			onAdvancedProperties: () => this.handleOnAdvancedProperties(),

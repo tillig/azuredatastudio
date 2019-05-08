@@ -35,10 +35,9 @@ export class OEShimService extends Disposable implements IOEShimService {
 	private nodeHandleMap = new Map<number, string>();
 
 	constructor(
-		@IObjectExplorerService private oe: IObjectExplorerService,
-		@IConnectionManagementService private cm: IConnectionManagementService,
-		@IConnectionDialogService private cd: IConnectionDialogService,
-		@ICapabilitiesService private capabilities: ICapabilitiesService
+		@IObjectExplorerService private readonly oe: IObjectExplorerService,
+		@IConnectionManagementService private readonly cm: IConnectionManagementService,
+		@ICapabilitiesService private readonly capabilities: ICapabilitiesService
 	) {
 		super();
 	}
@@ -48,9 +47,9 @@ export class OEShimService extends Disposable implements IOEShimService {
 		let connProfile = new ConnectionProfile(this.capabilities, node.payload);
 		connProfile.saveProfile = false;
 		if (this.cm.providerRegistered(providerId)) {
-			let userProfile = await this.cd.openDialogAndWait(this.cm, { connectionType: ConnectionType.default, showDashboard: false }, connProfile, undefined, false);
-			if (userProfile) {
-				connProfile = new ConnectionProfile(this.capabilities, userProfile);
+			let userProfile = await this.cm.connect(connProfile, undefined, { showConnectionDialogOnError: true, showFirewallRuleOnError: true, showDashboard: false, saveTheConnection: false, params: undefined });
+			if (userProfile.connected) {
+				connProfile = new ConnectionProfile(this.capabilities, userProfile.connectionProfile);
 			} else {
 				return Promise.reject('User canceled');
 			}

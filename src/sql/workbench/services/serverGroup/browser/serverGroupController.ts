@@ -19,15 +19,15 @@ export class ServerGroupController implements IServerGroupController {
 	_serviceBrand: any;
 
 	private _serverGroupDialog: ServerGroupDialog;
-	private _connectionManagementService: IConnectionManagementService;
 	private _callbacks: IServerGroupDialogCallbacks;
 	private _group: ConnectionProfileGroup;
 	private _viewModel: ServerGroupViewModel;
 
 	constructor(
-		@IErrorMessageService private _errorMessageService: IErrorMessageService,
-		@IInstantiationService private _instantiationService: IInstantiationService,
-		@IConfigurationService private _configurationService: IConfigurationService
+		@IErrorMessageService private readonly errorMessageService: IErrorMessageService,
+		@IInstantiationService private readonly instantiationService: IInstantiationService,
+		@IConfigurationService private readonly configurationService: IConfigurationService,
+		@IConnectionManagementService private readonly connectionManagementService: IConnectionManagementService
 	) {
 	}
 
@@ -37,12 +37,12 @@ export class ServerGroupController implements IServerGroupController {
 			this._group.name = this._viewModel.groupName;
 			this._group.color = this._viewModel.groupColor;
 			this._group.description = this._viewModel.groupDescription;
-			this._connectionManagementService.editGroup(this._group).then(() => {
+			this.connectionManagementService.editGroup(this._group).then(() => {
 				this._serverGroupDialog.close();
 			}).catch(err => {
 				// rollback changes made
 				this._group = tempGroup;
-				this._errorMessageService.showDialog(Severity.Error, '', err);
+				this.errorMessageService.showDialog(Severity.Error, '', err);
 			});
 
 		} else {
@@ -53,13 +53,13 @@ export class ServerGroupController implements IServerGroupController {
 				color: this._viewModel.groupColor,
 				description: this._viewModel.groupDescription
 			};
-			this._connectionManagementService.saveProfileGroup(newGroup).then(groupId => {
+			this.connectionManagementService.saveProfileGroup(newGroup).then(groupId => {
 				if (this._callbacks) {
 					this._callbacks.onAddGroup(this._serverGroupDialog.groupName);
 				}
 				this._serverGroupDialog.close();
 			}).catch(err => {
-				this._errorMessageService.showDialog(Severity.Error, '', err);
+				this.errorMessageService.showDialog(Severity.Error, '', err);
 			});
 		}
 	}
@@ -75,24 +75,22 @@ export class ServerGroupController implements IServerGroupController {
 	}
 
 
-	public showCreateGroupDialog(connectionManagementService: IConnectionManagementService, callbacks?: IServerGroupDialogCallbacks): Promise<void> {
-		this._connectionManagementService = connectionManagementService;
+	public showCreateGroupDialog(callbacks?: IServerGroupDialogCallbacks): Promise<void> {
 		this._group = null;
-		this._viewModel = new ServerGroupViewModel(undefined, this._configurationService.getValue(SERVER_GROUP_CONFIG)[SERVER_GROUP_COLORS_CONFIG]);
+		this._viewModel = new ServerGroupViewModel(undefined, this.configurationService.getValue(SERVER_GROUP_CONFIG)[SERVER_GROUP_COLORS_CONFIG]);
 		this._callbacks = callbacks ? callbacks : undefined;
 		return this.openServerGroupDialog();
 	}
 
-	public showEditGroupDialog(connectionManagementService: IConnectionManagementService, group: ConnectionProfileGroup): Promise<void> {
-		this._connectionManagementService = connectionManagementService;
+	public showEditGroupDialog(group: ConnectionProfileGroup): Promise<void> {
 		this._group = group;
-		this._viewModel = new ServerGroupViewModel(group, this._configurationService.getValue(SERVER_GROUP_CONFIG)[SERVER_GROUP_COLORS_CONFIG]);
+		this._viewModel = new ServerGroupViewModel(group, this.configurationService.getValue(SERVER_GROUP_CONFIG)[SERVER_GROUP_COLORS_CONFIG]);
 		return this.openServerGroupDialog();
 	}
 
 	private openServerGroupDialog(): Promise<void> {
 		if (!this._serverGroupDialog) {
-			this._serverGroupDialog = this._instantiationService.createInstance(ServerGroupDialog);
+			this._serverGroupDialog = this.instantiationService.createInstance(ServerGroupDialog);
 			this._serverGroupDialog.viewModel = this._viewModel;
 			this._serverGroupDialog.onCancel(() => { });
 			this._serverGroupDialog.onAddServerGroup(() => this.handleOnAddServerGroup());

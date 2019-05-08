@@ -71,7 +71,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		if (connectionCompletionOptions) {
 			// Somehow, connectionProfile.saveProfile is false even if initialConnectionProfile.saveProfile is true, reset the flag here.
 			connectionProfile.saveProfile = initialConnectionProfile.saveProfile;
-			await this._connectionManagementService.connectAndSaveProfile(connectionProfile, undefined, {
+			await this._connectionManagementService.connect(connectionProfile, undefined, {
 				saveTheConnection: isUndefinedOrNull(connectionCompletionOptions.saveConnection) ? true : connectionCompletionOptions.saveConnection,
 				showDashboard: isUndefinedOrNull(connectionCompletionOptions.showDashboard) ? false : connectionCompletionOptions.showDashboard,
 				params: undefined,
@@ -113,7 +113,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 	public $connect(connectionProfile: IConnectionProfile, saveConnection: boolean = true, showDashboard: boolean = true): Thenable<azdata.ConnectionResult> {
 		let profile = new ConnectionProfile(this._capabilitiesService, connectionProfile);
 		profile.id = generateUuid();
-		return this._connectionManagementService.connectAndSaveProfile(profile, undefined, {
+		return this._connectionManagementService.connect(profile, undefined, {
 			saveTheConnection: saveConnection,
 			showDashboard: showDashboard,
 			params: undefined,

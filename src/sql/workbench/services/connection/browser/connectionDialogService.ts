@@ -225,7 +225,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		}
 	}
 
-	private handleDefaultOnConnect(params: INewConnectionParams, connection: IConnectionProfile): Thenable<void> {
+	private handleDefaultOnConnect(params: INewConnectionParams, connection: IConnectionProfile): Promise<void> {
 		if (this.ignoreNextConnect) {
 			this._connectionDialog.resetConnection();
 			this._connectionDialog.close();
@@ -247,7 +247,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 			showFirewallRuleOnError: true
 		};
 
-		return this._connectionManagementService.connectAndSaveProfile(connection, uri, options, params && params.input).then(connectionResult => {
+		return this._connectionManagementService.connect(connection, uri, options, params && params.input).then(connectionResult => {
 			this._connecting = false;
 			if (connectionResult && connectionResult.connected) {
 				this._connectionDialog.close();
@@ -280,14 +280,14 @@ export class ConnectionDialogService implements IConnectionDialogService {
 			if (providerName === Constants.cmsProviderName) {
 				this._connectionControllerMap[providerName] =
 					this._instantiationService.createInstance(CmsConnectionController,
-						this._container, this._connectionManagementService,
+						this._container,
 						this._capabilitiesService.getCapabilities(providerName).connection, {
 							onSetConnectButton: (enable: boolean) => this.handleSetConnectButtonEnable(enable)
 						}, providerName, this._inputModel ? this._inputModel.options.authTypeChanged : false);
 			} else {
 				this._connectionControllerMap[providerName] =
 					this._instantiationService.createInstance(ConnectionController,
-						this._container, this._connectionManagementService,
+						this._container,
 						this._capabilitiesService.getCapabilities(providerName).connection, {
 							onSetConnectButton: (enable: boolean) => this.handleSetConnectButtonEnable(enable)
 						}, providerName);
@@ -373,7 +373,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		params?: INewConnectionParams,
 		model?: IConnectionProfile,
 		connectionResult?: IConnectionResult,
-		doConnect: boolean = true): Thenable<IConnectionProfile> {
+		doConnect: boolean = true): Promise<IConnectionProfile> {
 
 		if (!doConnect) {
 			this.ignoreNextConnect = true;
@@ -393,7 +393,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		connectionManagementService: IConnectionManagementService,
 		params?: INewConnectionParams,
 		model?: IConnectionProfile,
-		connectionResult?: IConnectionResult): Thenable<void> {
+		connectionResult?: IConnectionResult): Promise<void> {
 
 		this._connectionManagementService = connectionManagementService;
 

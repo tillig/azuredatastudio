@@ -33,6 +33,7 @@ import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/co
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { AccountManagementTestService } from 'sqltest/stubs/accountManagementStubs';
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
+import { TestInstantiationService } from 'vs/platform/instantiation/test/common/instantiationServiceMock';
 
 suite('SQL ConnectionManagementService tests', () => {
 
@@ -146,9 +147,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 	function createConnectionManagementService(): ConnectionManagementService {
 		let connectionManagementService = new ConnectionManagementService(
-			connectionStore.object,
 			connectionDialogService.object,
-			undefined,
 			undefined,
 			workbenchEditorService.object,
 			undefined,
