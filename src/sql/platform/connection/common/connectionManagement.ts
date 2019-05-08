@@ -97,8 +97,6 @@ export interface IConnectionManagementService {
 	 */
 	onConnectionComplete(handle: number, connectionInfoSummary: azdata.ConnectionInfoSummary): void;
 
-	onIntelliSenseCacheComplete(handle: number, connectionUri: string): void;
-
 	onConnectionChangedNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo);
 
 	getConnectionGroups(providers?: string[]): ConnectionProfileGroup[];
@@ -182,8 +180,6 @@ export interface IConnectionManagementService {
 	cancelEditorConnection(owner: IConnectableInput): Thenable<boolean>;
 
 	showDashboard(connection: IConnectionProfile): Thenable<boolean>;
-
-	closeDashboard(uri: string): void;
 
 	getProviderIdFromUri(ownerUri: string): string;
 

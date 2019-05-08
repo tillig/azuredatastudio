@@ -33,7 +33,6 @@ import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/co
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { AccountManagementTestService } from 'sqltest/stubs/accountManagementStubs';
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
-import { TestInstantiationService } from 'vs/platform/instantiation/test/common/instantiationServiceMock';
 
 suite('SQL ConnectionManagementService tests', () => {
 
@@ -155,7 +154,6 @@ suite('SQL ConnectionManagementService tests', () => {
 			capabilitiesService,
 			undefined,
 			editorGroupService.object,
-			undefined,
 			resourceProviderStubMock.object,
 			undefined,
 			accountManagementService.object,
@@ -210,32 +208,26 @@ suite('SQL ConnectionManagementService tests', () => {
 
 	function connect(uri: string, options?: IConnectionCompletionOptions, fromDialog?: boolean, connection?: IConnectionProfile, error?: string, errorCode?: number, errorCallStack?: string): Promise<IConnectionResult> {
 		let connectionToUse = connection ? connection : connectionProfile;
-		return new Promise<IConnectionResult>((resolve, reject) => {
-			let id = connectionToUse.getOptionsKey();
-			let defaultUri = 'connection://' + (id ? id : connectionToUse.serverName + ':' + connectionToUse.databaseName);
-			connectionManagementService.onConnectionRequestSent(() => {
-				let info: azdata.ConnectionInfoSummary = {
-					connectionId: error ? undefined : 'id',
-					connectionSummary: {
-						databaseName: connectionToUse.databaseName,
-						serverName: connectionToUse.serverName,
-						userName: connectionToUse.userName
-					},
-					errorMessage: error,
-					errorNumber: errorCode,
-					messages: errorCallStack,
-					ownerUri: uri ? uri : defaultUri,
-					serverInfo: undefined
-				};
-				connectionManagementService.onConnectionComplete(0, info);
-			});
-			connectionManagementService.cancelConnectionForUri(uri).then(() => {
-				if (fromDialog) {
-					resolve(connectionManagementService.connectAndSaveProfile(connectionToUse, uri, options));
-				} else {
-					resolve(connectionManagementService.connect(connectionToUse, uri, options));
-				}
-			});
+		let id = connectionToUse.getOptionsKey();
+		let defaultUri = 'connection://' + (id ? id : connectionToUse.serverName + ':' + connectionToUse.databaseName);
+		connectionManagementService.onConnectRequestSent(() => {
+			let info: azdata.ConnectionInfoSummary = {
+				connectionId: error ? undefined : 'id',
+				connectionSummary: {
+					databaseName: connectionToUse.databaseName,
+					serverName: connectionToUse.serverName,
+					userName: connectionToUse.userName
+				},
+				errorMessage: error,
+				errorNumber: errorCode,
+				messages: errorCallStack,
+				ownerUri: uri ? uri : defaultUri,
+				serverInfo: undefined
+			};
+			connectionManagementService.onConnectionComplete(0, info);
+		});
+		return connectionManagementService.cancelConnectionForUri(uri).then(() => {
+			return connectionManagementService.connect(connectionToUse, uri, options);
 		});
 	}
 

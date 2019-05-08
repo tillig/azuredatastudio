@@ -61,7 +61,7 @@ suite('ConnectionDialogService tests', () => {
 			runQueryOnCompletion: undefined,
 			querySelection: undefined
 		};
-		mockConnectionManagementService.setup(x => x.connectAndSaveProfile(undefined, TypeMoq.It.is(_ => true), TypeMoq.It.isAny(), TypeMoq.It.isAny())).returns(
+		mockConnectionManagementService.setup(x => x.connect(undefined, TypeMoq.It.is(_ => true), TypeMoq.It.isAny(), TypeMoq.It.isAny())).returns(
 			() => Promise.resolve(<IConnectionResult>{ connected: true, errorMessage: undefined, errorCode: undefined }));
 
 		// If I call handleDefaultOnConnect with the given parameters
@@ -70,7 +70,7 @@ suite('ConnectionDialogService tests', () => {
 			// Then the Connection Management Service's connect method was called with the expected URI
 			let expectedUri = isEditor ? testUri : undefined;
 			mockConnectionManagementService.verify(
-				x => x.connectAndSaveProfile(undefined, TypeMoq.It.is(uri => uri === expectedUri), TypeMoq.It.isAny(), TypeMoq.It.isAny()),
+				x => x.connect(undefined, TypeMoq.It.is(uri => uri === expectedUri), TypeMoq.It.isAny(), TypeMoq.It.isAny()),
 				TypeMoq.Times.once());
 		});
 	}

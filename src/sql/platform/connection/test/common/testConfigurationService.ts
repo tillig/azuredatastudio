@@ -35,7 +35,7 @@ export class TestConfigurationService implements IConfigurationService {
 				targetObject = targetObject[keyArray[i]];
 			}
 		}
-		return Promise.resolve(void 0);
+		return Promise.resolve();
 	}
 
 	public onDidChangeConfiguration() {
