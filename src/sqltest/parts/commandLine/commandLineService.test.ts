@@ -34,6 +34,7 @@ class TestParsedArgs implements ParsedArgs {
 	add?: boolean;
 	database?: string;
 	command?: string;
+	'connection-id'?: string;
 	debugBrkPluginHost?: string;
 	debugBrkSearch?: string;
 	debugId?: string;
@@ -345,7 +346,7 @@ suite('commandLineService tests', () => {
 			})
 			.verifiable(TypeMoq.Times.once());
 		connectionManagementService.setup(c => c.getConnectionProfileById('testID')).returns(() => originalProfile).verifiable(TypeMoq.Times.once());
-		connectionManagementService.setup(x => x.getConnectionGroups(TypeMoq.It.isAny())).returns(() => [conProfGroup]);
+		connectionManagementService.setup(x => x.getConnectionGroups(TypeMoq.It.isAny())).returns(() => [conProfGroup]).verifiable(TypeMoq.Times.once());
 		const configurationService = getConfigurationServiceMock(true);
 		const logService = new TestLogService();
 		let service = getCommandLineService(connectionManagementService.object, configurationService.object, capabilitiesService, undefined, undefined, logService);
@@ -386,6 +387,60 @@ suite('commandLineService tests', () => {
 		let service = getCommandLineService(connectionManagementService.object, configurationService.object, capabilitiesService, undefined, editorService.object);
 		await service.processCommandLine(args);
 		queryInput.verifyAll();
+		connectionManagementService.verifyAll();
+	});
+
+	test('processCommandLine reuses saved connections that match connectionid', async () => {
+		const connectionManagementService: TypeMoq.Mock<IConnectionManagementService>
+			= TypeMoq.Mock.ofType<IConnectionManagementService>(TestConnectionManagementService, TypeMoq.MockBehavior.Strict);
+
+		let connection = new ConnectionProfile(capabilitiesService, {
+			connectionName: 'Test',
+			savePassword: false,
+			groupFullName: 'testGroup',
+			serverName: 'myserver',
+			databaseName: 'mydatabase',
+			authenticationType: Constants.integrated,
+			password: undefined,
+			userName: '',
+			groupId: undefined,
+			providerName: 'MSSQL',
+			options: {},
+			saveProfile: true,
+			id: 'testID'
+		});
+		let conProfGroup = new ConnectionProfileGroup('testGroup', undefined, 'testGroup', undefined, undefined);
+		conProfGroup.connections = [connection];
+		const args: TestParsedArgs = new TestParsedArgs();
+		args['connection-id'] = 'testID';
+		connectionManagementService.setup((c) => c.showConnectionDialog()).verifiable(TypeMoq.Times.never());
+		connectionManagementService.setup(c => c.hasRegisteredServers()).returns(() => true).verifiable(TypeMoq.Times.atMostOnce());
+		let originalProfile: IConnectionProfile = undefined;
+		let returnNull: boolean = true;
+		connectionManagementService.setup(c => c.connectIfNotConnected(
+			TypeMoq.It.is<ConnectionProfile>(p => p.serverName === 'myserver' && p.authenticationType === Constants.integrated && p.connectionName === 'Test' && p.id === 'testID'), 'connection', true))
+			.returns((conn) => {
+				returnNull = false;
+				originalProfile = conn;
+				return Promise.resolve('unused');
+			})
+			.verifiable(TypeMoq.Times.once());
+
+		// the connection isn't active until after connectIfNotConnected
+		connectionManagementService.setup(c => c.getConnectionProfileById('testID')).
+			returns(() => {
+				if (returnNull) {
+					return undefined;
+				} else {
+					return connection;
+				}
+			})
+			.verifiable(TypeMoq.Times.exactly(2));
+		connectionManagementService.setup(x => x.getConnectionGroups(TypeMoq.It.isAny())).returns(() => [conProfGroup]).verifiable(TypeMoq.Times.once());
+		const configurationService = getConfigurationServiceMock(true);
+		const logService = new TestLogService();
+		let service = getCommandLineService(connectionManagementService.object, configurationService.object, capabilitiesService, undefined, undefined, logService);
+		await service.processCommandLine(args);
 		connectionManagementService.verifyAll();
 	});
 });

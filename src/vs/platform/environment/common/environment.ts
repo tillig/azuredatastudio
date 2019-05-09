@@ -77,6 +77,7 @@ export interface ParsedArgs {
 	server?: string;
 	user?: string;
 	command?: string;
+	'connection-id'?: string;
 	// {{SQL CARBON EDIT}}
 }
 

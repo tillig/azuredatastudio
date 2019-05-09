@@ -80,7 +80,7 @@ export class CommandLineService implements ICommandLineProcessing {
 				commandName = args.command;
 			}
 
-			if (args.server) {
+			if (args.server || args['connection-id']) {
 				profile = this.readProfileFromArgs(args);
 			}
 		}
@@ -159,6 +159,14 @@ export class CommandLineService implements ICommandLineProcessing {
 	}
 
 	private readProfileFromArgs(args: ParsedArgs) {
+		// see if the connection is already active
+		if (args['connection-id'] && this._connectionManagementService) {
+			let profile = this._connectionManagementService.getConnectionProfileById(args['connection-id']);
+			if (profile) {
+				return profile;
+			}
+		}
+
 		let profile = new ConnectionProfile(this._capabilitiesService, null);
 		// We want connection store to use any matching password it finds
 		profile.savePassword = true;
@@ -171,17 +179,21 @@ export class CommandLineService implements ICommandLineProcessing {
 		profile.setOptionValue('applicationName', Constants.applicationName);
 		profile.setOptionValue('databaseDisplayName', profile.databaseName);
 		profile.setOptionValue('groupId', profile.groupId);
-		return this._connectionManagementService ? this.tryMatchSavedProfile(profile) : profile;
+
+		return this._connectionManagementService ? this.tryMatchSavedProfile(profile, args['connection-id']) : profile;
 	}
 
-	private tryMatchSavedProfile(profile: ConnectionProfile) {
+	private tryMatchSavedProfile(profile: ConnectionProfile, connectionId?: string) {
 		let match: ConnectionProfile = undefined;
 		// If we can find a saved mssql provider connection that matches the args, use it
 		let groups = this._connectionManagementService.getConnectionGroups([Constants.mssqlProviderName]);
 		if (groups && groups.length > 0) {
 			let rootGroup = groups[0];
 			let connections = ConnectionProfileGroup.getConnectionsInGroup(rootGroup);
-			match = connections.find((c) => this.matchProfile(profile, c));
+			match = connections.find((c) => c.id === connectionId);
+			if (!match) {
+				match = connections.find((c) => this.matchProfile(profile, c));
+			}
 		}
 		return match ? match : profile;
 	}
