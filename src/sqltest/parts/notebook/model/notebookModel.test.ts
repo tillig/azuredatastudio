@@ -22,7 +22,7 @@ import { Deferred } from 'sql/base/common/promise';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { Memento } from 'vs/workbench/common/memento';
 import { Emitter } from 'vs/base/common/event';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { TestStorageService, TestLogService } from 'vs/workbench/test/workbenchTestServices';
 
@@ -81,7 +81,7 @@ suite('notebook model', function (): void {
 	setup(() => {
 		sessionReady = new Deferred<void>();
 		notificationService = TypeMoq.Mock.ofType(TestNotificationService, TypeMoq.MockBehavior.Loose);
-		capabilitiesService = TypeMoq.Mock.ofType(CapabilitiesTestService);
+		capabilitiesService = TypeMoq.Mock.ofType(TestCapabilitiesService);
 		memento = TypeMoq.Mock.ofType(Memento, TypeMoq.MockBehavior.Loose, '');
 		memento.setup(x => x.getMemento(TypeMoq.It.isAny())).returns(() => void 0);
 		queryConnectionService = TypeMoq.Mock.ofType(ConnectionManagementService, TypeMoq.MockBehavior.Loose, memento.object, undefined, new TestStorageService());

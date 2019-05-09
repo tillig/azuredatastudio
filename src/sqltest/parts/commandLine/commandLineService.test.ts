@@ -12,7 +12,7 @@ import { CommandLineService } from 'sql/workbench/services/commandLine/common/co
 import * as Constants from 'sql/platform/connection/common/constants';
 import { ParsedArgs } from 'vs/platform/environment/common/environment';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { IConnectionManagementService, IConnectionCompletionOptions, ConnectionType } from 'sql/platform/connection/common/connectionManagement';
 import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
@@ -92,10 +92,10 @@ class TestParsedArgs implements ParsedArgs {
 }
 suite('commandLineService tests', () => {
 
-	let capabilitiesService: CapabilitiesTestService;
+	let capabilitiesService: TestCapabilitiesService;
 
 	setup(() => {
-		capabilitiesService = new CapabilitiesTestService();
+		capabilitiesService = new TestCapabilitiesService();
 	});
 
 	function getCommandLineService(connectionManagementService: IConnectionManagementService,

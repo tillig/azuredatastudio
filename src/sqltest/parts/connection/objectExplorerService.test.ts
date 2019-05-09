@@ -17,7 +17,7 @@ import * as assert from 'assert';
 import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { Event, Emitter } from 'vs/base/common/event';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 import { TestLogService } from 'vs/workbench/test/workbenchTestServices';
 
 suite('SQL Object Explorer Service tests', () => {
@@ -218,7 +218,7 @@ suite('SQL Object Explorer Service tests', () => {
 			]
 		};
 
-		let capabilitiesService = new CapabilitiesTestService();
+		let capabilitiesService = new TestCapabilitiesService();
 		capabilitiesService.capabilities['MSSQL'] = { connection: sqlProvider };
 
 		connection = new ConnectionProfile(capabilitiesService, {

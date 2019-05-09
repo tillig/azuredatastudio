@@ -17,7 +17,7 @@ import * as Utils from 'sql/platform/connection/common/utils';
 import * as Constants from 'sql/platform/connection/common/constants';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import * as ConnectionContracts from 'sql/workbench/parts/connection/common/connection';
-import { ConnectionStatusManager } from 'sql/platform/connection/common/connectionStatusManager';
+import { ConnectionStatusManager, isDefaultTypeUri } from 'sql/platform/connection/common/connectionStatusManager';
 import { DashboardInput } from 'sql/workbench/parts/dashboard/dashboardInput';
 import { ConnectionGlobalStatus } from 'sql/workbench/parts/connection/common/connectionGlobalStatus';
 import { ConnectionStatusbarItem } from 'sql/workbench/parts/connection/browser/connectionStatus';
@@ -310,7 +310,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return new Promise<IConnectionResult>((resolve, reject) => {
 			if (options && options.showConnectionDialogOnError) {
 				let params: INewConnectionParams = options && options.params ? options.params : {
-					connectionType: this._connectionStatusManager.isDefaultTypeUri(owner.uri) ? ConnectionType.default : ConnectionType.editor,
+					connectionType: isDefaultTypeUri(owner.uri) ? ConnectionType.default : ConnectionType.editor,
 					input: owner,
 					runQueryOnCompletion: RunQueryOnConnectionMode.none,
 					showDashboard: options.showDashboard
@@ -693,7 +693,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * URI, which happens when the connected database is master or the default database
 	 */
 	public getFormattedUri(uri: string, connectionProfile: IConnectionProfile): string {
-		if (this._connectionStatusManager.isDefaultTypeUri(uri)) {
+		if (isDefaultTypeUri(uri)) {
 			return this.getConnectionUri(connectionProfile);
 		} else {
 			return uri;
@@ -835,7 +835,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 		return new Promise<string>((resolve, reject) => {
 			this._connectionStore.saveProfile(connection).then(savedProfile => {
-				let newId = this._connectionStatusManager.updateConnectionProfile(savedProfile, id);
+				let newId = this._connectionStatusManager.updateConnectionProfile(id, savedProfile);
 				return resolve(newId);
 			});
 		});
@@ -876,7 +876,6 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	public onConnectionComplete(handle: number, info: azdata.ConnectionInfoSummary): void {
-		const self = this;
 		let connection = this._connectionStatusManager.onConnectionComplete(info);
 
 		if (info.connectionId) {
@@ -887,10 +886,10 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 			connection.extensionTimer.stop();
 
 			connection.connectHandler(true);
-			self.addTelemetryForConnection(connection);
+			this.addTelemetryForConnection(connection);
 
-			if (self._connectionStatusManager.isDefaultTypeUri(info.ownerUri)) {
-				self._connectionGlobalStatus.setStatusToConnected(info.connectionSummary);
+			if (isDefaultTypeUri(info.ownerUri)) {
+				this._connectionGlobalStatus.setStatusToConnected(info.connectionSummary);
 			}
 		} else {
 			connection.connectHandler(false, info.errorMessage, info.errorNumber, info.messages);
@@ -988,7 +987,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		const self = this;
 
 		return new Promise<IConnectionResult>((resolve, reject) => {
-			let connectionInfo = this._connectionStatusManager.addConnection(connection, uri);
+			let connectionInfo = this._connectionStatusManager.addConnection(uri, connection);
 			// Setup the handler for the connection complete notification to call
 			connectionInfo.connectHandler = ((connectResult, errorMessage, errorCode, callStack) => {
 				let connectionMngInfo = this._connectionStatusManager.findConnection(uri);
@@ -1046,7 +1045,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 						this._notifyDisconnected(connection, fileUri);
 					}
 
-					if (this._connectionStatusManager.isDefaultTypeUri(fileUri)) {
+					if (isDefaultTypeUri(fileUri)) {
 						this._connectionGlobalStatus.setStatusToDisconnected(fileUri);
 					}
 
@@ -1075,7 +1074,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 			this.doDisconnect(uri, profile).then(result => {
 				if (result) {
 					this.addTelemetryForConnectionDisconnected(input);
-					this._connectionStatusManager.removeConnection(uri);
+					this._connectionStatusManager.deleteConnection(uri);
 					resolve();
 				} else {
 					reject(result);

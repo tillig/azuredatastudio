@@ -12,14 +12,14 @@ import { TestInstantiationService } from 'vs/platform/instantiation/test/common/
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 
 import * as TypeMoq from 'typemoq';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 
 suite('ServerTreeView onAddConnectionProfile handler tests', () => {
 
 	let serverTreeView: ServerTreeView;
 	let mockTree: TypeMoq.Mock<Tree>;
 	let mockRefreshTreeMethod: TypeMoq.Mock<Function>;
-	let capabilitiesService = new CapabilitiesTestService();
+	let capabilitiesService = new TestCapabilitiesService();
 
 	setup(() => {
 		let instantiationService = new TestInstantiationService();

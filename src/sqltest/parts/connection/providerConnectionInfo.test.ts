@@ -8,11 +8,11 @@ import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import * as azdata from 'azdata';
 import * as assert from 'assert';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 
 suite('SQL ProviderConnectionInfo tests', () => {
 	let msSQLCapabilities: any;
-	let capabilitiesService: CapabilitiesTestService;
+	let capabilitiesService: TestCapabilitiesService;
 
 	let connectionProfile: IConnectionProfile = {
 		connectionName: 'name',
@@ -126,7 +126,7 @@ suite('SQL ProviderConnectionInfo tests', () => {
 			connectionOptions: connectionProvider,
 		};
 		capabilities.push(msSQLCapabilities);
-		capabilitiesService = new CapabilitiesTestService();
+		capabilitiesService = new TestCapabilitiesService();
 		capabilitiesService.capabilities['MSSQL'] = { connection: msSQLCapabilities };
 	});
 
