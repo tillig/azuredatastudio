@@ -187,7 +187,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * @param owner of the connection. Can be the editors
 	 * @param options to use after the connection is complete
 	 */
-	private tryConnect(connection: IConnectionProfile, owner: IConnectableInput, options?: IConnectionCompletionOptions): Promise<IConnectionResult> {
+	private tryConnect(connection: IConnectionProfile, options?: IConnectionCompletionOptions): Promise<IConnectionResult> {
 		// Load the password if it's not already loaded
 		return this.connectionStore.addSavedPassword(connection).then(async result => {
 			const newConnection = result.profile;
@@ -229,15 +229,13 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 */
 	private showConnectionDialogOnError(
 		connection: IConnectionProfile,
-		owner: IConnectableInput,
 		connectionResult: IConnectionResult,
 		options?: IConnectionCompletionOptions): Promise<IConnectionResult> {
 		if (options && options.showConnectionDialogOnError) {
 			const params: INewConnectionParams = options && options.params ? options.params : {
-				connectionType: this.connectionStatusManager.isDefaultTypeUri(owner.uri) ? ConnectionType.default : ConnectionType.editor,
+				connectionType: this.connectionStatusManager.isDefaultTypeUri(connection.uri) ? ConnectionType.default : ConnectionType.editor,
 				input: owner,
-				runQueryOnCompletion: RunQueryOnConnectionMode.none,
-				showDashboard: options.showDashboard
+				runQueryOnCompletion: RunQueryOnConnectionMode.none
 			};
 			return this.showConnectionDialog(params, connection, connectionResult).then(() => {
 				return connectionResult;
@@ -260,54 +258,11 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		}
 		if (options && options.useExistingConnection) {
 			if (this.connectionStatusManager.isConnected(uri)) {
-				return Promise.resolve(this.connectionStatusManager.getOriginalOwnerUri(ownerUri));
+				return Promise.resolve(this.connectionStatusManager.getOriginalOwnerUri(uri));
 			}
 		}
-		let input: IConnectableInput = options && options.params ? options.params.input : undefined;
-		if (!input) {
-			input = {
-				onConnectReject: callbacks ? callbacks.onConnectReject : undefined,
-				onConnectStart: callbacks ? callbacks.onConnectStart : undefined,
-				onConnectSuccess: callbacks ? callbacks.onConnectSuccess : undefined,
-				onDisconnect: callbacks ? callbacks.onDisconnect : undefined,
-				onConnectCanceled: callbacks ? callbacks.onConnectCanceled : undefined,
-				uri: uri
-			};
-		}
 
-
-		if (uri !== input.uri) {
-			//TODO: this should never happen. If the input is already passed, it should have the uri
-			this.logService.warn(`the given uri is different that the input uri. ${uri}|${input.uri}`);
-		}
-		return this.tryConnect(connection, input, options);
-	}
-
-	/**
-	 * If there's already a connection for given profile and purpose, returns the ownerUri for the connection
-	 * otherwise tries to make a connection and returns the owner uri when connection is complete
-	 * The purpose is connection by default
-	 */
-	public connectIfNotConnected(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection' | 'notebook', saveConnection: boolean = false): Promise<string> {
-		const ownerUri: string = Utils.generateUri(connection, purpose);
-		if (this.connectionStatusManager.isConnected(ownerUri)) {
-			return Promise.resolve(this.connectionStatusManager.getOriginalOwnerUri(ownerUri));
-		} else {
-			const options: IConnectionCompletionOptions = {
-				saveTheConnection: saveConnection,
-				showConnectionDialogOnError: true,
-				showDashboard: purpose === 'dashboard',
-				params: undefined,
-				showFirewallRuleOnError: true,
-			};
-			return this.connect(connection, ownerUri, options).then(connectionResult => {
-				if (connectionResult && connectionResult.connected) {
-					return this.connectionStatusManager.getOriginalOwnerUri(ownerUri);
-				} else {
-					return Promise.reject(connectionResult.errorMessage);
-				}
-			});
-		}
+		return this.tryConnect(connection, options);
 	}
 
 	private async connectWithOptions(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {

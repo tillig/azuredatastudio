@@ -53,7 +53,6 @@ export interface IConnectionResult {
 	errorMessage: string;
 	errorCode: number;
 	callStack: string;
-	errorHandled?: boolean;
 	connectionProfile?: IConnectionProfile;
 }
 
@@ -258,8 +257,6 @@ export interface INewConnectionParams {
 	connectionType: ConnectionType;
 	input?: IConnectableInput;
 	runQueryOnCompletion?: RunQueryOnConnectionMode;
-	querySelection?: azdata.ISelectionData;
-	showDashboard?: boolean;
 	providers?: string[];
 }
 
