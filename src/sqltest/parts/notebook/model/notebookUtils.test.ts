@@ -6,7 +6,7 @@
 import * as should from 'should';
 import { IConnectionProfile } from 'azdata';
 
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { formatServerNameWithDatabaseNameForAttachTo, getServerFromFormattedAttachToName, getDatabaseFromFormattedAttachToName } from 'sql/workbench/parts/notebook/notebookUtils';
 
@@ -29,7 +29,7 @@ suite('notebookUtils', function (): void {
 	};
 
 	test('Should format server and database name correctly for attach to', async function (): Promise<void> {
-		let capabilitiesService = new CapabilitiesTestService();
+		let capabilitiesService = new TestCapabilitiesService();
 		let connProfile = new ConnectionProfile(capabilitiesService, conn);
 		connProfile.serverName = 'serverName';
 		connProfile.databaseName = 'databaseName';
@@ -38,7 +38,7 @@ suite('notebookUtils', function (): void {
 	});
 
 	test('Should format server name correctly for attach to', async function (): Promise<void> {
-		let capabilitiesService = new CapabilitiesTestService();
+		let capabilitiesService = new TestCapabilitiesService();
 		let connProfile = new ConnectionProfile(capabilitiesService, conn);
 		connProfile.serverName = 'serverName';
 		let attachToNameFormatted = formatServerNameWithDatabaseNameForAttachTo(connProfile);
@@ -46,7 +46,7 @@ suite('notebookUtils', function (): void {
 	});
 
 	test('Should format server name correctly for attach to when database is undefined', async function (): Promise<void> {
-		let capabilitiesService = new CapabilitiesTestService();
+		let capabilitiesService = new TestCapabilitiesService();
 		let connProfile = new ConnectionProfile(capabilitiesService, conn);
 		connProfile.serverName = 'serverName';
 		connProfile.databaseName = undefined;
@@ -55,7 +55,7 @@ suite('notebookUtils', function (): void {
 	});
 
 	test('Should format server name as empty string when server/database are undefined', async function (): Promise<void> {
-		let capabilitiesService = new CapabilitiesTestService();
+		let capabilitiesService = new TestCapabilitiesService();
 		let connProfile = new ConnectionProfile(capabilitiesService, conn);
 		connProfile.serverName = undefined;
 		connProfile.databaseName = undefined;

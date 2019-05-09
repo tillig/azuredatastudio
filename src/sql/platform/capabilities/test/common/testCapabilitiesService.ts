@@ -11,7 +11,7 @@ import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/ap
 import { Event, Emitter } from 'vs/base/common/event';
 import { Action } from 'vs/base/common/actions';
 
-export class CapabilitiesTestService implements ICapabilitiesService {
+export class TestCapabilitiesService implements ICapabilitiesService {
 
 	public _serviceBrand: any;
 

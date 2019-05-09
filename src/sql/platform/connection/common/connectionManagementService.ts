@@ -17,7 +17,7 @@ import * as Utils from 'sql/platform/connection/common/utils';
 import * as Constants from 'sql/platform/connection/common/constants';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import * as ConnectionContracts from 'sql/workbench/parts/connection/common/connection';
-import { ConnectionStatusManager } from 'sql/platform/connection/common/connectionStatusManager';
+import { ConnectionStatusManager, isDefaultTypeUri } from 'sql/platform/connection/common/connectionStatusManager';
 import { DashboardInput } from 'sql/workbench/parts/dashboard/dashboardInput';
 import { ConnectionGlobalStatus } from 'sql/workbench/parts/connection/common/connectionGlobalStatus';
 import { ConnectionStatusbarItem } from 'sql/workbench/parts/connection/browser/connectionStatus';
@@ -233,7 +233,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		options?: IConnectionCompletionOptions): Promise<IConnectionResult> {
 		if (options && options.showConnectionDialogOnError) {
 			const params: INewConnectionParams = options && options.params ? options.params : {
-				connectionType: this.connectionStatusManager.isDefaultTypeUri(connection.uri) ? ConnectionType.default : ConnectionType.editor,
+				connectionType: isDefaultTypeUri(connection.uri) ? ConnectionType.default : ConnectionType.editor,
 				input: owner,
 				runQueryOnCompletion: RunQueryOnConnectionMode.none
 			};
@@ -512,7 +512,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * URI, which happens when the connected database is master or the default database
 	 */
 	public getFormattedUri(uri: string, connectionProfile: IConnectionProfile): string {
-		if (this.connectionStatusManager.isDefaultTypeUri(uri)) {
+		if (isDefaultTypeUri(uri)) {
 			return this.getConnectionUri(connectionProfile);
 		} else {
 			return uri;
@@ -651,7 +651,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 	private saveToSettings(id: string, connection: IConnectionProfile): Promise<string> {
 		return this.connectionStore.saveProfile(connection).then(savedProfile => {
-			return this.connectionStatusManager.updateConnectionProfile(savedProfile, id);
+			return this.connectionStatusManager.updateConnectionProfile(id, savedProfile);
 		});
 	}
 
@@ -702,7 +702,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 			connection.connectHandler(true);
 			this.addTelemetryForConnection(connection);
 
-			if (this.connectionStatusManager.isDefaultTypeUri(info.ownerUri)) {
+			if (isDefaultTypeUri(info.ownerUri)) {
 				this.connectionGlobalStatus.setStatusToConnected(info.connectionSummary);
 			}
 		} else {
@@ -792,7 +792,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	// Connect an open URI to a connection profile
 	private createNewConnection(uri: string, connection: IConnectionProfile): Promise<IConnectionResult> {
 		return new Promise<IConnectionResult>(resolve => {
-			const connectionInfo = this.connectionStatusManager.addConnection(connection, uri);
+			const connectionInfo = this.connectionStatusManager.addConnection(uri, connection);
 			// Setup the handler for the connection complete notification to call
 			connectionInfo.connectHandler = ((connectResult, errorMessage, errorCode, callStack) => {
 				const connectionMngInfo = this.connectionStatusManager.findConnection(uri);
@@ -843,7 +843,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 					this._onDisconnect.fire({ connectionUri: fileUri, connectionProfile: connection });
 				}
 
-				if (this.connectionStatusManager.isDefaultTypeUri(fileUri)) {
+				if (isDefaultTypeUri(fileUri)) {
 					this.connectionGlobalStatus.setStatusToDisconnected(fileUri);
 				}
 
@@ -870,7 +870,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return this.doDisconnect(uri, profile).then(result => {
 			if (result) {
 				this.addTelemetryForConnectionDisconnected(input);
-				this.connectionStatusManager.removeConnection(uri);
+				this.connectionStatusManager.deleteConnection(uri);
 				return undefined;
 			} else {
 				return Promise.reject(result);

@@ -19,7 +19,7 @@ import { IHandleFirewallRuleResult } from 'sql/workbench/services/resourceProvid
 import { WorkbenchEditorTestService } from 'sqltest/stubs/workbenchEditorTestService';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { EditorGroupTestService } from 'sqltest/stubs/editorGroupService';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 import { ConnectionProviderStub } from 'sqltest/stubs/connectionProviderStub';
 import { ResourceProviderStub } from 'sqltest/stubs/resourceProviderServiceStub';
 
@@ -36,7 +36,7 @@ import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 
 suite('SQL ConnectionManagementService tests', () => {
 
-	let capabilitiesService: CapabilitiesTestService;
+	let capabilitiesService: TestCapabilitiesService;
 	let connectionDialogService: TypeMoq.Mock<ConnectionDialogTestService>;
 	let connectionStore: TypeMoq.Mock<ConnectionStore>;
 	let workbenchEditorService: TypeMoq.Mock<WorkbenchEditorTestService>;
@@ -79,7 +79,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 	setup(() => {
 
-		capabilitiesService = new CapabilitiesTestService();
+		capabilitiesService = new TestCapabilitiesService();
 		connectionDialogService = TypeMoq.Mock.ofType(ConnectionDialogTestService);
 		connectionStore = TypeMoq.Mock.ofType(ConnectionStore, TypeMoq.MockBehavior.Loose, new TestStorageService());
 		workbenchEditorService = TypeMoq.Mock.ofType(WorkbenchEditorTestService);
@@ -706,7 +706,7 @@ suite('SQL ConnectionManagementService tests', () => {
 		let profile = Object.assign({}, connectionProfile);
 		profile.options = { password: profile.password };
 		profile.id = 'test_id';
-		connectionStatusManager.addConnection(profile, 'test_uri');
+		connectionStatusManager.addConnection('test_uri', profile);
 		(connectionManagementService as any)._connectionStatusManager = connectionStatusManager;
 		let credentials = connectionManagementService.getActiveConnectionCredentials(profile.id);
 		assert.equal(credentials['password'], profile.options['password']);
@@ -717,7 +717,7 @@ suite('SQL ConnectionManagementService tests', () => {
 		profile.options = { password: profile.password };
 		profile.id = 'test_id';
 		let uri = 'test_initial_uri';
-		connectionStatusManager.addConnection(profile, uri);
+		connectionStatusManager.addConnection(uri, profile);
 		(connectionManagementService as any)._connectionStatusManager = connectionStatusManager;
 
 		// If I call getConnectionUriFromId on the given connection
@@ -731,7 +731,7 @@ suite('SQL ConnectionManagementService tests', () => {
 		let profile = Object.assign({}, connectionProfile);
 		profile.options = { password: profile.password };
 		profile.id = 'test_id';
-		connectionStatusManager.addConnection(profile, Utils.generateUri(profile));
+		connectionStatusManager.addConnection(Utils.generateUri(profile), profile);
 		(connectionManagementService as any)._connectionStatusManager = connectionStatusManager;
 
 		// If I call getConnectionUriFromId with a different URI than the connection's

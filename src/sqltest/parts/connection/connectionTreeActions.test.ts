@@ -27,7 +27,7 @@ import Severity from 'vs/base/common/severity';
 import { ObjectExplorerActionsContext, ManageConnectionAction } from 'sql/workbench/parts/objectExplorer/browser/objectExplorerActions';
 import { IConnectionResult, IConnectionParams } from 'sql/platform/connection/common/connectionManagement';
 import { TreeSelectionHandler } from 'sql/workbench/parts/objectExplorer/browser/treeSelectionHandler';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 import { UNSAVED_GROUP_ID } from 'sql/platform/connection/common/constants';
 import { $ } from 'vs/base/browser/dom';
 
@@ -39,7 +39,7 @@ suite('SQL Connection Tree Action tests', () => {
 		errorCode: undefined,
 		callStack: undefined
 	};
-	let capabilitiesService = new CapabilitiesTestService();
+	let capabilitiesService = new TestCapabilitiesService();
 	setup(() => {
 		errorMessageService = TypeMoq.Mock.ofType(ErrorMessageServiceStub, TypeMoq.MockBehavior.Loose);
 		let nothing: void;

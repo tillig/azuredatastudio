@@ -13,75 +13,56 @@ import { StopWatch } from 'vs/base/common/stopwatch';
 
 export class ConnectionStatusManager {
 
-	private _connections: { [id: string]: ConnectionManagementInfo };
+	private connections = new Map<string, ConnectionManagementInfo>();
 
-	constructor(@ICapabilitiesService private _capabilitiesService: ICapabilitiesService) {
-		this._connections = {};
+	constructor(@ICapabilitiesService private capabilitiesService: ICapabilitiesService) {
 	}
 
-	public findConnection(uri: string): ConnectionManagementInfo {
-		if (uri in this._connections) {
-			return this._connections[uri];
-		} else {
-			return undefined;
+	public findConnection(uri: string): ConnectionManagementInfo | undefined {
+		return this.connections.get(uri);
+	}
+
+	public findConnectionByProfileId(profileId: string): ConnectionManagementInfo | undefined {
+		for (const conn of this.connections.values()) {
+			if (conn.connectionProfile.id === profileId) {
+				return conn;
+			}
 		}
+		return undefined;
 	}
 
-	public findConnectionByProfileId(profileId: string): ConnectionManagementInfo {
-		return Object.values(this._connections).find((connection: ConnectionManagementInfo) => connection.connectionProfile.id === profileId);
-	}
-
-	public findConnectionProfile(connectionProfile: IConnectionProfile): ConnectionManagementInfo {
-		let id = Utils.generateUri(connectionProfile);
+	public findConnectionProfile(connectionProfile: IConnectionProfile): ConnectionManagementInfo | undefined {
+		const id = Utils.generateUri(connectionProfile);
 		return this.findConnection(id);
 	}
 
-	public hasConnection(id: string): Boolean {
-		return !!this.findConnection(id);
-	}
-
 	public deleteConnection(id: string): void {
-		let info = this.findConnection(id);
-		if (info) {
-			for (let key in this._connections) {
-				if (this._connections[key].connectionId === info.connectionId) {
-					if (this._connections[key].connecting) {
-						this._connections[key].deleted = true;
-					} else {
-						delete this._connections[key];
-					}
-				}
-			}
+		const conn = this.connections.get(id);
+		if (conn) {
+			conn.deleted = true;
+			this.connections.delete(id);
 		}
 	}
 
-	public getConnectionProfile(id: string): ConnectionProfile {
-		let connectionInfoForId = this.findConnection(id);
-		return connectionInfoForId ? connectionInfoForId.connectionProfile : undefined;
+	public getConnectionProfile(id: string): ConnectionProfile | undefined {
+		const conn = this.connections.get(id);
+		return conn && conn.connectionProfile;
 	}
 
-	public addConnection(connection: IConnectionProfile, id: string): ConnectionManagementInfo {
+	public addConnection(id: string, connection: IConnectionProfile): ConnectionManagementInfo {
 		// Always create a copy and save that in the list
-		let connectionProfile = new ConnectionProfile(this._capabilitiesService, connection);
-		let connectionInfo: ConnectionManagementInfo = new ConnectionManagementInfo();
+		const connectionProfile = new ConnectionProfile(this.capabilitiesService, connection);
+		const connectionInfo = new ConnectionManagementInfo();
 		connectionInfo.providerId = connection.providerName;
 		connectionInfo.extensionTimer = StopWatch.create();
 		connectionInfo.intelliSenseTimer = StopWatch.create();
 		connectionInfo.connectionProfile = connectionProfile;
 		connectionInfo.connecting = true;
-		this._connections[id] = connectionInfo;
+		this.connections.set(id, connectionInfo);
 		connectionInfo.serviceTimer = StopWatch.create();
 		connectionInfo.ownerUri = id;
 
 		return connectionInfo;
-	}
-
-	/**
-	 *
-	 * @param uri Remove connection from list of active connections
-	 */
-	public removeConnection(uri: string) {
-		delete this._connections[uri];
 	}
 
 	/**
@@ -90,30 +71,34 @@ export class ConnectionStatusManager {
 	 * when the connection is stored, the group id get assigned to the profile and it can change the id
 	 * So for those kind of connections, we need to add the new id and the connection
 	 */
-	public updateConnectionProfile(connection: IConnectionProfile, id: string): string {
-		let newId: string = id;
-		let connectionInfo: ConnectionManagementInfo = this._connections[id];
-		if (connectionInfo && connection) {
-			if (this.isDefaultTypeUri(id)) {
-				connectionInfo.connectionProfile.groupId = connection.groupId;
-				newId = Utils.generateUri(connection);
+	public updateConnectionProfile(id: string, connection: IConnectionProfile): string | undefined {
+		const conn = this.connections.get(id);
+		if (conn && connection) {
+			if (isDefaultTypeUri(id)) {
+				conn.connectionProfile.groupId = connection.groupId;
+				const newId = Utils.generateUri(connection);
 				if (newId !== id) {
-					this.deleteConnection(id);
-					this._connections[newId] = connectionInfo;
+					this.connections.delete(id);
+					this.connections.set(newId, conn);
 				}
+				id = newId;
 			}
-			connectionInfo.connectionProfile.id = connection.id;
+			conn.connectionProfile.id = connection.id;
+			return id;
 		}
-		return newId;
+		return undefined;
 	}
 
-	public onConnectionComplete(summary: azdata.ConnectionInfoSummary): ConnectionManagementInfo {
-		let connection = this._connections[summary.ownerUri];
-		connection.serviceTimer.stop();
-		connection.connecting = false;
-		connection.connectionId = summary.connectionId;
-		connection.serverInfo = summary.serverInfo;
-		return connection;
+	public onConnectionComplete(summary: azdata.ConnectionInfoSummary): ConnectionManagementInfo | undefined {
+		const connection = this.connections.get(summary.ownerUri);
+		if (connection) {
+			connection.serviceTimer.stop();
+			connection.connecting = false;
+			connection.connectionId = summary.connectionId;
+			connection.serverInfo = summary.serverInfo;
+			return connection;
+		}
+		return undefined;
 	}
 
 	/**
@@ -121,16 +106,16 @@ export class ConnectionStatusManager {
 	 * @param summary connection summary
 	 */
 	public updateDatabaseName(summary: azdata.ConnectionInfoSummary): void {
-		let connection = this._connections[summary.ownerUri];
+		const connection = this.connections.get(summary.ownerUri);
 
 		//Check if the existing connection database name is different the one in the summary
-		if (connection.connectionProfile.databaseName !== summary.connectionSummary.databaseName) {
+		if (connection && connection.connectionProfile.databaseName !== summary.connectionSummary.databaseName) {
 			//Add the ownerUri with database name to the map if not already exists
 			connection.connectionProfile.databaseName = summary.connectionSummary.databaseName;
-			let prefix = Utils.getUriPrefix(summary.ownerUri);
-			let ownerUriWithDbName = Utils.generateUriWithPrefix(connection.connectionProfile, prefix);
-			if (!(ownerUriWithDbName in this._connections)) {
-				this._connections[ownerUriWithDbName] = connection;
+			const prefix = Utils.getUriPrefix(summary.ownerUri);
+			const ownerUriWithDbName = Utils.generateUriWithPrefix(connection.connectionProfile, prefix);
+			if (!this.connections.has(ownerUriWithDbName)) {
+				this.connections.set(ownerUriWithDbName, connection);
 			}
 		}
 	}
@@ -155,8 +140,8 @@ export class ConnectionStatusManager {
 		return ownerUriToReturn;
 	}
 
-	public onConnectionChanged(changedConnInfo: azdata.ChangedConnectionInfo): IConnectionProfile {
-		let connection = this._connections[changedConnInfo.connectionUri];
+	public onConnectionChanged(changedConnInfo: azdata.ChangedConnectionInfo): IConnectionProfile | undefined {
+		const connection = this.connections.get(changedConnInfo.connectionUri);
 		if (connection && connection.connectionProfile) {
 			connection.connectionProfile.serverName = changedConnInfo.connection.serverName;
 			connection.connectionProfile.databaseName = changedConnInfo.connection.databaseName;
@@ -167,25 +152,21 @@ export class ConnectionStatusManager {
 	}
 
 	public isConnected(id: string): boolean {
-		return (id in this._connections && this._connections[id].connectionId && !!this._connections[id].connectionId);
+		return this.connections.has(id) && this.connections.get(id).connectionId && !!this.connections.get(id).connectionId;
 	}
 
 	public isConnecting(id: string): boolean {
-		return (id in this._connections && this._connections[id].connecting);
-	}
-
-	public isDefaultTypeUri(uri: string): boolean {
-		return uri && uri.startsWith(Utils.uriPrefixes.default);
+		return this.connections.has(id) && this.connections.get(id).connecting;
 	}
 
 	public getProviderIdFromUri(ownerUri: string): string {
-		let providerId: string = '';
-		let connection = this.findConnection(ownerUri);
+		let providerId = '';
+		const connection = this.findConnection(ownerUri);
 		if (connection) {
 			providerId = connection.connectionProfile.providerName;
 		}
-		if (!providerId && this.isDefaultTypeUri(ownerUri)) {
-			let optionsKey = ownerUri.replace(Utils.uriPrefixes.default, '');
+		if (!providerId && isDefaultTypeUri(ownerUri)) {
+			const optionsKey = ownerUri.replace(Utils.uriPrefixes.default, '');
 			providerId = ConnectionProfile.getProviderFromOptionsKey(optionsKey);
 		}
 		return providerId;
@@ -195,7 +176,10 @@ export class ConnectionStatusManager {
 	 * Get a list of the active connection profiles managed by the status manager
 	*/
 	public getActiveConnectionProfiles(providers?: string[]): ConnectionProfile[] {
-		let profiles = Object.values(this._connections).map((connectionInfo: ConnectionManagementInfo) => connectionInfo.connectionProfile);
+		let profiles: Array<ConnectionProfile> = [];
+		for (const conn of this.connections.values()) {
+			profiles.push(conn.connectionProfile);
+		}
 		// Remove duplicate profiles that may be listed multiple times under different URIs by filtering for profiles that don't have the same ID as an earlier profile in the list
 		profiles = profiles.filter((profile, index) => profiles.findIndex(otherProfile => otherProfile.id === profile.id) === index);
 
@@ -204,4 +188,8 @@ export class ConnectionStatusManager {
 		}
 		return profiles;
 	}
+}
+
+export function isDefaultTypeUri(uri: string): boolean {
+	return uri && uri.startsWith(Utils.uriPrefixes.default);
 }
