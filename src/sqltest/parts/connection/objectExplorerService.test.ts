@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ObjectExplorerProviderTestService } from 'sqltest/stubs/objectExplorerProviderTestService';
-import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
+import { TestConnectionManagementService } from 'sql/platform/connection/test/common/testConnectionManagementService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ObjectExplorerService, NodeExpandInfoWithProviderId } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';

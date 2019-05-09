@@ -254,9 +254,14 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * @param options to be used after the connection is completed
 	 * @param callbacks to call after the connection is completed
 	 */
-	public connect(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {
+	public connect(connection: IConnectionProfile, uri?: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<string> {
 		if (!uri) {
 			uri = Utils.generateUri(connection);
+		}
+		if (options && options.useExistingConnection) {
+			if (this.connectionStatusManager.isConnected(uri)) {
+				return Promise.resolve(this.connectionStatusManager.getOriginalOwnerUri(ownerUri));
+			}
 		}
 		let input: IConnectableInput = options && options.params ? options.params.input : undefined;
 		if (!input) {

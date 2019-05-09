@@ -10,7 +10,6 @@ import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/co
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
-import { IServerGroupDialogCallbacks } from 'sql/platform/serverGroup/common/serverGroupController';
 
 export const VIEWLET_ID = 'workbench.view.connections';
 
@@ -21,27 +20,32 @@ export interface IConnectionCompletionOptions {
 	/**
 	 * save the connection to MRU and settings (only save to setting if profile.saveProfile is set to true)
 	 */
-	saveTheConnection: boolean;
+	saveTheConnection?: boolean;
 
 	/**
 	 * open the dashboard after connection is complete
 	 */
-	showDashboard: boolean;
+	showDashboard?: boolean;
 
 	/**
 	 * Parameters to be used if connecting from an editor
 	 */
-	params: INewConnectionParams;
+	params?: INewConnectionParams;
 
 	/**
 	 * Open the connection dialog if connection fails
 	 */
-	showConnectionDialogOnError: boolean;
+	showConnectionDialogOnError?: boolean;
 
 	/**
 	 * Open the connection firewall rule dialog if connection fails
 	 */
-	showFirewallRuleOnError: boolean;
+	showFirewallRuleOnError?: boolean;
+
+	/**
+	 * Use an existing connection with the same profile if exists
+	 */
+	useExistingConnection?: boolean;
 }
 
 export interface IConnectionResult {
@@ -54,11 +58,11 @@ export interface IConnectionResult {
 }
 
 export interface IConnectionCallbacks {
-	onConnectStart(): void;
-	onConnectReject(error?: string): void;
-	onConnectSuccess(params?: INewConnectionParams): void;
-	onDisconnect(): void;
-	onConnectCanceled(): void;
+	onConnectStart?(): void;
+	onConnectReject?(error?: string): void;
+	onConnectSuccess?(params?: INewConnectionParams): void;
+	onDisconnect?(): void;
+	onConnectCanceled?(): void;
 }
 
 export const SERVICE_ID = 'connectionManagementService';
@@ -82,9 +86,9 @@ export interface IConnectionManagementService {
 	showConnectionDialog(params?: INewConnectionParams, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void>;
 
 	/**
-	 * Load the password and opens a new connection
+	 * Open a connection with the given profile
 	 */
-	connect(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
+	connect(connection: IConnectionProfile, uri?: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<string>;
 
 	/**
 	 * Finds existing connection for given profile and purpose is any exists.

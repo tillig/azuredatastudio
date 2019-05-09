@@ -12,7 +12,7 @@ import {
 	ActiveConnectionsFilterAction, RecentConnectionsFilterAction
 }
 	from 'sql/workbench/parts/objectExplorer/browser/connectionTreeAction';
-import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
+import { TestConnectionManagementService } from 'sql/platform/connection/test/common/testConnectionManagementService';
 import { ErrorMessageServiceStub } from 'sqltest/stubs/errorMessageServiceStub';
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
