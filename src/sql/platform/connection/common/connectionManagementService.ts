@@ -61,22 +61,22 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	private readonly connectionStore = this.instantiationService.createInstance(ConnectionStore);
 	private readonly connectionGlobalStatus = this.instantiationService.createInstance(ConnectionGlobalStatus);
 
-	private readonly _onAddConnectionProfile = new Emitter<IConnectionProfile>();
+	private readonly _onAddConnectionProfile = this._register(new Emitter<IConnectionProfile>());
 	public readonly onAddConnectionProfile = this._onAddConnectionProfile.event;
 
-	private readonly _onDeleteConnectionProfile = new Emitter<void>();
+	private readonly _onDeleteConnectionProfile = this._register(new Emitter<void>());
 	public readonly onDeleteConnectionProfile = this._onDeleteConnectionProfile.event;
 
-	private readonly _onConnect = new Emitter<IConnectionParams>();
+	private readonly _onConnect = this._register(new Emitter<IConnectionParams>());
 	public readonly onConnect = this._onConnect.event;
 
-	private readonly _onDisconnect = new Emitter<IConnectionParams>();
+	private readonly _onDisconnect = this._register(new Emitter<IConnectionParams>());
 	public readonly onDisconnect = this._onDisconnect.event;
 
-	private readonly _onConnectionChanged = new Emitter<IConnectionParams>();
+	private readonly _onConnectionChanged = this._register(new Emitter<IConnectionParams>());
 	public readonly onConnectionChanged = this._onConnectionChanged.event;
 
-	private readonly _onLanguageFlavorChanged = new Emitter<azdata.DidChangeLanguageFlavorParams>();
+	private readonly _onLanguageFlavorChanged = this._register(new Emitter<azdata.DidChangeLanguageFlavorParams>());
 	public readonly onLanguageFlavorChanged = this._onLanguageFlavorChanged.event;
 
 	constructor(
@@ -116,9 +116,6 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		entries(registry.providers).map(v => {
 			providerRegistration({ id: v[0], properties: v[1] });
 		});
-
-		this._register(this._onAddConnectionProfile);
-		this._register(this._onDeleteConnectionProfile);
 
 		// Refresh editor titles when connections start/end/change to ensure tabs are colored correctly
 		this.onConnectionChanged(() => this.refreshEditorTitles());
