@@ -53,7 +53,6 @@ import { IConfigurationService } from 'vs/platform/configuration/common/configur
 import { ILogService } from 'vs/platform/log/common/log';
 
 export class ConnectionManagementService extends Disposable implements IConnectionManagementService {
-
 	_serviceBrand: any;
 
 	private readonly _providers = new Map<string, { onReady: Promise<azdata.ConnectionProvider>, properties: ConnectionProviderProperties }>();
@@ -73,9 +72,6 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 	private readonly _onDisconnect = new Emitter<IConnectionParams>();
 	public readonly onDisconnect = this._onDisconnect.event;
-
-	private readonly _onConnectRequestSent = new Emitter<void>();
-	public readonly onConnectRequestSent = this._onConnectRequestSent.event;
 
 	private readonly _onConnectionChanged = new Emitter<IConnectionParams>();
 	public readonly onConnectionChanged = this._onConnectionChanged.event;
@@ -646,7 +642,6 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 		return this._providers.get(connection.providerName).onReady.then((provider) => {
 			provider.connect(uri, connectionInfo);
-			this._onConnectRequestSent.fire();
 
 			// TODO make this generic enough to handle non-SQL languages too
 			this.doChangeLanguageFlavor(uri, 'sql', connection.providerName);
@@ -734,7 +729,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	public onConnectionComplete(handle: number, info: azdata.ConnectionInfoSummary): void {
+	private onConnectionComplete(handle: number, info: azdata.ConnectionInfoSummary): void {
 		const connection = this.connectionStatusManager.onConnectionComplete(info);
 
 		if (info.connectionId) {
@@ -755,7 +750,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		}
 	}
 
-	public onConnectionChangedNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo): void {
+	private onConnectionChangedNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo): void {
 		const profile: IConnectionProfile = this.connectionStatusManager.onConnectionChanged(changedConnInfo);
 		this._notifyConnectionChanged(profile, changedConnInfo.connectionUri);
 	}

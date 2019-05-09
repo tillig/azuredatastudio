@@ -210,37 +210,34 @@ suite('SQL ConnectionManagementService tests', () => {
 		let connectionToUse = connection ? connection : connectionProfile;
 		let id = connectionToUse.getOptionsKey();
 		let defaultUri = 'connection://' + (id ? id : connectionToUse.serverName + ':' + connectionToUse.databaseName);
-		connectionManagementService.onConnectRequestSent(() => {
-			let info: azdata.ConnectionInfoSummary = {
-				connectionId: error ? undefined : 'id',
-				connectionSummary: {
-					databaseName: connectionToUse.databaseName,
-					serverName: connectionToUse.serverName,
-					userName: connectionToUse.userName
-				},
-				errorMessage: error,
-				errorNumber: errorCode,
-				messages: errorCallStack,
-				ownerUri: uri ? uri : defaultUri,
-				serverInfo: undefined
-			};
-			connectionManagementService.onConnectionComplete(0, info);
-		});
+		// connectionManagementService.onConnectRequestSent(() => {
+		// 	let info: azdata.ConnectionInfoSummary = {
+		// 		connectionId: error ? undefined : 'id',
+		// 		connectionSummary: {
+		// 			databaseName: connectionToUse.databaseName,
+		// 			serverName: connectionToUse.serverName,
+		// 			userName: connectionToUse.userName
+		// 		},
+		// 		errorMessage: error,
+		// 		errorNumber: errorCode,
+		// 		messages: errorCallStack,
+		// 		ownerUri: uri ? uri : defaultUri,
+		// 		serverInfo: undefined
+		// 	};
+		// 	connectionManagementService.onConnectionComplete(0, info);
+		// });
 		return connectionManagementService.cancelConnectionForUri(uri).then(() => {
 			return connectionManagementService.connect(connectionToUse, uri, options);
 		});
 	}
 
-	test('showConnectionDialog should open the dialog with default type given no parameters', done => {
-		connectionManagementService.showConnectionDialog().then(() => {
+	test('showConnectionDialog should open the dialog with default type given no parameters', () => {
+		return connectionManagementService.showConnectionDialog().then(() => {
 			verifyShowConnectionDialog(undefined, ConnectionType.default, undefined);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('showConnectionDialog should open the dialog with given type given valid input', done => {
+	test('showConnectionDialog should open the dialog with given type given valid input', () => {
 		let params: INewConnectionParams = {
 			connectionType: ConnectionType.editor,
 			input: {
@@ -253,15 +250,12 @@ suite('SQL ConnectionManagementService tests', () => {
 			},
 			runQueryOnCompletion: RunQueryOnConnectionMode.executeQuery
 		};
-		connectionManagementService.showConnectionDialog(params).then(() => {
+		return connectionManagementService.showConnectionDialog(params).then(() => {
 			verifyShowConnectionDialog(undefined, params.connectionType, params.input.uri);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('showConnectionDialog should pass the model to the dialog if there is a model assigned to the uri', done => {
+	test('showConnectionDialog should pass the model to the dialog if there is a model assigned to the uri', () => {
 		let params: INewConnectionParams = {
 			connectionType: ConnectionType.editor,
 			input: {
@@ -275,21 +269,18 @@ suite('SQL ConnectionManagementService tests', () => {
 			runQueryOnCompletion: RunQueryOnConnectionMode.executeQuery
 		};
 
-		connect(params.input.uri).then(() => {
+		return connect(params.input.uri).then(() => {
 			let saveConnection = connectionManagementService.getConnectionProfile(params.input.uri);
 
 			assert.notEqual(saveConnection, undefined, `profile was not added to the connections`);
 			assert.equal(saveConnection.serverName, connectionProfile.serverName, `Server names are different`);
 			connectionManagementService.showConnectionDialog(params).then(() => {
 				verifyShowConnectionDialog(connectionProfile, params.connectionType, params.input.uri);
-				done();
-			}).catch(err => {
-				done(err);
 			});
-		}, err => done(err));
+		});
 	});
 
-	test('connect should save profile given options with saveProfile set to true', done => {
+	test('connect should save profile given options with saveProfile set to true', () => {
 		let uri: string = 'Editor Uri';
 		let options: IConnectionCompletionOptions = {
 			params: undefined,
@@ -299,34 +290,12 @@ suite('SQL ConnectionManagementService tests', () => {
 			showFirewallRuleOnError: true
 		};
 
-		connect(uri, options).then(() => {
+		return connect(uri, options).then(() => {
 			verifyOptions(options);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	/* Andresse  10/5/17 commented this test out since it was only working before my changes by the chance of how Promises work
-		If we want to continue to test this, the connection logic needs to be rewritten to actually wait for everything to be done before it resolves */
-	// test('connect should show dashboard given options with showDashboard set to true', done => {
-	// 	let uri: string = 'Editor Uri';
-	// 	let options: IConnectionCompletionOptions = {
-	// 		params: undefined,
-	// 		saveTheConnection: false,
-	// 		showDashboard: true,
-	// 		showConnectionDialogOnError: false
-	// 	};
-
-	// 	connect(uri, options).then(() => {
-	// 		verifyOptions(options);
-	// 		done();
-	// 	}).catch(err => {
-	// 		done(err);
-	// 	});
-	// });
-
-	test('connect should pass the params in options to onConnectSuccess callback', done => {
+	test('connect should pass the params in options to onConnectSuccess callback', () => {
 		let uri: string = 'Editor Uri';
 		let paramsInOnConnectSuccess: INewConnectionParams;
 		let options: IConnectionCompletionOptions = {
@@ -351,41 +320,32 @@ suite('SQL ConnectionManagementService tests', () => {
 			showFirewallRuleOnError: true
 		};
 
-		connect(uri, options).then(() => {
+		return connect(uri, options).then(() => {
 			verifyOptions(options);
 			assert.notEqual(paramsInOnConnectSuccess, undefined);
 			assert.equal(paramsInOnConnectSuccess.connectionType, options.params.connectionType);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('connectAndSaveProfile should show not load the password', done => {
+	test('connectAndSaveProfile should show not load the password', () => {
 		let uri: string = 'Editor Uri';
 		let options: IConnectionCompletionOptions = undefined;
 
-		connect(uri, options, true).then(() => {
+		return connect(uri, options, true).then(() => {
 			verifyOptions(options, true);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('connect with undefined uri and options should connect using the default uri', done => {
+	test('connect with undefined uri and options should connect using the default uri', () => {
 		let uri = undefined;
 		let options: IConnectionCompletionOptions = undefined;
 
-		connect(uri, options).then(() => {
+		return connect(uri, options).then(() => {
 			assert.equal(connectionManagementService.isProfileConnected(connectionProfile), true);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('failed connection should open the dialog if connection fails', done => {
+	test('failed connection should open the dialog if connection fails', () => {
 		let uri = undefined;
 		let error: string = 'error';
 		let errorCode: number = 111;
@@ -406,18 +366,15 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: errorCallStack
 		};
 
-		connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
+		return connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowFirewallRuleDialog(connectionProfile, false);
 			verifyShowConnectionDialog(connectionProfile, ConnectionType.default, uri, connectionResult);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('failed connection should not open the dialog if the option is set to false even if connection fails', done => {
+	test('failed connection should not open the dialog if the option is set to false even if connection fails', () => {
 		let uri = undefined;
 		let error: string = 'error when options set to false';
 		let errorCode: number = 111;
@@ -438,18 +395,15 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: errorCallStack
 		};
 
-		connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
+		return connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowFirewallRuleDialog(connectionProfile, false);
 			verifyShowConnectionDialog(connectionProfile, ConnectionType.default, uri, connectionResult, false);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('failed firewall rule should open the firewall rule dialog', done => {
+	test('failed firewall rule should open the firewall rule dialog', () => {
 		handleFirewallRuleResult.canHandleFirewallRule = true;
 		resolveHandleFirewallRuleDialog = true;
 		isFirewallRuleAdded = true;
@@ -467,17 +421,14 @@ suite('SQL ConnectionManagementService tests', () => {
 			showFirewallRuleOnError: true
 		};
 
-		connect(uri, options, false, connectionProfile, error, errorCode).then(result => {
+		return connect(uri, options, false, connectionProfile, error, errorCode).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, expectedError);
 			verifyShowFirewallRuleDialog(connectionProfile, true);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('failed firewall rule connection should not open the firewall rule dialog if the option is set to false even if connection fails', done => {
+	test('failed firewall rule connection should not open the firewall rule dialog if the option is set to false even if connection fails', () => {
 		handleFirewallRuleResult.canHandleFirewallRule = true;
 		resolveHandleFirewallRuleDialog = true;
 		isFirewallRuleAdded = true;
@@ -502,18 +453,15 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: errorCallStack
 		};
 
-		connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
+		return connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowFirewallRuleDialog(connectionProfile, false);
 			verifyShowConnectionDialog(connectionProfile, ConnectionType.default, uri, connectionResult, false);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('failed firewall rule connection and failed during open firewall rule should open the firewall rule dialog and connection dialog with error', done => {
+	test('failed firewall rule connection and failed during open firewall rule should open the firewall rule dialog and connection dialog with error', () => {
 		handleFirewallRuleResult.canHandleFirewallRule = true;
 		resolveHandleFirewallRuleDialog = false;
 		isFirewallRuleAdded = true;
@@ -538,18 +486,15 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: errorCallStack
 		};
 
-		connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
+		return connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowFirewallRuleDialog(connectionProfile, true);
 			verifyShowConnectionDialog(connectionProfile, ConnectionType.default, uri, connectionResult, true);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('failed firewall rule connection should open the firewall rule dialog. Then canceled firewall rule dialog should not open connection dialog', done => {
+	test('failed firewall rule connection should open the firewall rule dialog. Then canceled firewall rule dialog should not open connection dialog', () => {
 		handleFirewallRuleResult.canHandleFirewallRule = true;
 		resolveHandleFirewallRuleDialog = true;
 		isFirewallRuleAdded = false;
@@ -574,18 +519,15 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: errorCallStack
 		};
 
-		connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
+		return connect(uri, options, false, connectionProfile, error, errorCode, errorCallStack).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowFirewallRuleDialog(connectionProfile, true);
 			verifyShowConnectionDialog(connectionProfile, ConnectionType.default, uri, connectionResult, false);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('connect when password is empty and unsaved should open the dialog', done => {
+	test('connect when password is empty and unsaved should open the dialog', () => {
 		let uri = undefined;
 		let expectedConnection: boolean = false;
 		let options: IConnectionCompletionOptions = {
@@ -603,18 +545,15 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: undefined
 		};
 
-		connect(uri, options, false, connectionProfileWithEmptyUnsavedPassword).then(result => {
+		return connect(uri, options, false, connectionProfileWithEmptyUnsavedPassword).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowConnectionDialog(connectionProfileWithEmptyUnsavedPassword, ConnectionType.default, uri, connectionResult);
 			verifyShowFirewallRuleDialog(connectionProfile, false);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('connect when password is empty and saved should not open the dialog', done => {
+	test('connect when password is empty and saved should not open the dialog', () => {
 		let uri = undefined;
 		let expectedConnection: boolean = true;
 		let options: IConnectionCompletionOptions = {
@@ -632,17 +571,14 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: undefined
 		};
 
-		connect(uri, options, false, connectionProfileWithEmptySavedPassword).then(result => {
+		return connect(uri, options, false, connectionProfileWithEmptySavedPassword).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowConnectionDialog(connectionProfileWithEmptySavedPassword, ConnectionType.default, uri, connectionResult, false);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('connect from editor when empty password when it is required and saved should not open the dialog', done => {
+	test('connect from editor when empty password when it is required and saved should not open the dialog', () => {
 		let uri = 'editor 3';
 		let expectedConnection: boolean = true;
 		let options: IConnectionCompletionOptions = {
@@ -672,48 +608,39 @@ suite('SQL ConnectionManagementService tests', () => {
 			callStack: undefined
 		};
 
-		connect(uri, options, false, connectionProfileWithEmptySavedPassword).then(result => {
+		return connect(uri, options, false, connectionProfileWithEmptySavedPassword).then(result => {
 			assert.equal(result.connected, expectedConnection);
 			assert.equal(result.errorMessage, connectionResult.errorMessage);
 			verifyShowConnectionDialog(connectionProfileWithEmptySavedPassword, ConnectionType.editor, uri, connectionResult, false);
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('doChangeLanguageFlavor should throw on unknown provider', done => {
+	test('doChangeLanguageFlavor should throw on unknown provider', () => {
 		// given a provider that will never exist
 		let invalidProvider = 'notaprovider';
 		// when I call doChangeLanguageFlavor
 		// Then I expect it to throw
 		assert.throws(() => connectionManagementService.doChangeLanguageFlavor('file://my.sql', 'sql', invalidProvider));
-		done();
 	});
 
-	test('doChangeLanguageFlavor should send event for known provider', done => {
+	test('doChangeLanguageFlavor should send event for known provider', () => {
 		// given a provider that is registered
 		let uri = 'file://my.sql';
 		let language = 'sql';
 		let flavor = 'MSSQL';
 		// when I call doChangeLanguageFlavor
-		try {
-			let called = false;
-			connectionManagementService.onLanguageFlavorChanged((changeParams: azdata.DidChangeLanguageFlavorParams) => {
-				called = true;
-				assert.equal(changeParams.uri, uri);
-				assert.equal(changeParams.language, language);
-				assert.equal(changeParams.flavor, flavor);
-			});
-			connectionManagementService.doChangeLanguageFlavor(uri, language, flavor);
-			assert.ok(called, 'expected onLanguageFlavorChanged event to be sent');
-			done();
-		} catch (error) {
-			done(error);
-		}
+		let called = false;
+		connectionManagementService.onLanguageFlavorChanged((changeParams: azdata.DidChangeLanguageFlavorParams) => {
+			called = true;
+			assert.equal(changeParams.uri, uri);
+			assert.equal(changeParams.language, language);
+			assert.equal(changeParams.flavor, flavor);
+		});
+		connectionManagementService.doChangeLanguageFlavor(uri, language, flavor);
+		assert.ok(called, 'expected onLanguageFlavorChanged event to be sent');
 	});
 
-	test('ensureDefaultLanguageFlavor should not send event if uri is connected', done => {
+	test('ensureDefaultLanguageFlavor should not send event if uri is connected', () => {
 		let uri: string = 'Editor Uri';
 		let options: IConnectionCompletionOptions = {
 			params: undefined,
@@ -727,16 +654,13 @@ suite('SQL ConnectionManagementService tests', () => {
 		connectionManagementService.onLanguageFlavorChanged((changeParams: azdata.DidChangeLanguageFlavorParams) => {
 			called = true;
 		});
-		connect(uri, options).then(() => {
+		return connect(uri, options).then(() => {
 			connectionManagementService.ensureDefaultLanguageFlavor(uri);
 			assert.equal(called, false, 'do not expect flavor change to be called');
-			done();
-		}).catch(err => {
-			done(err);
 		});
 	});
 
-	test('getConnectionId returns the URI associated with a connection that has had its database filled in', done => {
+	test('getConnectionId returns the URI associated with a connection that has had its database filled in', () => {
 		// Set up the connection management service with a connection corresponding to a default database
 		let dbName = 'master';
 		let serverName = 'test_server';
@@ -746,21 +670,16 @@ suite('SQL ConnectionManagementService tests', () => {
 		let connectionProfileWithDb: IConnectionProfile = Object.assign(connectionProfileWithoutDb, { databaseName: dbName });
 		// Save the database with a URI that has the database name filled in, to mirror Carbon's behavior
 		let ownerUri = Utils.generateUri(connectionProfileWithDb);
-		connect(ownerUri, undefined, false, connectionProfileWithoutDb).then(() => {
-			try {
-				// If I get the URI for the connection with or without a database from the connection management service
-				let actualUriWithDb = connectionManagementService.getConnectionUri(connectionProfileWithDb);
-				let actualUriWithoutDb = connectionManagementService.getConnectionUri(connectionProfileWithoutDb);
+		return connect(ownerUri, undefined, false, connectionProfileWithoutDb).then(() => {
+			// If I get the URI for the connection with or without a database from the connection management service
+			let actualUriWithDb = connectionManagementService.getConnectionUri(connectionProfileWithDb);
+			let actualUriWithoutDb = connectionManagementService.getConnectionUri(connectionProfileWithoutDb);
 
-				// Then the retrieved URIs should match the one on the connection
-				let expectedUri = Utils.generateUri(connectionProfileWithoutDb);
-				assert.equal(actualUriWithDb, expectedUri);
-				assert.equal(actualUriWithoutDb, expectedUri);
-				done();
-			} catch (err) {
-				done(err);
-			}
-		}, err => done(err));
+			// Then the retrieved URIs should match the one on the connection
+			let expectedUri = Utils.generateUri(connectionProfileWithoutDb);
+			assert.equal(actualUriWithDb, expectedUri);
+			assert.equal(actualUriWithoutDb, expectedUri);
+		});
 	});
 
 	test('getTabColorForUri returns undefined when there is no connection for the given URI', () => {
@@ -769,7 +688,7 @@ suite('SQL ConnectionManagementService tests', () => {
 		assert.equal(color, undefined);
 	});
 
-	test('getTabColorForUri returns the group color corresponding to the connection for a URI', done => {
+	test('getTabColorForUri returns the group color corresponding to the connection for a URI', () => {
 		// Set up the connection store to give back a group for the expected connection profile
 		configResult['tabColorMode'] = 'border';
 		let expectedColor = 'red';
@@ -777,15 +696,10 @@ suite('SQL ConnectionManagementService tests', () => {
 			color: expectedColor
 		});
 		let uri = 'testUri';
-		connect(uri).then(() => {
-			try {
-				let tabColor = connectionManagementService.getTabColorForUri(uri);
-				assert.equal(tabColor, expectedColor);
-				done();
-			} catch (e) {
-				done(e);
-			}
-		}, err => done(err));
+		return connect(uri).then(() => {
+			let tabColor = connectionManagementService.getTabColorForUri(uri);
+			assert.equal(tabColor, expectedColor);
+		});
 	});
 
 	test('getActiveConnectionCredentials returns the credentials dictionary for a connection profile', () => {

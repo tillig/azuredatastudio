@@ -69,12 +69,12 @@ export interface IConnectionManagementService {
 	_serviceBrand: any;
 
 	// Event Emitters
-	onAddConnectionProfile: Event<IConnectionProfile>;
-	onDeleteConnectionProfile: Event<void>;
-	onConnect: Event<IConnectionParams>;
-	onDisconnect: Event<IConnectionParams>;
-	onConnectionChanged: Event<IConnectionParams>;
-	onLanguageFlavorChanged: Event<azdata.DidChangeLanguageFlavorParams>;
+	readonly onAddConnectionProfile: Event<IConnectionProfile>;
+	readonly onDeleteConnectionProfile: Event<void>;
+	readonly onConnect: Event<IConnectionParams>;
+	readonly onDisconnect: Event<IConnectionParams>;
+	readonly onConnectionChanged: Event<IConnectionParams>;
+	readonly onLanguageFlavorChanged: Event<azdata.DidChangeLanguageFlavorParams>;
 
 	/**
 	 * Opens the connection dialog to create new connection
@@ -91,13 +91,6 @@ export interface IConnectionManagementService {
 	 * The purpose is connection by default
 	 */
 	findExistingConnection(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile;
-
-	/**
-	 * Adds the successful connection to MRU and send the connection error back to the connection handler for failed connections
-	 */
-	onConnectionComplete(handle: number, connectionInfoSummary: azdata.ConnectionInfoSummary): void;
-
-	onConnectionChangedNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo);
 
 	getConnectionGroups(providers?: string[]): ConnectionProfileGroup[];
 
