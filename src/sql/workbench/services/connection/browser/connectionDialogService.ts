@@ -4,8 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import {
-	IConnectionManagementService,
-	ConnectionType, INewConnectionParams, IConnectionCompletionOptions, IConnectionResult
+	IConnectionManagementService, IConnectionResult
 } from 'sql/platform/connection/common/connectionManagement';
 import { ConnectionDialogWidget, OnShowUIResponse } from 'sql/workbench/services/connection/browser/connectionDialogWidget';
 import { ConnectionController } from 'sql/workbench/services/connection/browser/connectionController';
@@ -28,8 +27,8 @@ import * as types from 'vs/base/common/types';
 import { trim } from 'vs/base/common/strings';
 import { localize } from 'vs/nls';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { CmsConnectionController } from 'sql/workbench/services/connection/browser/cmsConnectionController';
+import { ILayoutService } from 'vs/platform/layout/browser/layoutService';
 
 export interface IConnectionValidateResult {
 	isValid: boolean;
@@ -73,7 +72,6 @@ export class ConnectionDialogService implements IConnectionDialogService {
 	private _connecting: boolean = false;
 	private _connectionErrorTitle = localize('connectionError', 'Connection error');
 	private _dialogDeferredPromise: Deferred<IConnectionProfile>;
-	private _toDispose = [];
 
 	/**
 	 * This is used to work around the interconnectedness of this code
@@ -82,7 +80,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 	private _connectionManagementService: IConnectionManagementService;
 
 	constructor(
-		@IWorkbenchLayoutService private layoutService: IWorkbenchLayoutService,
+		@ILayoutService private layoutService: ILayoutService,
 		@IInstantiationService private _instantiationService: IInstantiationService,
 		@ICapabilitiesService private _capabilitiesService: ICapabilitiesService,
 		@IErrorMessageService private _errorMessageService: IErrorMessageService,

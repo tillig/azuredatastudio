@@ -167,6 +167,7 @@ registerSingleton(IConfigurationResolverService, ConfigurationResolverService, t
 //#endregion
 
 // {{SQL CARBON EDIT}} - SQL-specific services
+import 'sql/platform/connection/common/connectionStoreService';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { IConnectionDialogService } from 'sql/workbench/services/connection/common/connectionDialogService';

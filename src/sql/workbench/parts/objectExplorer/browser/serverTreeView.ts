@@ -15,6 +15,7 @@ import { localize } from 'vs/nls';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { Event, Emitter } from 'vs/base/common/event';
 import { append, $, hide, show } from 'vs/base/browser/dom';
+import { CommandsRegistry } from 'vs/platform/commands/common/commands';
 
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
@@ -34,7 +35,6 @@ import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMess
 import { ServerTreeActionProvider } from 'sql/workbench/parts/objectExplorer/browser/serverTreeActionProvider';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { isHidden } from 'sql/base/browser/dom';
-import { CommandsRegistry } from 'vs/platform/commands/common/commands';
 
 /**
  * ServerTreeview implements the dynamic tree view.
@@ -146,19 +146,6 @@ export class ServerTreeView {
 
 		// Theme styler
 		this._toDispose.push(attachListStyler(this._tree, this._themeService));
-
-		// Refresh Tree when these events are emitted
-		this._toDispose.push(this._connectionManagementService.onAddConnectionProfile((newProfile: IConnectionProfile) => {
-			this.handleAddConnectionProfile(newProfile);
-		}));
-		this._toDispose.push(this._connectionManagementService.onDeleteConnectionProfile(() => {
-			this.refreshTree();
-		}));
-		this._toDispose.push(this._connectionManagementService.onDisconnect((connectionParams) => {
-			if (this.isObjectExplorerConnectionUri(connectionParams.connectionUri)) {
-				this.deleteObjectExplorerNodeAndRefreshTree(connectionParams.connectionProfile);
-			}
-		}));
 
 		if (this._objectExplorerService && this._objectExplorerService.onUpdateObjectExplorerNodes) {
 			this._toDispose.push(this._objectExplorerService.onUpdateObjectExplorerNodes(args => {

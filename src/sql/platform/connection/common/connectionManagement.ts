@@ -6,17 +6,15 @@
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { Event } from 'vs/base/common/event';
 import * as azdata from 'azdata';
-import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
+import { IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 
-export const VIEWLET_ID = 'workbench.view.connections';
-
 /**
  * Options for the actions that could happen after connecting is complete
  */
-export interface IConnectionCompletionOptions {
+export interface IConnectOptions {
 	/**
 	 * save the connection to MRU and settings (only save to setting if profile.saveProfile is set to true)
 	 */
@@ -26,11 +24,6 @@ export interface IConnectionCompletionOptions {
 	 * open the dashboard after connection is complete
 	 */
 	showDashboard?: boolean;
-
-	/**
-	 * Parameters to be used if connecting from an editor
-	 */
-	params?: INewConnectionParams;
 
 	/**
 	 * Open the connection dialog if connection fails
@@ -56,14 +49,6 @@ export interface IConnectionResult {
 	connectionProfile?: IConnectionProfile;
 }
 
-export interface IConnectionCallbacks {
-	onConnectStart?(): void;
-	onConnectReject?(error?: string): void;
-	onConnectSuccess?(params?: INewConnectionParams): void;
-	onDisconnect?(): void;
-	onConnectCanceled?(): void;
-}
-
 export const SERVICE_ID = 'connectionManagementService';
 
 export const IConnectionManagementService = createDecorator<IConnectionManagementService>(SERVICE_ID);
@@ -72,22 +57,15 @@ export interface IConnectionManagementService {
 	_serviceBrand: any;
 
 	// Event Emitters
-	readonly onAddConnectionProfile: Event<IConnectionProfile>;
-	readonly onDeleteConnectionProfile: Event<void>;
-	readonly onConnect: Event<IConnectionParams>;
-	readonly onDisconnect: Event<IConnectionParams>;
-	readonly onConnectionChanged: Event<IConnectionParams>;
+	readonly onConnect: Event<string>;
+	readonly onDisconnect: Event<string>;
+	readonly onConnectionChanged: Event<string>;
 	readonly onLanguageFlavorChanged: Event<azdata.DidChangeLanguageFlavorParams>;
-
-	/**
-	 * Opens the connection dialog to create new connection
-	 */
-	showConnectionDialog(params?: INewConnectionParams, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void>;
 
 	/**
 	 * Open a connection with the given profile
 	 */
-	connect(connection: IConnectionProfile, uri?: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<string>;
+	connect(connection: IConnectionProfile, uri?: string, options?: IConnectOptions): Promise<string>;
 
 	/**
 	 * Finds existing connection for given profile and purpose is any exists.
@@ -95,25 +73,7 @@ export interface IConnectionManagementService {
 	 */
 	findExistingConnection(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile;
 
-	getConnectionGroups(providers?: string[]): ConnectionProfileGroup[];
-
-	getRecentConnections(providers?: string[]): ConnectionProfile[];
-
-	clearRecentConnectionsList(): void;
-
-	clearRecentConnection(connectionProfile: IConnectionProfile): void;
-
 	getActiveConnections(providers?: string[]): ConnectionProfile[];
-
-	saveProfileGroup(profile: IConnectionProfileGroup): Promise<string>;
-
-	changeGroupIdForConnectionGroup(source: IConnectionProfileGroup, target: IConnectionProfileGroup): Promise<void>;
-
-	changeGroupIdForConnection(source: ConnectionProfile, targetGroupName: string): Promise<void>;
-
-	deleteConnection(connection: ConnectionProfile): Promise<boolean>;
-
-	deleteConnectionGroup(group: ConnectionProfileGroup): Promise<boolean>;
 
 	getAdvancedProperties(): azdata.ConnectionOption[];
 
@@ -135,26 +95,17 @@ export interface IConnectionManagementService {
 	 */
 	isProfileConnecting(connectionProfile: IConnectionProfile): boolean;
 
-	isRecent(connectionProfile: ConnectionProfile): boolean;
-
 	isConnected(fileUri: string, connectionProfile?: ConnectionProfile): boolean;
 
-	disconnectEditor(owner: IConnectableInput, force?: boolean): Promise<boolean>;
-
 	disconnect(connection: IConnectionProfile): Promise<void>;
-
 	disconnect(ownerUri: string): Promise<void>;
 
-	addSavedPassword(connectionProfile: IConnectionProfile): Promise<IConnectionProfile>;
-
-	listDatabases(connectionUri: string): Thenable<azdata.ListDatabasesResult>;
+	listDatabases(connectionUri: string): Promise<azdata.ListDatabasesResult>;
 
 	/**
 	 * Register a connection provider
 	 */
 	registerProvider(providerId: string, provider: azdata.ConnectionProvider): void;
-
-	editGroup(group: ConnectionProfileGroup): Promise<void>;
 
 	getConnectionProfile(fileUri: string): IConnectionProfile;
 
@@ -163,27 +114,16 @@ export interface IConnectionManagementService {
 	/**
 	 * Cancels the connection
 	 */
-	cancelConnection(connection: IConnectionProfile): Thenable<boolean>;
+	cancelConnection(connection: IConnectionProfile): Promise<boolean>;
 
 	/**
 	 * Changes the database for an active connection
 	 */
-	changeDatabase(connectionUri: string, databaseName: string): Thenable<boolean>;
+	changeDatabase(connectionUri: string, databaseName: string): Promise<boolean>;
 
-	/**
-	 * Cancels the connection for the editor
-	 */
-	cancelEditorConnection(owner: IConnectableInput): Thenable<boolean>;
-
-	showDashboard(connection: IConnectionProfile): Thenable<boolean>;
+	showDashboard(connection: IConnectionProfile): Promise<boolean>;
 
 	getProviderIdFromUri(ownerUri: string): string;
-
-	hasRegisteredServers(): boolean;
-
-	canChangeConnectionConfig(profile: IConnectionProfile, newGroupID: string): boolean;
-
-	getTabColorForUri(uri: string): string;
 
 	/**
 	 * Sends a notification that the language flavor for a given URI has changed.
@@ -204,14 +144,7 @@ export interface IConnectionManagementService {
 	/**
 	 * Refresh the IntelliSense cache for the connection with the given URI
 	 */
-	rebuildIntelliSenseCache(uri: string): Thenable<void>;
-
-	/**
-	 * Get a copy of the connection profile with its passwords removed
-	 * @param profile The connection profile to remove passwords from
-	 * @returns A copy of the connection profile with passwords removed
-	 */
-	removeConnectionProfileCredentials(profile: IConnectionProfile): IConnectionProfile;
+	rebuildIntelliSenseCache(uri: string): Promise<void>;
 
 	/**
 	 * Get the credentials for a connected connection profile, as they would appear in the options dictionary
@@ -231,67 +164,16 @@ export interface IConnectionManagementService {
 	/**
 	 * Get the connection string for the provided connection ID
 	 */
-	getConnectionString(connectionId: string, includePassword: boolean): Thenable<string>;
+	getConnectionString(connectionId: string, includePassword: boolean): Promise<string>;
 
 	/**
 	 * Serialize connection string with optional provider
 	 */
-	buildConnectionInfo(connectionString: string, provider?: string): Thenable<azdata.ConnectionInfo>;
+	buildConnectionInfo(connectionString: string, provider?: string): Promise<azdata.ConnectionInfo>;
 
 	providerRegistered(providerId: string): boolean;
 	/**
 	 * Get connection profile by id
 	 */
 	getConnectionProfileById(profileId: string): IConnectionProfile;
-}
-
-export enum RunQueryOnConnectionMode {
-	none = 0,
-	executeQuery = 1,
-	executeCurrentQuery = 2,
-	estimatedQueryPlan = 3,
-	actualQueryPlan = 4
-}
-
-export interface INewConnectionParams {
-	connectionType: ConnectionType;
-	input?: IConnectableInput;
-	runQueryOnCompletion?: RunQueryOnConnectionMode;
-	providers?: string[];
-}
-
-export interface IConnectableInput {
-	uri: string;
-	onConnectStart(): void;
-	onConnectReject(error?: string): void;
-	onConnectSuccess(params?: INewConnectionParams): void;
-	onDisconnect(): void;
-	onConnectCanceled(): void;
-}
-
-export enum ConnectionType {
-	default = 0,
-	editor = 1
-}
-
-export enum MetadataType {
-	Table = 0,
-	View = 1,
-	SProc = 2,
-	Function = 3
-}
-
-export enum TaskStatus {
-	NotStarted = 0,
-	InProgress = 1,
-	Succeeded = 2,
-	SucceededWithWarning = 3,
-	Failed = 4,
-	Canceled = 5,
-	Canceling = 6
-}
-
-export interface IConnectionParams {
-	connectionUri: string;
-	connectionProfile: IConnectionProfile;
 }

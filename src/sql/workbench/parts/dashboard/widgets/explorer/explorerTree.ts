@@ -6,7 +6,7 @@
 import { Router } from '@angular/router';
 
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
-import { MetadataType, IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
+import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { SingleConnectionManagementService } from 'sql/platform/bootstrap/node/commonServiceInterface.service';
 import {
 	NewQueryAction, ScriptSelectAction, EditDataAction, ScriptCreateAction, ScriptExecuteAction, ScriptAlterAction,
@@ -33,6 +33,13 @@ import { $ } from 'vs/base/browser/dom';
 import { ExecuteCommandAction } from 'vs/platform/actions/common/actions';
 import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import { IProgressService } from 'vs/platform/progress/common/progress';
+
+enum MetadataType {
+	Table = 0,
+	View = 1,
+	SProc = 2,
+	Function = 3
+}
 
 export class ObjectMetadataWrapper implements ObjectMetadata {
 	public metadataType: MetadataType;
