@@ -13,6 +13,7 @@ modelview-diff-editor-component {
 	height: 100%;
 	width : 100%;
 	display: block;
+	overflow: visible !important; /* show overflow so that horizontal scrollbar still shows if there's a title */
 }
 
 .vs-dark modelview-diff-editor-title {
