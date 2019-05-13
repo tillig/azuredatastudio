@@ -1,0 +1,19 @@
+{
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"noImplicitAny": true,
+		"moduleResolution": "classic"
+	},
+	"include": [
+		"./typings",
+		"./vs/vscode.d.ts",
+		"./vs/vscode.proposed.d.ts",
+		"./sql/azdata.d.ts",
+		"./sql/azdata.proposed.d.ts",
+		"./sql/base/**/*.ts"
+	],
+	"exclude": [
+		"node_modules/**"
+	]
+}

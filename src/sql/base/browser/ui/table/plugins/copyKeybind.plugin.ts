@@ -20,14 +20,14 @@ export class CopyKeybind<T> implements Slick.Plugin<T> {
 
 	public init(grid: Slick.Grid<T>) {
 		this.grid = grid;
-		this.handler.subscribe(this.grid.onKeyDown, (e, args) => this.handleKeyDown(e, args));
+		this.handler.subscribe(this.grid.onKeyDown, (e: KeyboardEvent) => this.handleKeyDown(e));
 	}
 
 	public destroy() {
 		this.handler.unsubscribeAll();
 	}
 
-	private handleKeyDown(e: KeyboardEvent, args: Slick.OnKeyDownEventArgs<T>): void {
+	private handleKeyDown(e: KeyboardEvent): void {
 		let event = new StandardKeyboardEvent(e);
 		let handled = false;
 

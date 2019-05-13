@@ -33,7 +33,7 @@ export class CheckboxSelectColumn<T> implements Slick.Plugin<T> {
 	private _options: ICheckboxSelectColumnOptions;
 	private _grid: Slick.Grid<T>;
 	private _handler = new Slick.EventHandler();
-	private _selectedRowsLookup = {};
+	private _selectedRowsLookup: { [row: number]: boolean } = {};
 
 	constructor(options?: ICheckboxSelectColumnOptions) {
 		this._options = mixin(options, defaultOptions, false);
@@ -42,20 +42,20 @@ export class CheckboxSelectColumn<T> implements Slick.Plugin<T> {
 	public init(grid: Slick.Grid<T>): void {
 		this._grid = grid;
 		this._handler
-			.subscribe(this._grid.onSelectedRowsChanged, (e, args) => this.handleSelectedRowsChanged(e, args))
-			.subscribe(this._grid.onClick, (e, args) => this.handleClick(e, args))
-			.subscribe(this._grid.onHeaderClick, (e, args) => this.handleHeaderClick(e, args))
-			.subscribe(this._grid.onKeyDown, (e, args) => this.handleKeyDown(e, args));
+			.subscribe(this._grid.onSelectedRowsChanged, () => this.handleSelectedRowsChanged())
+			.subscribe(this._grid.onClick, (e: Event, args: Slick.OnClickEventArgs<T>) => this.handleClick(e, args))
+			.subscribe(this._grid.onHeaderClick, (e: Event, args: Slick.OnHeaderClickEventArgs<T>) => this.handleHeaderClick(e, args))
+			.subscribe(this._grid.onKeyDown, (e: KeyboardEvent, args: Slick.OnKeyDownEventArgs<T>) => this.handleKeyDown(e, args));
 	}
 
 	public destroy(): void {
 		this._handler.unsubscribeAll();
 	}
 
-	private handleSelectedRowsChanged(e: Event, args: Slick.OnSelectedRowsChangedEventArgs<T>): void {
+	private handleSelectedRowsChanged(): void {
 		const selectedRows = this._grid.getSelectedRows();
-		let lookup = {}, row, i;
-		for (i = 0; i < selectedRows.length; i++) {
+		let lookup: { [row: number]: boolean } = {}, row: number;
+		for (let i = 0; i < selectedRows.length; i++) {
 			row = selectedRows[i];
 			lookup[row] = true;
 			if (lookup[row] !== this._selectedRowsLookup[row]) {
@@ -63,8 +63,8 @@ export class CheckboxSelectColumn<T> implements Slick.Plugin<T> {
 				delete this._selectedRowsLookup[row];
 			}
 		}
-		for (i in this._selectedRowsLookup) {
-			this._grid.invalidateRow(i);
+		for (const row in this._selectedRowsLookup) {
+			this._grid.invalidateRow(<number>(<any>row)); // we know this is a number since its defined as such, but typescript doesn't
 		}
 		this._selectedRowsLookup = lookup;
 		this._grid.render();
@@ -168,7 +168,7 @@ export class CheckboxSelectColumn<T> implements Slick.Plugin<T> {
 		};
 	}
 
-	private checkboxSelectionFormatter(row, cell, value, columnDef: Slick.Column<T>, dataContext): string {
+	private checkboxSelectionFormatter(row: number, cell: number, value: any, columnDef: Slick.Column<T>, dataContext: any): string {
 		return this._selectedRowsLookup[row]
 			? strings.format(checkboxTemplate, 'checked')
 			: strings.format(checkboxTemplate, '');

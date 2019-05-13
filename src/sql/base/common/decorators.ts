@@ -42,7 +42,7 @@ export function memoize(target: any, key: string, descriptor: any) {
 	};
 }
 
-export function unmemoize(target: Object, key: string) {
+export function unmemoize(target: any, key: string) {
 	const memoizeKey = `$memoize$${key}`;
 	if (target.hasOwnProperty(memoizeKey)) {
 		delete target[memoizeKey];

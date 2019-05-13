@@ -31,8 +31,8 @@ export interface ICellRangeSelector<T> extends Slick.Plugin<T> {
 }
 
 export interface ICellRangeDecorator {
-	show(range: Slick.Range);
-	hide();
+	show(range: Slick.Range): void;
+	hide(): void;
 }
 
 export class CellRangeSelector<T> implements ICellRangeSelector<T> {
@@ -57,10 +57,10 @@ export class CellRangeSelector<T> implements ICellRangeSelector<T> {
 		this.grid = grid;
 		this.canvas = this.grid.getCanvasNode();
 		this.handler
-			.subscribe(this.grid.onDragInit, e => this.handleDragInit(e))
-			.subscribe(this.grid.onDragStart, (e, dd) => this.handleDragStart(e, dd))
-			.subscribe(this.grid.onDrag, (e, dd) => this.handleDrag(e, dd))
-			.subscribe(this.grid.onDragEnd, (e, dd) => this.handleDragEnd(e, dd));
+			.subscribe(this.grid.onDragInit, (e: DOMEvent) => this.handleDragInit(e))
+			.subscribe(this.grid.onDragStart, (e: MouseEvent, dd: Slick.OnDragStartEventArgs<T>) => this.handleDragStart(e, dd))
+			.subscribe(this.grid.onDrag, (e: MouseEvent, dd: Slick.OnDragEventArgs<T>) => this.handleDrag(e, dd))
+			.subscribe(this.grid.onDragEnd, (e: MouseEvent, dd: Slick.OnDragEndEventArgs<T>) => this.handleDragEnd(e, dd));
 	}
 
 	public destroy() {

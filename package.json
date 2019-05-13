@@ -25,6 +25,8 @@
     "tslint": "node node_modules/tslint/bin/tslint -c tslint-gci.json -p src/tsconfig.json",
     "strict-null-check": "tsc -p src/tsconfig.strictNullChecks.json",
     "strict-null-check-watch": "tsc -p src/tsconfig.strictNullChecks.json --watch",
+    "no-implicit-any-check": "tsc -p src/tsconfig.noImplicitAnyChecks.json",
+    "no-implicit-any-check-watch": "tsc -p src/tsconfig.noImplicitAnyChecks.json --watch",
     "strict-initialization-watch": "tsc --watch -p src/tsconfig.json --noEmit --strictPropertyInitialization"
   },
   "dependencies": {
