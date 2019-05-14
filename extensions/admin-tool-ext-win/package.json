@@ -65,6 +65,8 @@
 		]
 	},
 	"dependencies": {
+		"mocha-junit-reporter": "^1.17.0",
+		"mocha-multi-reporters": "^1.1.7",
 		"vscode-extension-telemetry": "^0.0.15",
 		"vscode-nls": "^3.2.1"
 	},

@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import { context } from './testContext';
 
 const path = require('path');
-import * as testRunner from 'vscodetestcover';
+import * as testRunner from 'vscode/lib/testrunner';
 
 const suite = 'Integration Tests';
 
@@ -14,10 +14,6 @@ const testOptions: any = {
 	ui: 'tdd',
 	useColors: true,
 	timeout: 600000
-};
-
-const coverageConfig: any = {
-	coverConfig: '../coverageConfig.json'
 };
 
 if (process.env.BUILD_ARTIFACTSTAGINGDIRECTORY) {
@@ -35,6 +31,6 @@ if (!vscode.workspace.getConfiguration('test')['testSetupCompleted']) {
 	context.RunTest = false;
 }
 
-testRunner.configure(testOptions, coverageConfig);
+testRunner.configure(testOptions);
 
 export = testRunner;
