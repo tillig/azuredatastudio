@@ -55,7 +55,7 @@
 				},
 				{
 					"command": "adminToolExtWin.launchSsmsMinPropertiesDialog",
-					"when": "isWindows && connectionProvider == MSSQL && nodeType && nodeType =~ /^(Server|Database|Table|Column|Index|Statistic|View|ServerLevelLogin|ServerLevelServerRole|ServerLevelCredential|ServerLevelServerAudit|ServerLevelServerAuditSpecification|StoredProcedure|ScalarValuedFunction|TableValuedFunction|AggregateFunction|Synonym|Assembly|UserDefinedDataType|UserDefinedType|UserDefinedTableType|Sequence|User|DatabaseRole|ApplicationRole|Schema|SecurityPolicy|ServerLevelLinkedServer)$/",
+					"when": "isWindows && connectionProvider == MSSQL && !serverInfo.isCloud && nodeType && nodeType =~ /^(Server|Database|Table|Column|Index|Statistic|View|ServerLevelLogin|ServerLevelServerRole|ServerLevelCredential|ServerLevelServerAudit|ServerLevelServerAuditSpecification|StoredProcedure|ScalarValuedFunction|TableValuedFunction|AggregateFunction|Synonym|Assembly|UserDefinedDataType|UserDefinedType|UserDefinedTableType|Sequence|User|DatabaseRole|ApplicationRole|Schema|SecurityPolicy|ServerLevelLinkedServer)$/",
 					"group": "z-AdminToolExt@2"
 				}
 			]
@@ -65,12 +65,10 @@
 		]
 	},
 	"dependencies": {
-		"mocha-junit-reporter": "^1.17.0",
-		"mocha-multi-reporters": "^1.1.7",
 		"vscode-extension-telemetry": "^0.0.15",
 		"vscode-nls": "^3.2.1"
 	},
 	"devDependencies": {
-		"vscodetestcover": "^1.0.2"
+		"vscode": "1.0.1"
 	}
 }
