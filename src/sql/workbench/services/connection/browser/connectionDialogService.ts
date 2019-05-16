@@ -30,6 +30,7 @@ import { localize } from 'vs/nls';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { CmsConnectionController } from 'sql/workbench/services/connection/browser/cmsConnectionController';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 export interface IConnectionValidateResult {
 	isValid: boolean;
@@ -88,7 +89,8 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		@IErrorMessageService private _errorMessageService: IErrorMessageService,
 		@IConfigurationService private _configurationService: IConfigurationService,
 		@IClipboardService private _clipboardService: IClipboardService,
-		@ICommandService private _commandService: ICommandService
+		@ICommandService private _commandService: ICommandService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService
 	) {
 		this.initializeConnectionProviders();
 	}
@@ -280,14 +282,14 @@ export class ConnectionDialogService implements IConnectionDialogService {
 			if (providerName === Constants.cmsProviderName) {
 				this._connectionControllerMap[providerName] =
 					this._instantiationService.createInstance(CmsConnectionController,
-						this._container, this._connectionManagementService,
+						this._container,
 						this._capabilitiesService.getCapabilities(providerName).connection, {
 							onSetConnectButton: (enable: boolean) => this.handleSetConnectButtonEnable(enable)
 						}, providerName, this._inputModel ? this._inputModel.options.authTypeChanged : false);
 			} else {
 				this._connectionControllerMap[providerName] =
 					this._instantiationService.createInstance(ConnectionController,
-						this._container, this._connectionManagementService,
+						this._container,
 						this._capabilitiesService.getCapabilities(providerName).connection, {
 							onSetConnectButton: (enable: boolean) => this.handleSetConnectButtonEnable(enable)
 						}, providerName);
@@ -393,7 +395,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		connectionManagementService: IConnectionManagementService,
 		params?: INewConnectionParams,
 		model?: IConnectionProfile,
-		connectionResult?: IConnectionResult): Thenable<void> {
+		connectionResult?: IConnectionResult): Promise<void> {
 
 		this._connectionManagementService = connectionManagementService;
 
@@ -445,7 +447,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 			this._connectionDialog.newConnectionParams = params;
 		}
 		return new Promise<void>(() => {
-			this._connectionDialog.open(this._connectionManagementService.getRecentConnections(params.providers).length > 0);
+			this._connectionDialog.open(this.connectionStoreService.getRecentlyUsedConnections(params.providers).length > 0);
 			this.uiController.focusOnOpen();
 		});
 	}

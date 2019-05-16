@@ -6,7 +6,7 @@
 import { ConnectionDialogTestService } from 'sqltest/stubs/connectionDialogTestService';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { ConnectionStatusManager } from 'sql/platform/connection/common/connectionStatusManager';
-import { ConnectionStore } from 'sql/platform/connection/common/connectionStore';
+import { ConnectionStore } from 'sql/platform/connection/common/connectionStoreService';
 import {
 	INewConnectionParams, ConnectionType,
 	IConnectionCompletionOptions, IConnectionResult,

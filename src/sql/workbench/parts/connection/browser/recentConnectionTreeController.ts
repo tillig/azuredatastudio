@@ -16,6 +16,7 @@ import { IAction } from 'vs/base/common/actions';
 import { Event, Emitter } from 'vs/base/common/event';
 import mouse = require('vs/base/browser/mouseEvent');
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 export class RecentConnectionActionsProvider extends ContributableActionProvider {
 	private _onRecentConnectionRemoved = new Emitter<void>();
@@ -65,8 +66,9 @@ export class RecentConnectionTreeController extends DefaultController {
 	constructor(
 		private clickcb: (element: any, eventish: ICancelableEvent, origin: string) => void,
 		private actionProvider: RecentConnectionActionsProvider,
-		private _connectionManagementService: IConnectionManagementService,
-		@IContextMenuService private _contextMenuService: IContextMenuService
+		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
+		@IContextMenuService private _contextMenuService: IContextMenuService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService
 	) {
 		super();
 	}
@@ -100,7 +102,7 @@ export class RecentConnectionTreeController extends DefaultController {
 		if (event.keyCode === 20) {
 			let element = tree.getFocus();
 			if (element instanceof ConnectionProfile) {
-				this._connectionManagementService.clearRecentConnection(element);
+				this.connectionStoreService.removeRecentConnection(element);
 				this._onRecentConnectionRemoved.fire();
 				return true;
 			}

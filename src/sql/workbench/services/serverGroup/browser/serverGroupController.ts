@@ -10,16 +10,15 @@ import { IConfigurationService } from 'vs/platform/configuration/common/configur
 import { SERVER_GROUP_CONFIG, SERVER_GROUP_COLORS_CONFIG } from 'sql/workbench/parts/objectExplorer/common/serverGroup.contribution';
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
 import { IServerGroupController, IServerGroupDialogCallbacks } from 'sql/platform/serverGroup/common/serverGroupController';
-import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { ServerGroupDialog } from 'sql/workbench/parts/objectExplorer/browser/serverGroupDialog';
 import { ServerGroupViewModel } from 'sql/workbench/parts/objectExplorer/common/serverGroupViewModel';
 import { ConnectionProfileGroup, IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 export class ServerGroupController implements IServerGroupController {
 	_serviceBrand: any;
 
 	private _serverGroupDialog: ServerGroupDialog;
-	private _connectionManagementService: IConnectionManagementService;
 	private _callbacks: IServerGroupDialogCallbacks;
 	private _group: ConnectionProfileGroup;
 	private _viewModel: ServerGroupViewModel;
@@ -27,7 +26,8 @@ export class ServerGroupController implements IServerGroupController {
 	constructor(
 		@IErrorMessageService private _errorMessageService: IErrorMessageService,
 		@IInstantiationService private _instantiationService: IInstantiationService,
-		@IConfigurationService private _configurationService: IConfigurationService
+		@IConfigurationService private _configurationService: IConfigurationService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService
 	) {
 	}
 
@@ -37,7 +37,7 @@ export class ServerGroupController implements IServerGroupController {
 			this._group.name = this._viewModel.groupName;
 			this._group.color = this._viewModel.groupColor;
 			this._group.description = this._viewModel.groupDescription;
-			this._connectionManagementService.editGroup(this._group).then(() => {
+			this.connectionStoreService.editGroup(this._group).then(() => {
 				this._serverGroupDialog.close();
 			}).catch(err => {
 				// rollback changes made
@@ -53,7 +53,7 @@ export class ServerGroupController implements IServerGroupController {
 				color: this._viewModel.groupColor,
 				description: this._viewModel.groupDescription
 			};
-			this._connectionManagementService.saveProfileGroup(newGroup).then(groupId => {
+			this.connectionStoreService.saveProfileGroup(newGroup).then(groupId => {
 				if (this._callbacks) {
 					this._callbacks.onAddGroup(this._serverGroupDialog.groupName);
 				}
@@ -75,16 +75,14 @@ export class ServerGroupController implements IServerGroupController {
 	}
 
 
-	public showCreateGroupDialog(connectionManagementService: IConnectionManagementService, callbacks?: IServerGroupDialogCallbacks): Promise<void> {
-		this._connectionManagementService = connectionManagementService;
+	public showCreateGroupDialog(callbacks?: IServerGroupDialogCallbacks): Promise<void> {
 		this._group = null;
 		this._viewModel = new ServerGroupViewModel(undefined, this._configurationService.getValue(SERVER_GROUP_CONFIG)[SERVER_GROUP_COLORS_CONFIG]);
 		this._callbacks = callbacks ? callbacks : undefined;
 		return this.openServerGroupDialog();
 	}
 
-	public showEditGroupDialog(connectionManagementService: IConnectionManagementService, group: ConnectionProfileGroup): Promise<void> {
-		this._connectionManagementService = connectionManagementService;
+	public showEditGroupDialog(group: ConnectionProfileGroup): Promise<void> {
 		this._group = group;
 		this._viewModel = new ServerGroupViewModel(group, this._configurationService.getValue(SERVER_GROUP_CONFIG)[SERVER_GROUP_COLORS_CONFIG]);
 		return this.openServerGroupDialog();

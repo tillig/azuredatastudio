@@ -12,6 +12,7 @@ import { TreeUpdateUtils } from 'sql/workbench/parts/objectExplorer/browser/tree
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import Severity from 'vs/base/common/severity';
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 /**
  * Implements the DataSource(that returns a parent/children of an element) for the server tree
@@ -21,7 +22,8 @@ export class ServerTreeDataSource implements IDataSource {
 	constructor(
 		@IObjectExplorerService private _objectExplorerService: IObjectExplorerService,
 		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
-		@IErrorMessageService private _errorMessageService: IErrorMessageService
+		@IErrorMessageService private _errorMessageService: IErrorMessageService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService
 	) {
 	}
 
@@ -101,7 +103,7 @@ export class ServerTreeDataSource implements IDataSource {
 		} else if (element instanceof ConnectionProfileGroup) {
 			return Promise.resolve(element.getParent());
 		} else if (element instanceof TreeNode) {
-			return Promise.resolve(TreeUpdateUtils.getObjectExplorerParent(element, this._connectionManagementService));
+			return Promise.resolve(TreeUpdateUtils.getObjectExplorerParent(element, this.connectionStoreService));
 		} else {
 			return Promise.resolve(null);
 		}

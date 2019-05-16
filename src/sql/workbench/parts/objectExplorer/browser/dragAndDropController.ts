@@ -11,6 +11,7 @@ import { DragMouseEvent } from 'vs/base/browser/mouseEvent';
 import { TreeUpdateUtils } from 'sql/workbench/parts/objectExplorer/browser/treeUpdateUtils';
 import { UNSAVED_GROUP_ID } from 'sql/platform/connection/common/constants';
 import { IDragAndDropData } from 'vs/base/browser/dnd';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 /**
  * Implements drag and drop for the server tree
@@ -19,6 +20,7 @@ export class ServerTreeDragAndDrop implements IDragAndDrop {
 
 	constructor(
 		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService
 	) {
 	}
 
@@ -70,7 +72,7 @@ export class ServerTreeDragAndDrop implements IDragAndDrop {
 			// Verify if the connection can be moved to the target group
 			const source = data.getData()[0];
 			if (source instanceof ConnectionProfile) {
-				if (!this._connectionManagementService.canChangeConnectionConfig(source, targetConnectionProfileGroup.id)) {
+				if (!this.connectionStoreService.canChangeConnectionConfig(source, targetConnectionProfileGroup.id)) {
 					canDragOver = false;
 				}
 			} else if (source instanceof ConnectionProfileGroup) {
@@ -101,18 +103,17 @@ export class ServerTreeDragAndDrop implements IDragAndDrop {
 		const source = data.getData()[0];
 		if (source && source.getParent) {
 			let oldParent: ConnectionProfileGroup = source.getParent();
-			const self = this;
 			if (this.isDropAllowed(targetConnectionProfileGroup, oldParent, source)) {
 
 				if (source instanceof ConnectionProfile) {
 					// Change group id of profile
-					this._connectionManagementService.changeGroupIdForConnection(source, targetConnectionProfileGroup.id).then(() => {
-						TreeUpdateUtils.registeredServerUpdate(tree, self._connectionManagementService, targetConnectionProfileGroup);
+					this.connectionStoreService.changeGroupIdForConnection(source, targetConnectionProfileGroup.id).then(() => {
+						TreeUpdateUtils.registeredServerUpdate(tree, this.connectionStoreService, targetConnectionProfileGroup);
 					});
 				} else if (source instanceof ConnectionProfileGroup) {
 					// Change parent id of group
-					this._connectionManagementService.changeGroupIdForConnectionGroup(source, targetConnectionProfileGroup).then(() => {
-						TreeUpdateUtils.registeredServerUpdate(tree, self._connectionManagementService);
+					this.connectionStoreService.changeGroupIdForConnectionGroup(source, targetConnectionProfileGroup).then(() => {
+						TreeUpdateUtils.registeredServerUpdate(tree, this.connectionStoreService);
 					});
 				}
 			}

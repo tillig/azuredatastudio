@@ -271,6 +271,7 @@ registerSingleton(IAccountPickerService, AccountPickerService);
 registerSingleton(IProfilerService, ProfilerService);
 registerSingleton(IDacFxService, DacFxService);
 registerSingleton(ISchemaCompareService, SchemaCompareService);
+import 'sql/platform/connection/common/connectionStoreService';
 // {{SQL CARBON EDIT}} - End
 
 //#region --- workbench parts

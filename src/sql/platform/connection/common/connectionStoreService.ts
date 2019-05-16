@@ -13,6 +13,9 @@ import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ICredentialsService } from 'sql/platform/credentials/common/credentialsService';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
+import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
+import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
+import { Event, Emitter } from 'vs/base/common/event';
 
 const MAX_CONNECTIONS_DEFAULT = 25;
 
@@ -23,21 +26,71 @@ const CRED_ID_PREFIX = 'id:';
 const CRED_ITEMTYPE_PREFIX = 'itemtype:';
 const CRED_PROFILE_USER = 'Profile';
 
+export const IConnectionStoreService = createDecorator<IConnectionStoreService>('connectionStoreService');
+
+export interface IConnectionStoreService {
+	_serviceBrand: any;
+	readonly onProfileDeleted: Event<IConnectionProfile>;
+	readonly onProfileAdded: Event<IConnectionProfile>;
+	readonly onProfileUpdated: Event<IConnectionProfile>;
+	readonly onGroupDeleted: Event<ConnectionProfileGroup>;
+	readonly onGroupAdded: Event<ConnectionProfileGroup>;
+	readonly onGroupUpdated: Event<ConnectionProfileGroup>;
+	addSavedPassword(profile: IConnectionProfile): Promise<{ profile: IConnectionProfile, savedCred: boolean }>;
+	isPasswordRequired(profile: IConnectionProfile): boolean;
+	saveProfile(profile: IConnectionProfile, forceWritePlaintextPassword?: boolean): Promise<IConnectionProfile>;
+	addRecentConnection(conn: IConnectionProfile): Promise<void>;
+	getRecentlyUsedConnections(providers?: string[]): ConnectionProfile[];
+	deleteConnectionFromConfiguration(connection: ConnectionProfile): Promise<void>;
+	deleteGroupFromConfiguration(group: ConnectionProfileGroup): Promise<void>;
+	getConnectionProfileGroups(withoutConnections?: boolean, providers?: string[]): ConnectionProfileGroup[];
+	editGroup(group: ConnectionProfileGroup): Promise<void>;
+	saveProfileGroup(profile: IConnectionProfileGroup): Promise<string>;
+	clearRecentlyUsed(): void;
+	removeRecentConnection(conn: IConnectionProfile): void;
+	getProfileWithoutPassword(conn: IConnectionProfile): ConnectionProfile;
+	canChangeConnectionConfig(profile: ConnectionProfile, newGroupID: string): boolean;
+	changeGroupIdForConnectionGroup(source: ConnectionProfileGroup, target: ConnectionProfileGroup): Promise<void>;
+	changeGroupIdForConnection(source: ConnectionProfile, targetGroupId: string): Promise<void>;
+	getConnections(): Array<ConnectionProfile>;
+	getGroupFromId(groupId: string): IConnectionProfileGroup;
+}
+
 /**
  * Manages the connections list including saved profiles and the most recently used connections
  *
  * @export
  */
-export class ConnectionStore {
+export class ConnectionStoreService implements IConnectionStoreService {
+	_serviceBrand: any;
+
 	private groupIdMap = new ReverseLookUpMap<string, string>();
 	private connectionConfig = new ConnectionConfig(this.configurationService, this.capabilitiesService);
 	private mru: Array<IConnectionProfile>;
 
+	private readonly _onProfileDeleted = new Emitter<IConnectionProfile>();
+	public readonly onProfileDeleted = this._onProfileDeleted.event;
+
+	private readonly _onProfileAdded = new Emitter<IConnectionProfile>();
+	public readonly onProfileAdded = this._onProfileAdded.event;
+
+	private readonly _onProfileUpdated = new Emitter<IConnectionProfile>();
+	public readonly onProfileUpdated = this._onProfileUpdated.event;
+
+	private readonly _onGroupDeleted = new Emitter<ConnectionProfileGroup>();
+	public readonly onGroupDeleted = this._onGroupDeleted.event;
+
+	private readonly _onGroupAdded = new Emitter<ConnectionProfileGroup>();
+	public readonly onGroupAdded = this._onGroupAdded.event;
+
+	private readonly _onGroupUpdated = new Emitter<ConnectionProfileGroup>();
+	public readonly onGroupUpdated = this._onGroupUpdated.event;
+
 	constructor(
-		@IStorageService private storageService: IStorageService,
-		@IConfigurationService private configurationService: IConfigurationService,
-		@ICredentialsService private credentialService: ICredentialsService,
-		@ICapabilitiesService private capabilitiesService: ICapabilitiesService
+		@IStorageService private readonly storageService: IStorageService,
+		@IConfigurationService private readonly configurationService: IConfigurationService,
+		@ICredentialsService private readonly credentialService: ICredentialsService,
+		@ICapabilitiesService private readonly capabilitiesService: ICapabilitiesService
 	) {
 		try {
 			const configRaw = this.storageService.get(RECENT_CONNECTIONS_STATE_KEY, StorageScope.GLOBAL, '[]');
@@ -294,6 +347,10 @@ export class ConnectionStore {
 		return this.convertToConnectionGroup(groups, profilesInConfiguration, undefined);
 	}
 
+	public getConnections(): Array<ConnectionProfile> {
+		return this.connectionConfig.getConnections(true);
+	}
+
 	private convertToConnectionGroup(groups: IConnectionProfileGroup[], connections: ConnectionProfile[], parent: ConnectionProfileGroup = undefined): ConnectionProfileGroup[] {
 		const result: ConnectionProfileGroup[] = [];
 		const children = groups.filter(g => g.parentId === (parent ? parent.id : undefined));
@@ -384,3 +441,5 @@ export class ConnectionStore {
 		return this.groupIdMap.reverseGet(key);
 	}
 }
+
+registerSingleton(IConnectionStoreService, ConnectionStoreService, true);

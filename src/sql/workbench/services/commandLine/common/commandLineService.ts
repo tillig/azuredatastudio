@@ -27,6 +27,7 @@ import { localize } from 'vs/nls';
 import { QueryInput } from 'sql/workbench/parts/query/common/queryInput';
 import { URI } from 'vs/base/common/uri';
 import { ILogService } from 'vs/platform/log/common/log';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 export class CommandLineService implements ICommandLineProcessing {
 	public _serviceBrand: any;
@@ -41,7 +42,8 @@ export class CommandLineService implements ICommandLineProcessing {
 		@ICommandService private _commandService: ICommandService,
 		@IConfigurationService private _configurationService: IConfigurationService,
 		@IStatusbarService private _statusBarService: IStatusbarService,
-		@ILogService private logService: ILogService
+		@ILogService private logService: ILogService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService
 	) {
 		if (ipc) {
 			ipc.on('ads:processCommandLine', (event: any, args: ParsedArgs) => this.onLaunched(args));
@@ -85,7 +87,7 @@ export class CommandLineService implements ICommandLineProcessing {
 			}
 		}
 		let showConnectDialogOnStartup: boolean = this._configurationService.getValue('workbench.showConnectDialogOnStartup');
-		if (showConnectDialogOnStartup && !commandName && !profile && !this._connectionManagementService.hasRegisteredServers()) {
+		if (showConnectDialogOnStartup && !commandName && !profile && this.connectionStoreService.getConnections().length === 0) {
 			// prompt the user for a new connection on startup if no profiles are registered
 			await this._connectionManagementService.showConnectionDialog();
 			return;
@@ -177,7 +179,7 @@ export class CommandLineService implements ICommandLineProcessing {
 	private tryMatchSavedProfile(profile: ConnectionProfile) {
 		let match: ConnectionProfile = undefined;
 		// If we can find a saved mssql provider connection that matches the args, use it
-		let groups = this._connectionManagementService.getConnectionGroups([Constants.mssqlProviderName]);
+		let groups = this.connectionStoreService.getConnectionProfileGroups(false, [Constants.mssqlProviderName]);
 		if (groups && groups.length > 0) {
 			let rootGroup = groups[0];
 			let connections = ConnectionProfileGroup.getConnectionsInGroup(rootGroup);

@@ -18,6 +18,7 @@ import { generateUuid } from 'vs/base/common/uuid';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionDialogService } from 'sql/workbench/services/connection/common/connectionDialogService';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 @extHostNamedCustomer(SqlMainContext.MainThreadConnectionManagement)
 export class MainThreadConnectionManagement implements MainThreadConnectionManagementShape {
@@ -31,7 +32,8 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		@IObjectExplorerService private _objectExplorerService: IObjectExplorerService,
 		@IEditorService private _workbenchEditorService: IEditorService,
 		@IConnectionDialogService private _connectionDialogService: IConnectionDialogService,
-		@ICapabilitiesService private _capabilitiesService: ICapabilitiesService
+		@ICapabilitiesService private _capabilitiesService: ICapabilitiesService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService
 	) {
 		if (extHostContext) {
 			this._proxy = extHostContext.getProxy(SqlExtHostContext.ExtHostConnectionManagement);
@@ -101,7 +103,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		if (!profile) {
 			return undefined;
 		}
-		profile = this._connectionManagementService.removeConnectionProfileCredentials(profile);
+		profile = this.connectionStoreService.getProfileWithoutPassword(profile);
 		let connection: azdata.connection.Connection = {
 			providerName: profile.providerName,
 			connectionId: profile.id,

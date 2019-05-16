@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import * as azdata from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
-import { ConnectionStore } from 'sql/platform/connection/common/connectionStore';
+import { ConnectionStore } from 'sql/platform/connection/common/connectionStoreService';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { TestConfigurationService } from 'sql/platform/connection/test/common/testConfigurationService';
 import { TestCredentialsService } from 'sql/platform/credentials/test/common/testCredentialsService';

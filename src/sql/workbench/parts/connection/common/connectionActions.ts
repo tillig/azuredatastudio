@@ -18,6 +18,7 @@ import { DashboardInput } from 'sql/workbench/parts/dashboard/dashboardInput';
 import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 import { IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 /**
  * Workbench action to clear the recent connnections list
@@ -36,7 +37,7 @@ export class ClearRecentConnectionsAction extends Action {
 	constructor(
 		id: string,
 		label: string,
-		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService,
 		@INotificationService private _notificationService: INotificationService,
 		@IQuickInputService private _quickInputService: IQuickInputService,
 		@IDialogService private _dialogService: IDialogService,
@@ -53,14 +54,14 @@ export class ClearRecentConnectionsAction extends Action {
 		if (this._useConfirmationMessage) {
 			return this.promptConfirmationMessage().then(result => {
 				if (result.confirmed) {
-					this._connectionManagementService.clearRecentConnectionsList();
+					this.connectionStoreService.clearRecentlyUsed();
 					this._onRecentConnectionsRemoved.fire();
 				}
 			});
 		} else {
 			return this.promptQuickOpenService().then(result => {
 				if (result) {
-					this._connectionManagementService.clearRecentConnectionsList();
+					this.connectionStoreService.clearRecentlyUsed();
 
 					const actions: INotificationActions = { primary: [] };
 					this._notificationService.notify({
@@ -119,17 +120,15 @@ export class ClearSingleRecentConnectionAction extends Action {
 		id: string,
 		label: string,
 		private _connectionProfile: IConnectionProfile,
-		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
+		@IConnectionStoreService private readonly connectionStoreService: IConnectionStoreService,
 	) {
 		super(id, label);
 		this.enabled = true;
 	}
 
 	public run(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			resolve(this._connectionManagementService.clearRecentConnection(this._connectionProfile));
-			this._onRecentConnectionRemoved.fire();
-		});
+		this.connectionStoreService.removeRecentConnection(this._connectionProfile);
+		return Promise.resolve();
 	}
 }
 

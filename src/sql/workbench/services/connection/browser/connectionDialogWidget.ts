@@ -37,6 +37,7 @@ import { SIDE_BAR_BACKGROUND } from 'vs/workbench/common/theme';
 import { IThemeService, ITheme } from 'vs/platform/theme/common/themeService';
 import { ILayoutService } from 'vs/platform/layout/browser/layoutService';
 import { ILogService } from 'vs/platform/log/common/log';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 export interface OnShowUIResponse {
 	selectedProviderType: string;
@@ -97,7 +98,8 @@ export class ConnectionDialogWidget extends Modal {
 		@IContextMenuService private _contextMenuService: IContextMenuService,
 		@IContextViewService private _contextViewService: IContextViewService,
 		@IClipboardService clipboardService: IClipboardService,
-		@ILayoutService logService: ILogService
+		@ILayoutService logService: ILogService,
+		@IConnectionStoreService readonly connectionStoreService: IConnectionStoreService
 	) {
 		super(localize('connection', "Connection"), TelemetryKeys.Connection, telemetryService, layoutService, clipboardService, themeService, logService, contextKeyService, { hasSpinner: true, hasErrors: true });
 	}
@@ -184,7 +186,7 @@ export class ConnectionDialogWidget extends Modal {
 
 			if (c === savedConnectionTabId && expandableTree.getContentHeight() === 0) {
 				// Update saved connection tree
-				await TreeUpdateUtils.structuralTreeUpdate(this._savedConnectionTree, 'saved', this._connectionManagementService, this._providers);
+				await TreeUpdateUtils.structuralTreeUpdate(this._savedConnectionTree, 'saved', this._connectionManagementService, this.connectionStoreService, this._providers);
 
 				if (expandableTree.getContentHeight() > 0) {
 					DOM.hide(this._noSavedConnection);
@@ -312,12 +314,12 @@ export class ConnectionDialogWidget extends Modal {
 			}
 		};
 		const actionProvider = this._instantiationService.createInstance(RecentConnectionActionsProvider);
-		const controller = new RecentConnectionTreeController(leftClick, actionProvider, this._connectionManagementService, this._contextMenuService);
+		const controller = this._instantiationService.createInstance(RecentConnectionTreeController, leftClick, actionProvider);
 		actionProvider.onRecentConnectionRemoved(() => {
-			this.open(this._connectionManagementService.getRecentConnections().length > 0);
+			this.open(this.connectionStoreService.getRecentlyUsedConnections().length > 0);
 		});
 		controller.onRecentConnectionRemoved(() => {
-			this.open(this._connectionManagementService.getRecentConnections().length > 0);
+			this.open(this.connectionStoreService.getRecentlyUsedConnections().length > 0);
 		});
 		this._recentConnectionTree = TreeCreationUtils.createConnectionTree(treeContainer, this._instantiationService, controller);
 
@@ -384,7 +386,7 @@ export class ConnectionDialogWidget extends Modal {
 			DOM.hide(this._recentConnection);
 			DOM.show(this._noRecentConnection);
 		}
-		await TreeUpdateUtils.structuralTreeUpdate(this._recentConnectionTree, 'recent', this._connectionManagementService, this._providers);
+		await TreeUpdateUtils.structuralTreeUpdate(this._recentConnectionTree, 'recent', this._connectionManagementService, this.connectionStoreService, this._providers);
 
 		// reset saved connection tree
 		this._savedConnectionTree.setInput([]);

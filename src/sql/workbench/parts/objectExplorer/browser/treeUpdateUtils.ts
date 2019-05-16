@@ -13,6 +13,7 @@ import { NodeType } from 'sql/workbench/parts/objectExplorer/common/nodeType';
 import { TreeNode } from 'sql/workbench/parts/objectExplorer/common/treeNode';
 import * as errors from 'vs/base/common/errors';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 export interface IExpandableTree extends ITree {
 	// {{SQL CARBON EDIT }}	- add back deleted VS Code tree methods
@@ -48,7 +49,7 @@ export class TreeUpdateUtils {
 	/**
 	 * Set input for the tree.
 	 */
-	public static structuralTreeUpdate(tree: ITree, viewKey: string, connectionManagementService: IConnectionManagementService, providers?: string[]): Promise<void> {
+	public static structuralTreeUpdate(tree: ITree, viewKey: string, connectionManagementService: IConnectionManagementService, connectionStoreService: IConnectionStoreService, providers?: string[]): Promise<void> {
 		// convert to old VS Code tree interface with expandable methods
 		let expandableTree: IExpandableTree = <IExpandableTree>tree;
 
@@ -64,13 +65,13 @@ export class TreeUpdateUtils {
 		let groups;
 		let treeInput = new ConnectionProfileGroup('root', null, undefined, undefined, undefined);
 		if (viewKey === 'recent') {
-			groups = connectionManagementService.getRecentConnections(providers);
+			groups = connectionStoreService.getRecentlyUsedConnections(providers);
 			treeInput.addConnections(groups);
 		} else if (viewKey === 'active') {
 			groups = connectionManagementService.getActiveConnections(providers);
 			treeInput.addConnections(groups);
 		} else if (viewKey === 'saved') {
-			treeInput = TreeUpdateUtils.getTreeInput(connectionManagementService, providers);
+			treeInput = TreeUpdateUtils.getTreeInput(connectionStoreService, providers);
 		}
 
 		return tree.setInput(treeInput).then(() => {
@@ -88,7 +89,7 @@ export class TreeUpdateUtils {
 	/**
 	 * Set input for the registered servers tree.
 	 */
-	public static registeredServerUpdate(tree: ITree, connectionManagementService: IConnectionManagementService, elementToSelect?: any): Promise<void> {
+	public static registeredServerUpdate(tree: ITree, connectionStoreService: IConnectionStoreService, elementToSelect?: any): Promise<void> {
 		// convert to old VS Code tree interface with expandable methods
 		let expandableTree: IExpandableTree = <IExpandableTree>tree;
 
@@ -111,7 +112,7 @@ export class TreeUpdateUtils {
 			}
 		}
 
-		let treeInput = TreeUpdateUtils.getTreeInput(connectionManagementService);
+		let treeInput = TreeUpdateUtils.getTreeInput(connectionStoreService);
 		if (treeInput) {
 			if (treeInput !== tree.getInput()) {
 				return tree.setInput(treeInput).then(() => {
@@ -129,9 +130,9 @@ export class TreeUpdateUtils {
 		return Promise.resolve();
 	}
 
-	public static getTreeInput(connectionManagementService: IConnectionManagementService, providers?: string[]): ConnectionProfileGroup {
+	public static getTreeInput(connectionStoreService: IConnectionStoreService, providers?: string[]): ConnectionProfileGroup {
 
-		let groups = connectionManagementService.getConnectionGroups(providers);
+		let groups = connectionStoreService.getConnectionProfileGroups(false, providers);
 		if (groups && groups.length > 0) {
 			let treeInput = groups[0];
 			treeInput.name = 'root';
@@ -258,14 +259,14 @@ export class TreeUpdateUtils {
 		});
 	}
 
-	public static getObjectExplorerParent(objectExplorerNode: TreeNode, connectionManagementService: IConnectionManagementService): any {
+	public static getObjectExplorerParent(objectExplorerNode: TreeNode, connectionStoreService: IConnectionStoreService): any {
 		if (objectExplorerNode && objectExplorerNode.parent) {
 			// if object explorer node's parent is root, return connection profile
 			if (!objectExplorerNode.parent.parent) {
 				let connectionId = objectExplorerNode.getConnectionProfile().id;
 
 				// get connection profile from connection profile groups
-				let root = TreeUpdateUtils.getTreeInput(connectionManagementService);
+				let root = TreeUpdateUtils.getTreeInput(connectionStoreService);
 				let connections = ConnectionProfileGroup.getConnectionsInGroup(root);
 				let results = connections.filter(con => {
 					if (connectionId === con.id) {

@@ -69,9 +69,6 @@ export const IConnectionManagementService = createDecorator<IConnectionManagemen
 export interface IConnectionManagementService {
 	_serviceBrand: any;
 
-	// Event Emitters
-	onAddConnectionProfile: Event<IConnectionProfile>;
-	onDeleteConnectionProfile: Event<void>;
 	onConnect: Event<IConnectionParams>;
 	onDisconnect: Event<IConnectionParams>;
 	onConnectionChanged: Event<IConnectionParams>;
@@ -81,16 +78,6 @@ export interface IConnectionManagementService {
 	 * Opens the connection dialog to create new connection
 	 */
 	showConnectionDialog(params?: INewConnectionParams, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void>;
-
-	/**
-	 * Opens the add server group dialog
-	 */
-	showCreateServerGroupDialog(callbacks?: IServerGroupDialogCallbacks): Promise<void>;
-
-	/**
-	 * Opens the edit server group dialog
-	 */
-	showEditServerGroupDialog(group: ConnectionProfileGroup): Promise<void>;
 
 	/**
 	 * Load the password and opens a new connection
@@ -124,25 +111,7 @@ export interface IConnectionManagementService {
 
 	onConnectionChangedNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo);
 
-	getConnectionGroups(providers?: string[]): ConnectionProfileGroup[];
-
-	getRecentConnections(providers?: string[]): ConnectionProfile[];
-
-	clearRecentConnectionsList(): void;
-
-	clearRecentConnection(connectionProfile: IConnectionProfile): void;
-
 	getActiveConnections(providers?: string[]): ConnectionProfile[];
-
-	saveProfileGroup(profile: IConnectionProfileGroup): Promise<string>;
-
-	changeGroupIdForConnectionGroup(source: IConnectionProfileGroup, target: IConnectionProfileGroup): Promise<void>;
-
-	changeGroupIdForConnection(source: ConnectionProfile, targetGroupName: string): Promise<void>;
-
-	deleteConnection(connection: ConnectionProfile): Promise<boolean>;
-
-	deleteConnectionGroup(group: ConnectionProfileGroup): Promise<boolean>;
 
 	getAdvancedProperties(): azdata.ConnectionOption[];
 
@@ -155,7 +124,7 @@ export interface IConnectionManagementService {
 	isConnected(fileUri: string): boolean;
 
 	/**
-	 * Returns true if the connection profile is connected
+ * Returns true if the connection profile is connected
 	 */
 	isProfileConnected(connectionProfile: IConnectionProfile): boolean;
 
@@ -185,8 +154,6 @@ export interface IConnectionManagementService {
 
 	registerIconProvider(providerId: string, provider: azdata.IconProvider): void;
 
-	editGroup(group: ConnectionProfileGroup): Promise<void>;
-
 	getConnectionProfile(fileUri: string): IConnectionProfile;
 
 	getConnectionInfo(fileUri: string): ConnectionManagementInfo;
@@ -208,13 +175,7 @@ export interface IConnectionManagementService {
 
 	showDashboard(connection: IConnectionProfile): Thenable<boolean>;
 
-	closeDashboard(uri: string): void;
-
 	getProviderIdFromUri(ownerUri: string): string;
-
-	hasRegisteredServers(): boolean;
-
-	canChangeConnectionConfig(profile: IConnectionProfile, newGroupID: string): boolean;
 
 	getTabColorForUri(uri: string): string;
 
@@ -238,13 +199,6 @@ export interface IConnectionManagementService {
 	 * Refresh the IntelliSense cache for the connection with the given URI
 	 */
 	rebuildIntelliSenseCache(uri: string): Thenable<void>;
-
-	/**
-	 * Get a copy of the connection profile with its passwords removed
-	 * @param profile The connection profile to remove passwords from
-	 * @returns A copy of the connection profile with passwords removed
-	 */
-	removeConnectionProfileCredentials(profile: IConnectionProfile): IConnectionProfile;
 
 	/**
 	 * Get the credentials for a connected connection profile, as they would appear in the options dictionary
