@@ -7,18 +7,27 @@ import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilit
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup, IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { UNSAVED_GROUP_ID } from 'sql/platform/connection/common/constants';
-import { IConnectionProfile, IConnectionProfileStore } from 'sql/platform/connection/common/interfaces';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { generateUuid } from 'vs/base/common/uuid';
 import * as nls from 'vs/nls';
 import { ConfigurationTarget, IConfigurationService } from 'vs/platform/configuration/common/configuration';
+import { IConnectionProfile } from 'azdata';
+import { deepClone } from 'vs/base/common/objects';
 
 const GROUPS_CONFIG_KEY = 'datasource.connectionGroups';
 const CONNECTIONS_CONFIG_KEY = 'datasource.connections';
 
-export interface ISaveGroupResult {
+interface ISaveGroupResult {
 	groups: IConnectionProfileGroup[];
 	newGroupId: string;
+}
+
+interface IConnectionProfileStore {
+	options: {};
+	groupId: string;
+	providerName: string;
+	savePassword: boolean;
+	id: string;
 }
 
 /**
@@ -27,8 +36,8 @@ export interface ISaveGroupResult {
 export class ConnectionConfig {
 
 	public constructor(
-		private configurationService: IConfigurationService,
-		private _capabilitiesService: ICapabilitiesService
+		private readonly configurationService: IConfigurationService,
+		private readonly capabilitiesService: ICapabilitiesService
 	) { }
 
 	/**
@@ -66,11 +75,11 @@ export class ConnectionConfig {
 				}
 
 				let connectionProfile = this.getConnectionProfileInstance(profile, groupId);
-				let newProfile = ConnectionProfile.convertToProfileStore(this._capabilitiesService, connectionProfile);
+				let newProfile = profileToStore(connectionProfile);
 
 				// Remove the profile if already set
 				let sameProfileInList = profiles.find(value => {
-					let providerConnectionProfile = ConnectionProfile.createFromStoredProfile(value, this._capabilitiesService);
+					let providerConnectionProfile = storeToProfile(value, this.capabilitiesService);
 					return providerConnectionProfile.matches(connectionProfile);
 				});
 				if (sameProfileInList) {
@@ -92,7 +101,7 @@ export class ConnectionConfig {
 	private getConnectionProfileInstance(profile: IConnectionProfile, groupId: string): ConnectionProfile {
 		let connectionProfile = profile as ConnectionProfile;
 		if (connectionProfile === undefined) {
-			connectionProfile = new ConnectionProfile(this._capabilitiesService, profile);
+			connectionProfile = new ConnectionProfile(this.capabilitiesService, profile);
 		}
 		connectionProfile.groupId = groupId;
 		return connectionProfile;
@@ -200,7 +209,7 @@ export class ConnectionConfig {
 		}
 
 		let connectionProfiles = profiles.map(p => {
-			return ConnectionProfile.createFromStoredProfile(p, this._capabilitiesService);
+			return storeToProfile(p, this.capabilitiesService);
 		});
 
 		return connectionProfiles;
@@ -214,7 +223,7 @@ export class ConnectionConfig {
 		let profiles = this.configurationService.inspect<IConnectionProfileStore[]>(CONNECTIONS_CONFIG_KEY).user;
 		// Remove the profile from the connections
 		profiles = profiles.filter(value => {
-			let providerConnectionProfile = ConnectionProfile.createFromStoredProfile(value, this._capabilitiesService);
+			let providerConnectionProfile = storeToProfile(value, this.capabilitiesService);
 			return providerConnectionProfile.getOptionsKey() !== profile.getOptionsKey();
 		});
 
@@ -235,7 +244,7 @@ export class ConnectionConfig {
 		let profiles = this.configurationService.inspect<IConnectionProfileStore[]>(CONNECTIONS_CONFIG_KEY).user;
 		// Remove the profiles from the connections
 		profiles = profiles.filter(value => {
-			let providerConnectionProfile = ConnectionProfile.createFromStoredProfile(value, this._capabilitiesService);
+			let providerConnectionProfile = storeToProfile(value, this.capabilitiesService);
 			return !connections.some((val) => val.getOptionsKey() === providerConnectionProfile.getOptionsKey());
 		});
 
@@ -284,10 +293,10 @@ export class ConnectionConfig {
 		if (profiles) {
 			if (profile.parent && profile.parent.id === UNSAVED_GROUP_ID) {
 				profile.groupId = newGroupID;
-				profiles.push(ConnectionProfile.convertToProfileStore(this._capabilitiesService, profile));
+				profiles.push(profileToStore(profile));
 			} else {
 				profiles.forEach((value) => {
-					let configProf = ConnectionProfile.createFromStoredProfile(value, this._capabilitiesService);
+					let configProf = storeToProfile(value, this.capabilitiesService);
 					if (configProf.getOptionsKey() === profile.getOptionsKey()) {
 						value.groupId = newGroupID;
 					}
@@ -315,7 +324,7 @@ export class ConnectionConfig {
 		}
 	}
 
-	public saveGroup(groups: IConnectionProfileGroup[], groupFullName: string, color: string, description: string): ISaveGroupResult {
+	private saveGroup(groups: IConnectionProfileGroup[], groupFullName: string, color: string, description: string): ISaveGroupResult {
 		let groupNames = ConnectionProfileGroup.getGroupFullNameParts(groupFullName);
 		return this.saveGroupInTree(groups, undefined, groupNames, color, description, 0);
 	}
@@ -395,4 +404,27 @@ export class ConnectionConfig {
 		};
 		return groupResult;
 	}
+}
+
+function profileToStore(profile: IConnectionProfile): IConnectionProfileStore {
+	return {
+		options: profile.options,
+		groupId: profile.groupId,
+		providerName: profile.providerName,
+		savePassword: profile.savePassword,
+		id: profile.id
+	};
+}
+
+function storeToProfile(store: IConnectionProfileStore, capabilities: ICapabilitiesService): ConnectionProfile {
+	const profile = new ConnectionProfile(capabilities, store.providerName);
+	// append group ID and original display name to build unique OE session ID
+	profile.options = deepClone(store.options);
+
+	profile.groupId = store.groupId;
+	profile.providerName = store.providerName;
+	profile.saveProfile = true;
+	profile.savePassword = store.savePassword;
+	profile.id = store.id || generateUuid();
+	return profile;
 }

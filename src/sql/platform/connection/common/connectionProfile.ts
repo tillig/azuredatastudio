@@ -4,21 +4,21 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
-import * as azdata from 'azdata';
 import { ProviderConnectionInfo } from 'sql/platform/connection/common/providerConnectionInfo';
-import * as interfaces from 'sql/platform/connection/common/interfaces';
+import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
+
+import * as azdata from 'azdata';
+
 import { equalsIgnoreCase } from 'vs/base/common/strings';
 import { generateUuid } from 'vs/base/common/uuid';
-import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { isString } from 'vs/base/common/types';
-import { deepClone } from 'vs/base/common/objects';
 
 // Concrete implementation of the IConnectionProfile interface
 
 /**
  * A concrete implementation of an IConnectionProfile with support for profile creation and validation
  */
-export class ConnectionProfile extends ProviderConnectionInfo implements interfaces.IConnectionProfile {
+export class ConnectionProfile extends ProviderConnectionInfo implements azdata.IConnectionProfile {
 
 	public parent: ConnectionProfileGroup = null;
 	private _id: string;
@@ -53,7 +53,7 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 		this.options['databaseDisplayName'] = this.databaseName;
 	}
 
-	public matches(other: interfaces.IConnectionProfile): boolean {
+	public matches(other: azdata.IConnectionProfile): boolean {
 		return other
 			&& this.providerName === other.providerName
 			&& this.nullCheckEqualsIgnoreCase(this.serverName, other.serverName)
@@ -163,14 +163,12 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 		return super.getOptionsKey();
 	}
 
-	public toIConnectionProfile(): interfaces.IConnectionProfile {
-		let result: interfaces.IConnectionProfile = {
+	public toIConnectionProfile(): azdata.IConnectionProfile {
+		return {
 			connectionName: this.connectionName,
 			serverName: this.serverName,
 			databaseName: this.databaseName,
 			authenticationType: this.authenticationType,
-			getOptionsKey: this.getOptionsKey,
-			matches: undefined,
 			groupId: this.groupId,
 			groupFullName: this.groupFullName,
 			password: this.password,
@@ -182,8 +180,6 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 			id: this.id,
 			azureTenantId: this.azureTenantId
 		};
-
-		return result;
 	}
 
 	public toConnectionInfo(): azdata.ConnectionInfo {
@@ -208,43 +204,5 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 			}
 		}
 		return undefined;
-	}
-
-	public static createFromStoredProfile(profile: interfaces.IConnectionProfileStore, capabilitiesService: ICapabilitiesService): ConnectionProfile {
-		let connectionInfo = new ConnectionProfile(capabilitiesService, profile.providerName);
-		connectionInfo.options = profile.options;
-
-		// append group ID and original display name to build unique OE session ID
-		connectionInfo.options = deepClone(profile.options);
-		connectionInfo.options['groupId'] = connectionInfo.groupId;
-		connectionInfo.options['databaseDisplayName'] = connectionInfo.databaseName;
-
-		connectionInfo.groupId = profile.groupId;
-		connectionInfo.providerName = profile.providerName;
-		connectionInfo.saveProfile = true;
-		connectionInfo.savePassword = profile.savePassword;
-		connectionInfo.id = profile.id || generateUuid();
-		return connectionInfo;
-	}
-
-	public static convertToProfileStore(
-		capabilitiesService: ICapabilitiesService,
-		connectionProfile: interfaces.IConnectionProfile): interfaces.IConnectionProfileStore {
-		if (connectionProfile) {
-			let connectionInfo = ConnectionProfile.fromIConnectionProfile(capabilitiesService, connectionProfile);
-			let profile: interfaces.IConnectionProfileStore = {
-				options: {},
-				groupId: connectionProfile.groupId,
-				providerName: connectionInfo.providerName,
-				savePassword: connectionInfo.savePassword,
-				id: connectionInfo.id
-			};
-
-			profile.options = connectionInfo.options;
-
-			return profile;
-		} else {
-			return undefined;
-		}
 	}
 }

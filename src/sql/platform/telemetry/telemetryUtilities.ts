@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ITelemetryService, ITelemetryData } from 'vs/platform/telemetry/common/telemetry';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ILogService } from 'vs/platform/log/common/log';
+import { IConnectionProfile } from 'azdata';
 
 export interface IConnectionTelemetryData extends ITelemetryData {
 	provider?: string;

@@ -6,9 +6,7 @@
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { Event } from 'vs/base/common/event';
 import * as azdata from 'azdata';
-import { IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 
 /**
@@ -21,24 +19,14 @@ export interface IConnectOptions {
 	saveTheConnection?: boolean;
 
 	/**
-	 * open the dashboard after connection is complete
-	 */
-	showDashboard?: boolean;
-
-	/**
-	 * Open the connection dialog if connection fails
-	 */
-	showConnectionDialogOnError?: boolean;
-
-	/**
-	 * Open the connection firewall rule dialog if connection fails
-	 */
-	showFirewallRuleOnError?: boolean;
-
-	/**
 	 * Use an existing connection with the same profile if exists
 	 */
 	useExistingConnection?: boolean;
+
+	/**
+	 * Existing uri to use for connection; Use for when associating a connection with an existing editor
+	 */
+	existingUri?: string;
 }
 
 export interface IConnectionResult {
@@ -46,7 +34,7 @@ export interface IConnectionResult {
 	errorMessage: string;
 	errorCode: number;
 	callStack: string;
-	connectionProfile?: IConnectionProfile;
+	connectionProfile?: azdata.IConnectionProfile;
 }
 
 export const SERVICE_ID = 'connectionManagementService';
@@ -65,21 +53,21 @@ export interface IConnectionManagementService {
 	/**
 	 * Open a connection with the given profile
 	 */
-	connect(connection: IConnectionProfile, uri?: string, options?: IConnectOptions): Promise<string>;
+	connect(connection: azdata.IConnectionProfile, options?: IConnectOptions): Promise<string>;
 
 	/**
 	 * Finds existing connection for given profile and purpose is any exists.
 	 * The purpose is connection by default
 	 */
-	findExistingConnection(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile;
+	findExistingConnection(connection: azdata.IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile;
 
 	getActiveConnections(providers?: string[]): ConnectionProfile[];
 
 	getAdvancedProperties(): azdata.ConnectionOption[];
 
-	getConnectionUri(connectionProfile: IConnectionProfile): string;
+	getConnectionUri(connectionProfile: azdata.IConnectionProfile): string;
 
-	getFormattedUri(uri: string, connectionProfile: IConnectionProfile): string;
+	getFormattedUri(uri: string, connectionProfile: azdata.IConnectionProfile): string;
 
 	getConnectionUriFromId(connectionId: string): string;
 
@@ -88,16 +76,16 @@ export interface IConnectionManagementService {
 	/**
 	 * Returns true if the connection profile is connected
 	 */
-	isProfileConnected(connectionProfile: IConnectionProfile): boolean;
+	isProfileConnected(connectionProfile: azdata.IConnectionProfile): boolean;
 
 	/**
 	 * Returns true if the connection profile is connecting
 	 */
-	isProfileConnecting(connectionProfile: IConnectionProfile): boolean;
+	isProfileConnecting(connectionProfile: azdata.IConnectionProfile): boolean;
 
 	isConnected(fileUri: string, connectionProfile?: ConnectionProfile): boolean;
 
-	disconnect(connection: IConnectionProfile): Promise<void>;
+	disconnect(connection: azdata.IConnectionProfile): Promise<void>;
 	disconnect(ownerUri: string): Promise<void>;
 
 	listDatabases(connectionUri: string): Promise<azdata.ListDatabasesResult>;
@@ -107,21 +95,19 @@ export interface IConnectionManagementService {
 	 */
 	registerProvider(providerId: string, provider: azdata.ConnectionProvider): void;
 
-	getConnectionProfile(fileUri: string): IConnectionProfile;
+	getConnectionProfile(fileUri: string): azdata.IConnectionProfile;
 
 	getConnectionInfo(fileUri: string): ConnectionManagementInfo;
 
 	/**
 	 * Cancels the connection
 	 */
-	cancelConnection(connection: IConnectionProfile): Promise<boolean>;
+	cancelConnection(connection: azdata.IConnectionProfile): Promise<boolean>;
 
 	/**
 	 * Changes the database for an active connection
 	 */
 	changeDatabase(connectionUri: string, databaseName: string): Promise<boolean>;
-
-	showDashboard(connection: IConnectionProfile): Promise<boolean>;
 
 	getProviderIdFromUri(ownerUri: string): string;
 
@@ -175,5 +161,5 @@ export interface IConnectionManagementService {
 	/**
 	 * Get connection profile by id
 	 */
-	getConnectionProfileById(profileId: string): IConnectionProfile;
+	getConnectionProfileById(profileId: string): azdata.IConnectionProfile;
 }

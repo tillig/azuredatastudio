@@ -310,7 +310,7 @@ let registryProperties = {
 		'default': ','
 	},
 	'sql.saveAsCsv.lineSeperator': {
-		'type': '',
+		'type': 'string',
 		'description': localize('sql.saveAsCsv.lineSeperator', '[Optional] Character(s) used for seperating rows when saving results as CSV'),
 		'default': null
 	},
@@ -330,7 +330,7 @@ let registryProperties = {
 		'default': true
 	},
 	'sql.saveAsXml.formatted': {
-		'type': 'string',
+		'type': 'boolean',
 		'description': localize('sql.saveAsXml.formatted', '[Optional] When true, XML output will be formatted when saving results as XML'),
 		'default': true
 	},

@@ -8,18 +8,17 @@ import * as azdata from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { TestConfigurationService } from 'sql/platform/connection/test/common/testConfigurationService';
 import { TestCredentialsService } from 'sql/platform/credentials/test/common/testCredentialsService';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
-import { deepClone, deepFreeze } from 'vs/base/common/objects';
+import { deepFreeze } from 'vs/base/common/objects';
 import { ConfigurationTarget } from 'vs/platform/configuration/common/configuration';
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 
 suite('ConnectionStore', () => {
-	let defaultNamedProfile: IConnectionProfile = deepFreeze({
+	let defaultNamedProfile = deepFreeze<azdata.IConnectionProfile>({
 		connectionName: 'new name',
 		serverName: 'namedServer',
 		databaseName: 'bcd',
@@ -29,8 +28,6 @@ suite('ConnectionStore', () => {
 		savePassword: true,
 		groupId: '',
 		groupFullName: '',
-		getOptionsKey: undefined,
-		matches: undefined,
 		providerName: 'MSSQL',
 		options: {},
 		saveProfile: true,
@@ -311,7 +308,7 @@ suite('ConnectionStore', () => {
 
 		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
-		const connectionProfile: IConnectionProfile = Object.assign({}, defaultNamedProfile, { providerName: providerName });
+		const connectionProfile: azdata.IConnectionProfile = Object.assign({}, defaultNamedProfile, { providerName: providerName });
 
 		assert.ok(!connectionStore.isPasswordRequired(connectionProfile));
 	});
@@ -322,7 +319,7 @@ suite('ConnectionStore', () => {
 		const credentialsService = new TestCredentialsService();
 
 		const password: string = 'asdf!@#$';
-		const connectionProfile: IConnectionProfile = Object.assign({}, defaultNamedProfile, { password });
+		const connectionProfile: azdata.IConnectionProfile = Object.assign({}, defaultNamedProfile, { password });
 
 		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
@@ -380,24 +377,6 @@ suite('ConnectionStore', () => {
 		// If I look up the child group using its ID, then I get back the correct group
 		actualGroup = connectionStore.getGroupFromId(childGroupId);
 		assert.equal(actualGroup.id, childGroupId, 'Did not get the child group when looking it up with its ID');
-	});
-
-	test('getProfileWithoutPassword can return the profile without credentials in the password property or options dictionary', () => {
-		const storageService = new TestStorageService();
-		const configurationService = new TestConfigurationService();
-		const credentialsService = new TestCredentialsService();
-
-		const connectionStore = new ConnectionStoreService(storageService, configurationService,
-			credentialsService, capabilitiesService);
-		const profile = deepClone(defaultNamedProfile);
-		profile.options['password'] = profile.password;
-		profile.id = 'testId';
-		let expectedProfile = Object.assign({}, profile);
-		expectedProfile.password = '';
-		expectedProfile.options['password'] = '';
-		expectedProfile = ConnectionProfile.fromIConnectionProfile(capabilitiesService, expectedProfile).toIConnectionProfile();
-		let profileWithoutCredentials = connectionStore.getProfileWithoutPassword(profile);
-		assert.deepEqual(profileWithoutCredentials.toIConnectionProfile(), expectedProfile);
 	});
 
 	test('addPassword gets the password from the credentials service', async () => {

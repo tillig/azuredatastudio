@@ -9,7 +9,7 @@ import { URI } from 'vs/base/common/uri';
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { IModeService } from 'vs/editor/common/services/modeService';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 
 export class DashboardInput extends EditorInput {
@@ -48,13 +48,13 @@ export class DashboardInput extends EditorInput {
 		if (!model.getModel(this.getResource())) {
 			model.createModel('', modeService.create('dashboard'), this.getResource());
 		}
-		this._initializedPromise = _connectionService.connectIfNotConnected(_connectionProfile, 'dashboard').then(
+		this._initializedPromise = _connectionService.connect(_connectionProfile, undefined, { useExistingConnection: true }).then(
 			u => {
 				this._uri = u;
 				const info = this._connectionService.getConnectionInfo(u);
 				if (info) {
 					this._onConnectionChanged = this._connectionService.onConnectionChanged(e => {
-						if (e.connectionUri === u) {
+						if (e === u) {
 							this._onDidChangeLabel.fire();
 						}
 					});

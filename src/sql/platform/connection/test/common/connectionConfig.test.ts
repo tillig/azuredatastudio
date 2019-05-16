@@ -6,10 +6,9 @@
 import * as assert from 'assert';
 import * as azdata from 'azdata';
 import { ICapabilitiesService, ProviderFeatures } from 'sql/platform/capabilities/common/capabilitiesService';
-import { ConnectionConfig, ISaveGroupResult } from 'sql/platform/connection/common/connectionConfig';
+import { ConnectionConfig } from 'sql/platform/connection/common/connectionConfig';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup, IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
-import { IConnectionProfile, IConnectionProfileStore } from 'sql/platform/connection/common/interfaces';
 import { TestConfigurationService } from 'sql/platform/connection/test/common/testConfigurationService';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
@@ -76,7 +75,7 @@ suite('ConnectionConfig', () => {
 		}
 	]);
 
-	const testConnections: IConnectionProfileStore[] = deepFreeze([
+	const testConnections = deepFreeze([
 		{
 			options: {
 				serverName: 'server1',
@@ -241,7 +240,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('addConnection should add the new profile to user settings', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'new server',
 			databaseName: 'database',
 			userName: 'user',
@@ -250,8 +249,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: undefined,
 			groupId: undefined,
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -268,12 +265,12 @@ suite('ConnectionConfig', () => {
 		let savedConnectionProfile = await config.addConnection(connectionProfile);
 
 		assert.ok(!!savedConnectionProfile.id);
-		assert.equal(configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user.length, testConnections.length + 1);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connections').user.length, testConnections.length + 1);
 	});
 
 	test('addConnection should not add the new profile to user settings if already exists', async () => {
 		let existingConnection = testConnections[0];
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: existingConnection.options['serverName'],
 			databaseName: existingConnection.options['databaseName'],
 			userName: existingConnection.options['userName'],
@@ -282,8 +279,6 @@ suite('ConnectionConfig', () => {
 			groupId: existingConnection.groupId,
 			savePassword: true,
 			groupFullName: undefined,
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -302,11 +297,11 @@ suite('ConnectionConfig', () => {
 		let savedConnectionProfile = await config.addConnection(connectionProfile);
 
 		assert.equal(savedConnectionProfile.id, existingConnection.id);
-		assert.equal(configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user.length, testConnections.length);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connections').user.length, testConnections.length);
 	});
 
 	test('addConnection should add the new group to user settings if does not exist', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'new server',
 			databaseName: 'database',
 			userName: 'user',
@@ -315,8 +310,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g2/g2-2',
 			groupId: undefined,
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -332,8 +325,8 @@ suite('ConnectionConfig', () => {
 		let config = new ConnectionConfig(configurationService, capabilitiesService.object);
 		await config.addConnection(connectionProfile);
 
-		assert.equal(configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user.length, testConnections.length + 1);
-		assert.equal(configurationService.inspect<IConnectionProfileStore[]>('datasource.connectionGroups').user.length, testGroups.length + 1);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connections').user.length, testConnections.length + 1);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connectionGroups').user.length, testGroups.length + 1);
 	});
 
 	test('getConnections should return connections from user and workspace settings given getWorkspaceConnections set to true', () => {
@@ -385,47 +378,8 @@ suite('ConnectionConfig', () => {
 		});
 	});
 
-	test('saveGroup should save the new groups to tree and return the id of the last group name', () => {
-		let config = new ConnectionConfig(undefined, undefined);
-		let groups: IConnectionProfileGroup[] = deepClone(testGroups);
-		let newGroups: string = 'ROOT/g1/g1-1/new-group/new-group2';
-		let color: string = 'red';
-
-		let result: ISaveGroupResult = config.saveGroup(groups, newGroups, color, newGroups);
-		assert.ok(!!result);
-		assert.equal(result.groups.length, testGroups.length + 2, 'The result groups length is invalid');
-		let newGroup = result.groups.find(g => g.name === 'new-group2');
-		assert.equal(result.newGroupId, newGroup.id, 'The groups id is invalid');
-	});
-
-	test('saveGroup should only add the groups that are not in the tree', () => {
-		let config = new ConnectionConfig(undefined, undefined);
-		let groups: IConnectionProfileGroup[] = deepClone(testGroups);
-		let newGroups: string = 'ROOT/g2/g2-5';
-		let color: string = 'red';
-
-		let result: ISaveGroupResult = config.saveGroup(groups, newGroups, color, newGroups);
-		assert.ok(!!result);
-		assert.equal(result.groups.length, testGroups.length + 1, 'The result groups length is invalid');
-		let newGroup = result.groups.find(g => g.name === 'g2-5');
-		assert.equal(result.newGroupId, newGroup.id, 'The groups id is invalid');
-	});
-
-	test('saveGroup should not add any new group if tree already has all the groups in the full path', () => {
-		let config = new ConnectionConfig(undefined, undefined);
-		let groups: IConnectionProfileGroup[] = deepClone(testGroups);
-		let newGroups: string = 'ROOT/g2/g2-1';
-		let color: string = 'red';
-
-		let result: ISaveGroupResult = config.saveGroup(groups, newGroups, color, newGroups);
-		assert.ok(!!result);
-		assert.equal(result.groups.length, testGroups.length, 'The result groups length is invalid');
-		let newGroup = result.groups.find(g => g.name === 'g2-1');
-		assert.equal(result.newGroupId, newGroup.id, 'The groups id is invalid');
-	});
-
 	test('deleteConnection should remove the connection from config', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -434,8 +388,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -451,11 +403,11 @@ suite('ConnectionConfig', () => {
 		let config = new ConnectionConfig(configurationService, capabilitiesService.object);
 		await config.deleteConnection(connectionProfile);
 
-		assert.equal(configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user.length, testConnections.length - 1);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connections').user.length, testConnections.length - 1);
 	});
 
 	test('deleteConnectionGroup should remove the children connections and subgroups from config', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -464,8 +416,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -487,12 +437,12 @@ suite('ConnectionConfig', () => {
 		let config = new ConnectionConfig(configurationService, capabilitiesService.object);
 		await config.deleteGroup(connectionProfileGroup);
 
-		assert.equal(configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user.length, testConnections.length - 1);
-		assert.equal(configurationService.inspect<IConnectionProfileGroup[]>('datasource.connectionGroups').user.length, testGroups.length - 2);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connections').user.length, testConnections.length - 1);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connectionGroups').user.length, testGroups.length - 2);
 	});
 
 	test('deleteConnection should not throw error for connection not in config', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'connectionNotThere',
 			databaseName: 'database',
 			userName: 'user',
@@ -501,8 +451,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'newid',
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -516,7 +464,7 @@ suite('ConnectionConfig', () => {
 		let config = new ConnectionConfig(configurationService, capabilitiesService.object);
 		await config.deleteConnection(connectionProfile);
 
-		assert.equal(configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user.length, testConnections.length);
+		assert.equal(configurationService.inspect<Array<any>>('datasource.connections').user.length, testConnections.length);
 	});
 
 	test('renameGroup should change group name', async () => {
@@ -572,40 +520,48 @@ suite('ConnectionConfig', () => {
 
 
 	test('change group for connection with conflict should throw', async () => {
-		let changingProfile: IConnectionProfile = {
+		let changingProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
 			password: 'password',
 			authenticationType: '',
 			savePassword: true,
-			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: () => { return 'connectionId'; },
-			matches: undefined,
+			groupFullName: 'g3',
 			providerName: 'MSSQL',
-			options: {},
+			options: {
+				serverName: 'server3',
+				databaseName: 'database',
+				userName: 'user',
+				password: 'password',
+				authenticationType: ''
+			},
 			saveProfile: true,
 			id: 'server3-2',
 			connectionName: undefined
 		};
-		let existingProfile = ConnectionProfile.convertToProfileStore(capabilitiesService.object, {
+		let existingProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
 			password: 'password',
 			authenticationType: '',
 			savePassword: true,
-			groupFullName: 'test',
 			groupId: 'test',
-			getOptionsKey: () => { return 'connectionId'; },
-			matches: undefined,
+			groupFullName: 'test',
 			providerName: 'MSSQL',
-			options: {},
+			options: {
+				serverName: 'server3',
+				databaseName: 'database',
+				userName: 'user',
+				password: 'password',
+				authenticationType: ''
+			},
 			saveProfile: true,
 			id: 'server3',
 			connectionName: undefined
-		});
+		};
 
 		let _testConnections = deepClone(testConnections).concat([existingProfile, changingProfile]);
 
@@ -619,7 +575,7 @@ suite('ConnectionConfig', () => {
 			await config.changeGroupIdForConnection(connectionProfile, 'test');
 			assert.fail();
 		} catch (e) {
-			let editedConnections = configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user;
+			let editedConnections = configurationService.inspect<Array<any>>('datasource.connections').user;
 			// two
 			assert.equal(editedConnections.length, _testConnections.length);
 			let editedConnection = editedConnections.find(con => con.id === 'server3-2');
@@ -629,7 +585,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('change group(parent) for connection', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -638,8 +594,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: () => { return 'connectionId'; },
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -656,7 +610,7 @@ suite('ConnectionConfig', () => {
 		let config = new ConnectionConfig(configurationService, capabilitiesService.object);
 		await config.changeGroupIdForConnection(connectionProfile, newId);
 
-		let editedConnections = configurationService.inspect<IConnectionProfileStore[]>('datasource.connections').user;
+		let editedConnections = configurationService.inspect<Array<any>>('datasource.connections').user;
 		assert.equal(editedConnections.length, testConnections.length);
 		let editedConnection = editedConnections.find(con => con.id === 'server3');
 		assert.ok(!!editedConnection);

@@ -15,13 +15,7 @@ import Severity from 'vs/base/common/severity';
 import { append, $ } from 'vs/base/browser/dom';
 
 import { ISelectionData } from 'azdata';
-import {
-	IConnectionManagementService,
-	IConnectionParams,
-	INewConnectionParams,
-	ConnectionType,
-	RunQueryOnConnectionMode
-} from 'sql/platform/connection/common/connectionManagement';
+import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { QueryEditor } from 'sql/workbench/parts/query/browser/queryEditor';
 import { IQueryModelService } from 'sql/platform/query/common/queryModel';
 import { SelectBox } from 'sql/base/browser/ui/selectBox/selectBox';

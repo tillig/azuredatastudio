@@ -6,7 +6,6 @@
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import * as Utils from 'sql/platform/connection/common/utils';
 import * as azdata from 'azdata';
 import { StopWatch } from 'vs/base/common/stopwatch';
@@ -31,7 +30,7 @@ export class ConnectionStatusManager {
 		return undefined;
 	}
 
-	public findConnectionProfile(connectionProfile: IConnectionProfile): ConnectionManagementInfo | undefined {
+	public findConnectionProfile(connectionProfile: ConnectionProfile): ConnectionManagementInfo | undefined {
 		const id = Utils.generateUri(connectionProfile);
 		return this.findConnection(id);
 	}
@@ -49,7 +48,7 @@ export class ConnectionStatusManager {
 		return conn && conn.connectionProfile;
 	}
 
-	public addConnection(id: string, connection: IConnectionProfile): ConnectionManagementInfo {
+	public addConnection(id: string, connection: azdata.IConnectionProfile): ConnectionManagementInfo {
 		// Always create a copy and save that in the list
 		const connectionProfile = new ConnectionProfile(this.capabilitiesService, connection);
 		const connectionInfo = new ConnectionManagementInfo();
@@ -71,7 +70,7 @@ export class ConnectionStatusManager {
 	 * when the connection is stored, the group id get assigned to the profile and it can change the id
 	 * So for those kind of connections, we need to add the new id and the connection
 	 */
-	public updateConnectionProfile(id: string, connection: IConnectionProfile): string | undefined {
+	public updateConnectionProfile(id: string, connection: ConnectionProfile): string | undefined {
 		const conn = this.connections.get(id);
 		if (conn && connection) {
 			if (isDefaultTypeUri(id)) {
@@ -140,7 +139,7 @@ export class ConnectionStatusManager {
 		return ownerUriToReturn;
 	}
 
-	public onConnectionChanged(changedConnInfo: azdata.ChangedConnectionInfo): IConnectionProfile | undefined {
+	public onConnectionChanged(changedConnInfo: azdata.ChangedConnectionInfo): azdata.IConnectionProfile | undefined {
 		const connection = this.connections.get(changedConnInfo.connectionUri);
 		if (connection && connection.connectionProfile) {
 			connection.connectionProfile.serverName = changedConnInfo.connection.serverName;

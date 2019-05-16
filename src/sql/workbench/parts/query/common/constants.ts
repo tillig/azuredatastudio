@@ -4,8 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 export const copyIncludeHeaders = 'copyIncludeHeaders';
-export const configSaveAsCsv = 'saveAsCsv';
-export const configSaveAsXml = 'saveAsXml';
 export const configCopyRemoveNewLine = 'copyRemoveNewLine';
 export const configShowBatchTime = 'showBatchTime';
 export const querySection = 'query';

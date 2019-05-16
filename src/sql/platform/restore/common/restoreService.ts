@@ -6,7 +6,6 @@
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import * as azdata from 'azdata';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 export { TaskExecutionMode } from 'sql/platform/backup/common/backupService';
 
 export const SERVICE_ID = 'restoreService';
@@ -44,5 +43,5 @@ export interface IRestoreService {
 export const IRestoreDialogController = createDecorator<IRestoreDialogController>('restoreDialogService');
 export interface IRestoreDialogController {
 	_serviceBrand: any;
-	showDialog(connection: IConnectionProfile): Promise<void>;
+	showDialog(connection: azdata.IConnectionProfile): Promise<void>;
 }

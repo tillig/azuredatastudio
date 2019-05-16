@@ -16,7 +16,6 @@ import * as Utils from 'sql/platform/connection/common/utils';
 import { IHandleFirewallRuleResult } from 'sql/workbench/services/resourceProvider/common/resourceProviderService';
 
 import { WorkbenchEditorTestService } from 'sqltest/stubs/workbenchEditorTestService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { EditorGroupTestService } from 'sqltest/stubs/editorGroupService';
 import { TestCapabilitiesService } from 'sql/platform/capabilities/test/common/testCapabilitiesService';
 import { ConnectionProviderStub } from 'sqltest/stubs/connectionProviderStub';
@@ -32,12 +31,13 @@ import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/co
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { AccountManagementTestService } from 'sqltest/stubs/accountManagementStubs';
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
+import { ConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 
 suite('SQL ConnectionManagementService tests', () => {
 
 	let capabilitiesService: TestCapabilitiesService;
 	let connectionDialogService: TypeMoq.Mock<ConnectionDialogTestService>;
-	let connectionStore: TypeMoq.Mock<ConnectionStore>;
+	let connectionStore: TypeMoq.Mock<ConnectionStoreService>;
 	let workbenchEditorService: TypeMoq.Mock<WorkbenchEditorTestService>;
 	let editorGroupService: TypeMoq.Mock<EditorGroupTestService>;
 	let connectionStatusManager: ConnectionStatusManager;
@@ -48,7 +48,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 	let none: void;
 
-	let connectionProfile: IConnectionProfile = {
+	let connectionProfile: azdata.IConnectionProfile = {
 		connectionName: 'new name',
 		serverName: 'new server',
 		databaseName: 'database',
@@ -58,16 +58,14 @@ suite('SQL ConnectionManagementService tests', () => {
 		savePassword: true,
 		groupFullName: 'g2/g2-2',
 		groupId: 'group id',
-		getOptionsKey: () => { return 'connectionId'; },
-		matches: undefined,
 		providerName: 'MSSQL',
 		options: {},
 		saveProfile: true,
 		id: undefined
 	};
-	let connectionProfileWithEmptySavedPassword: IConnectionProfile =
+	let connectionProfileWithEmptySavedPassword: azdata.IConnectionProfile =
 		Object.assign({}, connectionProfile, { password: '', serverName: connectionProfile.serverName + 1 });
-	let connectionProfileWithEmptyUnsavedPassword: IConnectionProfile =
+	let connectionProfileWithEmptyUnsavedPassword: azdata.IConnectionProfile =
 		Object.assign({}, connectionProfile, { password: '', serverName: connectionProfile.serverName + 2, savePassword: false });
 
 	let connectionManagementService: ConnectionManagementService;
@@ -80,7 +78,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 		capabilitiesService = new TestCapabilitiesService();
 		connectionDialogService = TypeMoq.Mock.ofType(ConnectionDialogTestService);
-		connectionStore = TypeMoq.Mock.ofType(ConnectionStore, TypeMoq.MockBehavior.Loose, new TestStorageService());
+		connectionStore = TypeMoq.Mock.ofType(ConnectionStoreService, TypeMoq.MockBehavior.Loose, new TestStorageService());
 		workbenchEditorService = TypeMoq.Mock.ofType(WorkbenchEditorTestService);
 		editorGroupService = TypeMoq.Mock.ofType(EditorGroupTestService);
 		connectionStatusManager = new ConnectionStatusManager(capabilitiesService);
@@ -100,12 +98,12 @@ suite('SQL ConnectionManagementService tests', () => {
 		connectionStore.setup(x => x.addRecentConnection(TypeMoq.It.isAny())).returns(() => Promise.resolve());
 		connectionStore.setup(x => x.saveProfile(TypeMoq.It.isAny())).returns(() => Promise.resolve(connectionProfile));
 		workbenchEditorService.setup(x => x.openEditor(undefined, TypeMoq.It.isAny(), TypeMoq.It.isAny())).returns(() => Promise.resolve(undefined));
-		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<IConnectionProfile>(
+		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<azdata.IConnectionProfile>(
 			c => c.serverName === connectionProfile.serverName))).returns(() => Promise.resolve({ profile: connectionProfile, savedCred: true }));
-		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<IConnectionProfile>(
+		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<azdata.IConnectionProfile>(
 			c => c.serverName === connectionProfileWithEmptySavedPassword.serverName))).returns(
 				() => Promise.resolve({ profile: connectionProfileWithEmptySavedPassword, savedCred: true }));
-		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<IConnectionProfile>(
+		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<azdata.IConnectionProfile>(
 			c => c.serverName === connectionProfileWithEmptyUnsavedPassword.serverName))).returns(
 				() => Promise.resolve({ profile: connectionProfileWithEmptyUnsavedPassword, savedCred: false }));
 		connectionStore.setup(x => x.isPasswordRequired(TypeMoq.It.isAny())).returns(() => true);
@@ -161,12 +159,12 @@ suite('SQL ConnectionManagementService tests', () => {
 		return connectionManagementService;
 	}
 
-	function verifyShowConnectionDialog(connectionProfile: IConnectionProfile, connectionType: ConnectionType, uri: string, connectionResult?: IConnectionResult, didShow: boolean = true): void {
+	function verifyShowConnectionDialog(connectionProfile: azdata.IConnectionProfile, connectionType: ConnectionType, uri: string, connectionResult?: IConnectionResult, didShow: boolean = true): void {
 		if (connectionProfile) {
 			connectionDialogService.verify(x => x.showDialog(
 				TypeMoq.It.isAny(),
 				TypeMoq.It.is<INewConnectionParams>(p => p.connectionType === connectionType && (uri === undefined || p.input.uri === uri)),
-				TypeMoq.It.is<IConnectionProfile>(c => c !== undefined && c.serverName === connectionProfile.serverName),
+				TypeMoq.It.is<azdata.IConnectionProfile>(c => c !== undefined && c.serverName === connectionProfile.serverName),
 				connectionResult ? TypeMoq.It.is<IConnectionResult>(r => r.errorMessage === connectionResult.errorMessage && r.callStack === connectionResult.callStack) : undefined),
 				didShow ? TypeMoq.Times.once() : TypeMoq.Times.never());
 
@@ -180,9 +178,9 @@ suite('SQL ConnectionManagementService tests', () => {
 		}
 	}
 
-	function verifyShowFirewallRuleDialog(connectionProfile: IConnectionProfile, didShow: boolean = true): void {
+	function verifyShowFirewallRuleDialog(connectionProfile: azdata.IConnectionProfile, didShow: boolean = true): void {
 		resourceProviderStubMock.verify(x => x.showFirewallRuleDialog(
-			TypeMoq.It.is<IConnectionProfile>(c => c.serverName === connectionProfile.serverName),
+			TypeMoq.It.is<azdata.IConnectionProfile>(c => c.serverName === connectionProfile.serverName),
 			TypeMoq.It.isAny(),
 			TypeMoq.It.isAny()),
 			didShow ? TypeMoq.Times.once() : TypeMoq.Times.never());
@@ -205,7 +203,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 	}
 
-	function connect(uri: string, options?: IConnectionCompletionOptions, fromDialog?: boolean, connection?: IConnectionProfile, error?: string, errorCode?: number, errorCallStack?: string): Promise<IConnectionResult> {
+	function connect(uri: string, options?: IConnectionCompletionOptions, fromDialog?: boolean, connection?: ConnectionProfile, error?: string, errorCode?: number, errorCallStack?: string): Promise<IConnectionResult> {
 		let connectionToUse = connection ? connection : connectionProfile;
 		let id = connectionToUse.getOptionsKey();
 		let defaultUri = 'connection://' + (id ? id : connectionToUse.serverName + ':' + connectionToUse.databaseName);

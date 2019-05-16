@@ -3,15 +3,15 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as ConnectionConstants from 'sql/platform/connection/common/constants';
-import * as Constants from 'sql/workbench/parts/query/common/constants';
-import * as LocalizedConstants from 'sql/workbench/parts/query/common/localizedConstants';
-import * as WorkbenchUtils from 'sql/workbench/common/sqlWorkbenchUtils';
+import * as pretty from 'pretty-data';
+
 import { SaveResultsRequestParams } from 'azdata';
+
+import * as ConnectionConstants from 'sql/platform/connection/common/constants';
+import * as LocalizedConstants from 'sql/workbench/parts/query/common/localizedConstants';
 import { IQueryManagementService } from 'sql/platform/query/common/queryManagement';
 import { ISaveRequest, SaveFormat } from 'sql/workbench/parts/grid/common/interfaces';
 
-import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { IWorkspaceContextService } from 'vs/platform/workspace/common/workspace';
 import { IWindowsService, IWindowService, FileFilter } from 'vs/platform/windows/common/windows';
 import { Registry } from 'vs/platform/registry/common/platform';
@@ -20,8 +20,6 @@ import { IUntitledEditorService } from 'vs/workbench/services/untitled/common/un
 import { Schemas } from 'vs/base/common/network';
 import * as path from 'vs/base/common/path';
 import * as nls from 'vs/nls';
-import * as pretty from 'pretty-data';
-
 import Severity from 'vs/base/common/severity';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { getBaseLabel } from 'vs/base/common/labels';
@@ -33,40 +31,50 @@ import { IConfigurationService } from 'vs/platform/configuration/common/configur
 
 let prevSavePath: string;
 
+interface ICsvSaveConfig {
+	includeHeaders: boolean;
+	delimiter: string;
+	lineSeperator: string;
+	textIdentifier: string;
+	encoding: string;
+}
+
+interface IXmlSaveConfig {
+	formatted: boolean;
+	encoding: string;
+}
+
 /**
  *  Handles save results request from the context menu of slickGrid
  */
 export class ResultSerializer {
-	public static tempFileCount: number = 1;
 	private static MAX_FILENAMES = 100;
 
 	private _uri: string;
 	private _filePath: string;
 
 	constructor(
-		@IInstantiationService private _instantiationService: IInstantiationService,
-		@IOutputService private _outputService: IOutputService,
-		@IQueryManagementService private _queryManagementService: IQueryManagementService,
-		@IConfigurationService private _workspaceConfigurationService: IConfigurationService,
-		@IEditorService private _editorService: IEditorService,
-		@IWorkspaceContextService private _contextService: IWorkspaceContextService,
-		@IWindowsService private _windowsService: IWindowsService,
-		@IWindowService private _windowService: IWindowService,
-		@IUntitledEditorService private _untitledEditorService: IUntitledEditorService,
-		@INotificationService private _notificationService: INotificationService
+		@IOutputService private readonly outputService: IOutputService,
+		@IQueryManagementService private readonly queryManagementService: IQueryManagementService,
+		@IConfigurationService private readonly configurationService: IConfigurationService,
+		@IEditorService private readonly editorService: IEditorService,
+		@IWorkspaceContextService private readonly contextService: IWorkspaceContextService,
+		@IWindowsService private readonly windowsService: IWindowsService,
+		@IWindowService private readonly windowService: IWindowService,
+		@IUntitledEditorService private readonly untitledEditorService: IUntitledEditorService,
+		@INotificationService private readonly notificationService: INotificationService
 	) { }
 
 	/**
 	 * Handle save request by getting filename from user and sending request to service
 	 */
 	public saveResults(uri: string, saveRequest: ISaveRequest): Thenable<void> {
-		const self = this;
 		this._uri = uri;
 
 		// prompt for filepath
-		return self.promptForFilepath(saveRequest).then(filePath => {
+		return this.promptForFilepath(saveRequest).then(filePath => {
 			if (filePath) {
-				return self.sendRequestToService(filePath, saveRequest.batchIndex, saveRequest.resultSetNumber, saveRequest.format, saveRequest.selection ? saveRequest.selection[0] : undefined);
+				return this.sendRequestToService(filePath, saveRequest.batchIndex, saveRequest.resultSetNumber, saveRequest.format, saveRequest.selection ? saveRequest.selection[0] : undefined);
 			}
 			return Promise.resolve(undefined);
 		});
@@ -109,15 +117,15 @@ export class ResultSerializer {
 		let uri: URI = URI.from({ scheme: Schemas.untitled, path: fileName });
 
 		// If the current filename is taken, try another up to a max number
-		if (this._untitledEditorService.exists(uri)) {
+		if (this.untitledEditorService.exists(uri)) {
 			let i = 1;
 			while (i < ResultSerializer.MAX_FILENAMES
-				&& this._untitledEditorService.exists(uri)) {
+				&& this.untitledEditorService.exists(uri)) {
 				fileName = [columnName, i.toString()].join('-');
 				uri = URI.from({ scheme: Schemas.untitled, path: fileName });
 				i++;
 			}
-			if (this._untitledEditorService.exists(uri)) {
+			if (this.untitledEditorService.exists(uri)) {
 				// If this fails, return undefined and let the system figure out the right name
 				uri = undefined;
 			}
@@ -136,11 +144,11 @@ export class ResultSerializer {
 
 	private get outputChannel(): IOutputChannel {
 		this.ensureOutputChannelExists();
-		return this._outputService.getChannel(ConnectionConstants.outputChannelName);
+		return this.outputService.getChannel(ConnectionConstants.outputChannelName);
 	}
 
 	private get rootPath(): string {
-		return getRootPath(this._contextService);
+		return getRootPath(this.contextService);
 	}
 
 	private logToOutputChannel(message: string): void {
@@ -150,7 +158,7 @@ export class ResultSerializer {
 	private promptForFilepath(saveRequest: ISaveRequest): Thenable<string> {
 		let filepathPlaceHolder = (prevSavePath) ? path.dirname(prevSavePath) : resolveCurrentDirectory(this._uri, this.rootPath);
 		filepathPlaceHolder = path.join(filepathPlaceHolder, this.getResultsDefaultFilename(saveRequest));
-		return this._windowService.showSaveDialog({
+		return this.windowService.showSaveDialog({
 			title: nls.localize('resultsSerializer.saveAsFileTitle', 'Choose Results File'),
 			defaultPath: path.normalize(filepathPlaceHolder),
 			filters: this.getResultsFileExtension(saveRequest)
@@ -212,27 +220,17 @@ export class ResultSerializer {
 	}
 
 	private getConfigForCsv(): SaveResultsRequestParams {
-		let saveResultsParams = <SaveResultsRequestParams>{ resultFormat: SaveFormat.CSV as string };
+		const saveResultsParams = <SaveResultsRequestParams>{ resultFormat: SaveFormat.CSV as string };
 
-		// get save results config from vscode config
-		let saveConfig = WorkbenchUtils.getSqlConfigSection(this._workspaceConfigurationService, Constants.configSaveAsCsv);
+		const config = this.configurationService.getValue<ICsvSaveConfig>('sql.saveAsCsv');
+
 		// if user entered config, set options
-		if (saveConfig) {
-			if (saveConfig.includeHeaders !== undefined) {
-				saveResultsParams.includeHeaders = saveConfig.includeHeaders;
-			}
-			if (saveConfig.delimiter !== undefined) {
-				saveResultsParams.delimiter = saveConfig.delimiter;
-			}
-			if (saveConfig.lineSeperator !== undefined) {
-				saveResultsParams.lineSeperator = saveConfig.lineSeperator;
-			}
-			if (saveConfig.textIdentifier !== undefined) {
-				saveResultsParams.textIdentifier = saveConfig.textIdentifier;
-			}
-			if (saveConfig.encoding !== undefined) {
-				saveResultsParams.encoding = saveConfig.encoding;
-			}
+		if (config) {
+			saveResultsParams.includeHeaders = config.includeHeaders;
+			saveResultsParams.delimiter = config.delimiter;
+			saveResultsParams.lineSeperator = config.lineSeperator;
+			saveResultsParams.textIdentifier = config.textIdentifier;
+			saveResultsParams.encoding = config.encoding;
 		}
 
 		return saveResultsParams;
@@ -261,15 +259,11 @@ export class ResultSerializer {
 		let saveResultsParams = <SaveResultsRequestParams>{ resultFormat: SaveFormat.XML as string };
 
 		// get save results config from vscode config
-		let saveConfig = WorkbenchUtils.getSqlConfigSection(this._workspaceConfigurationService, Constants.configSaveAsXml);
+		const config = this.configurationService.getValue<IXmlSaveConfig>('sql.saveAsXml');
 		// if user entered config, set options
-		if (saveConfig) {
-			if (saveConfig.formatted !== undefined) {
-				saveResultsParams.formatted = saveConfig.formatted;
-			}
-			if (saveConfig.encoding !== undefined) {
-				saveResultsParams.encoding = saveConfig.encoding;
-			}
+		if (config) {
+			saveResultsParams.formatted = config.formatted;
+			saveResultsParams.encoding = config.encoding;
 		}
 
 		return saveResultsParams;
@@ -317,20 +311,20 @@ export class ResultSerializer {
 	private promptFileSavedNotification(savedFilePath: string) {
 		let label = getBaseLabel(path.dirname(savedFilePath));
 
-		this._notificationService.prompt(
+		this.notificationService.prompt(
 			Severity.Info,
 			LocalizedConstants.msgSaveSucceeded + savedFilePath,
 			[{
 				label: nls.localize('openLocation', "Open file location"),
 				run: () => {
-					let action = new ShowFileInFolderAction(savedFilePath, label || path.sep, this._windowsService);
+					let action = new ShowFileInFolderAction(savedFilePath, label || path.sep, this.windowsService);
 					action.run();
 					action.dispose();
 				}
 			}, {
 				label: nls.localize('openFile', "Open file"),
 				run: () => {
-					let action = new OpenFileInFolderAction(savedFilePath, label || path.sep, this._windowsService);
+					let action = new OpenFileInFolderAction(savedFilePath, label || path.sep, this.windowsService);
 					action.run();
 					action.dispose();
 				}
@@ -347,9 +341,9 @@ export class ResultSerializer {
 		this.logToOutputChannel(LocalizedConstants.msgSaveStarted + this._filePath);
 
 		// send message to the sqlserverclient for converting results to the requested format and saving to filepath
-		return this._queryManagementService.saveResults(saveResultsParams).then(result => {
+		return this.queryManagementService.saveResults(saveResultsParams).then(result => {
 			if (result.messages) {
-				this._notificationService.notify({
+				this.notificationService.notify({
 					severity: Severity.Error,
 					message: LocalizedConstants.msgSaveFailed + result.messages
 				});
@@ -363,7 +357,7 @@ export class ResultSerializer {
 			// Telemetry.sendTelemetryEvent('SavedResults', { 'type': format });
 
 		}, error => {
-			this._notificationService.notify({
+			this.notificationService.notify({
 				severity: Severity.Error,
 				message: LocalizedConstants.msgSaveFailed + error
 			});
@@ -377,10 +371,10 @@ export class ResultSerializer {
 	private openSavedFile(filePath: string, format: string): void {
 		if (format !== SaveFormat.EXCEL) {
 			let uri = URI.file(filePath);
-			this._editorService.openEditor({ resource: uri }).then((result) => {
+			this.editorService.openEditor({ resource: uri }).then((result) => {
 
 			}, (error: any) => {
-				this._notificationService.notify({
+				this.notificationService.notify({
 					severity: Severity.Error,
 					message: error
 				});
@@ -392,18 +386,15 @@ export class ResultSerializer {
 	 * Open the saved file in a new vscode editor pane
 	 */
 	private openUntitledFile(fileMode: string, contents: string, fileUri: URI = undefined): void {
-		const input = this._untitledEditorService.createOrGet(fileUri, fileMode, contents);
+		const input = this.untitledEditorService.createOrGet(fileUri, fileMode, contents);
 
-		this._editorService.openEditor(input, { pinned: true })
-			.then(
-				(success) => {
-				},
-				(error: any) => {
-					this._notificationService.notify({
-						severity: Severity.Error,
-						message: error
-					});
-				}
+		this.editorService.openEditor(input, { pinned: true })
+			.catch((error: any) => {
+				this.notificationService.notify({
+					severity: Severity.Error,
+					message: error
+				});
+			}
 			);
 	}
 }

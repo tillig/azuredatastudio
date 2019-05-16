@@ -3,8 +3,6 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
-
 import * as types from 'vs/base/common/types';
 import { ILocalizedString, MenuRegistry, ICommandAction } from 'vs/platform/actions/common/actions';
 import { Event, Emitter } from 'vs/base/common/event';
@@ -15,6 +13,7 @@ import { createCSSRule } from 'vs/base/browser/dom';
 import { URI } from 'vs/base/common/uri';
 import { CommandsRegistry } from 'vs/platform/commands/common/commands';
 import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
+import { IConnectionProfile } from 'azdata';
 
 export interface ITaskOptions {
 	id: string;

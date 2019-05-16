@@ -6,15 +6,14 @@
 import { ReverseLookUpMap } from 'sql/base/common/map';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { ConnectionConfig } from 'sql/platform/connection/common/connectionConfig';
-import { fixupConnectionCredentials } from 'sql/platform/connection/common/connectionInfo';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup, IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ICredentialsService } from 'sql/platform/credentials/common/credentialsService';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
 import { registerSingleton } from 'vs/platform/instantiation/common/extensions';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
+import { IConnectionProfile } from 'azdata';
 
 const MAX_CONNECTIONS_DEFAULT = 25;
 
@@ -34,6 +33,8 @@ export interface IAddSavedPasswordResponse {
 
 export interface IConnectionStoreService {
 	addSavedPassword(connection: IConnectionProfile): Promise<IAddSavedPasswordResponse>;
+	isPasswordRequired(connection: IConnectionProfile): boolean;
+	saveProfileGroup(profile: IConnectionProfileGroup): Promise<string>;
 }
 
 /**
@@ -121,9 +122,14 @@ export class ConnectionStoreService implements IConnectionStoreService {
 	 * @returns a Promise that returns the original profile, for help in chaining calls
 	 */
 	public saveProfile(profile: IConnectionProfile, forceWritePlaintextPassword?: boolean): Promise<IConnectionProfile> {
+		if (!profile.saveProfile) {
+			return Promise.resolve(profile);
+		} else {
+
+		}
 		// Add the profile to the saved list, taking care to clear out the password field if necessary
 		const savedProfile = forceWritePlaintextPassword ? profile : this.getProfileWithoutPassword(profile);
-		return this.saveProfileToConfig(savedProfile)
+		return this.connectionConfig.addConnection(savedProfile)
 			.then(savedConnectionProfile => {
 				profile.groupId = savedConnectionProfile.groupId;
 				profile.id = savedConnectionProfile.id;
@@ -145,14 +151,6 @@ export class ConnectionStoreService implements IConnectionStoreService {
 	 */
 	public saveProfileGroup(profile: IConnectionProfileGroup): Promise<string> {
 		return this.connectionConfig.addGroup(profile);
-	}
-
-	private saveProfileToConfig(profile: IConnectionProfile): Promise<IConnectionProfile> {
-		if (profile.saveProfile) {
-			return this.connectionConfig.addConnection(profile);
-		} else {
-			return Promise.resolve(profile);
-		}
 	}
 
 	/**
@@ -190,7 +188,7 @@ export class ConnectionStoreService implements IConnectionStoreService {
 		});
 	}
 
-	public getProfileWithoutPassword(conn: IConnectionProfile): ConnectionProfile {
+	private getProfileWithoutPassword(conn: IConnectionProfile): ConnectionProfile {
 		if (conn) {
 			let savedConn: ConnectionProfile = ConnectionProfile.fromIConnectionProfile(this.capabilitiesService, conn);
 			savedConn = savedConn.withoutPassword();
@@ -397,5 +395,25 @@ export class ConnectionStoreService implements IConnectionStoreService {
 		return this.groupIdMap.reverseGet(key);
 	}
 }
+
+function fixupConnectionCredentials(connCreds: IConnectionProfile): IConnectionProfile {
+	if (!connCreds.serverName) {
+		connCreds.serverName = '';
+	}
+
+	if (!connCreds.databaseName) {
+		connCreds.databaseName = '';
+	}
+
+	if (!connCreds.userName) {
+		connCreds.userName = '';
+	}
+
+	if (!connCreds.password) {
+		connCreds.password = '';
+	}
+	return connCreds;
+}
+
 
 registerSingleton(IConnectionStoreService, ConnectionStoreService, true);

@@ -9,7 +9,7 @@ import { OnInit, Component, Inject, forwardRef, ElementRef, ChangeDetectorRef, V
 import { Router } from '@angular/router';
 
 import { CommonServiceInterface } from 'sql/platform/bootstrap/node/commonServiceInterface.service';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { RefreshWidgetAction, EditDashboardAction } from 'sql/workbench/parts/dashboard/common/actions';
 import { DashboardPage } from 'sql/workbench/parts/dashboard/common/dashboardPage.component';
