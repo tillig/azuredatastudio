@@ -34,7 +34,7 @@ export interface IConnectionStoreService {
 	readonly onProfileAdded: Event<IConnectionProfile>;
 	readonly onProfileUpdated: Event<IConnectionProfile>;
 	readonly onGroupDeleted: Event<ConnectionProfileGroup>;
-	readonly onGroupAdded: Event<ConnectionProfileGroup>;
+	readonly onGroupAdded: Event<string>;
 	readonly onGroupUpdated: Event<ConnectionProfileGroup>;
 	addSavedPassword(profile: IConnectionProfile): Promise<{ profile: IConnectionProfile, savedCred: boolean }>;
 	isPasswordRequired(profile: IConnectionProfile): boolean;
@@ -58,8 +58,6 @@ export interface IConnectionStoreService {
 
 /**
  * Manages the connections list including saved profiles and the most recently used connections
- *
- * @export
  */
 export class ConnectionStoreService implements IConnectionStoreService {
 	_serviceBrand: any;
@@ -80,7 +78,7 @@ export class ConnectionStoreService implements IConnectionStoreService {
 	private readonly _onGroupDeleted = new Emitter<ConnectionProfileGroup>();
 	public readonly onGroupDeleted = this._onGroupDeleted.event;
 
-	private readonly _onGroupAdded = new Emitter<ConnectionProfileGroup>();
+	private readonly _onGroupAdded = new Emitter<string>();
 	public readonly onGroupAdded = this._onGroupAdded.event;
 
 	private readonly _onGroupUpdated = new Emitter<ConnectionProfileGroup>();
@@ -173,6 +171,7 @@ export class ConnectionStoreService implements IConnectionStoreService {
 				// Add necessary default properties before returning
 				// this is needed to support immediate connections
 				fixupConnectionCredentials(profile);
+				this._onProfileAdded.fire(profile);
 				return profile;
 			});
 	}
@@ -183,8 +182,10 @@ export class ConnectionStoreService implements IConnectionStoreService {
 	 * @param profile the profile group to save
 	 * @returns a Promise that returns the id of connection group
 	 */
-	public saveProfileGroup(profile: IConnectionProfileGroup): Promise<string> {
-		return this.connectionConfig.addGroup(profile);
+	public async saveProfileGroup(profile: IConnectionProfileGroup): Promise<string> {
+		const id = await this.connectionConfig.addGroup(profile);
+		this._onGroupAdded.fire(id);
+		return id;
 	}
 
 	private saveProfileToConfig(profile: IConnectionProfile): Promise<IConnectionProfile> {
@@ -388,16 +389,19 @@ export class ConnectionStoreService implements IConnectionStoreService {
 		return this.configurationService.getValue('sql.maxRecentConnections') || MAX_CONNECTIONS_DEFAULT;
 	}
 
-	public editGroup(group: ConnectionProfileGroup): Promise<void> {
-		return this.connectionConfig.editGroup(group).then();
+	public async editGroup(group: ConnectionProfileGroup): Promise<void> {
+		await this.connectionConfig.editGroup(group);
+		this._onGroupUpdated.fire(group);
 	}
 
-	public deleteConnectionFromConfiguration(connection: ConnectionProfile): Promise<void> {
-		return this.connectionConfig.deleteConnection(connection);
+	public async deleteConnectionFromConfiguration(connection: ConnectionProfile): Promise<void> {
+		await this.connectionConfig.deleteConnection(connection);
+		this._onProfileDeleted.fire(connection);
 	}
 
-	public deleteGroupFromConfiguration(group: ConnectionProfileGroup): Promise<void> {
-		return this.connectionConfig.deleteGroup(group);
+	public async deleteGroupFromConfiguration(group: ConnectionProfileGroup): Promise<void> {
+		await this.connectionConfig.deleteGroup(group);
+		this._onGroupDeleted.fire(group);
 	}
 
 	public changeGroupIdForConnectionGroup(source: ConnectionProfileGroup, target: ConnectionProfileGroup): Promise<void> {

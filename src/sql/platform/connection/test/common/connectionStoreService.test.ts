@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import * as azdata from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
-import { ConnectionStore } from 'sql/platform/connection/common/connectionStoreService';
+import { ConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { TestConfigurationService } from 'sql/platform/connection/test/common/testConfigurationService';
 import { TestCredentialsService } from 'sql/platform/credentials/test/common/testCredentialsService';
@@ -149,7 +149,7 @@ suite('ConnectionStore', () => {
 
 		// When saving 4 connections
 		// Expect all of them to be saved even if size is limited to 3
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		for (let i = 0; i < numCreds; i++) {
 			const cred = Object.assign({}, defaultNamedProfile, { serverName: defaultNamedProfile.serverName + i });
@@ -171,7 +171,7 @@ suite('ConnectionStore', () => {
 		const storageService = new TestStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		const connections = connectionStore.getRecentlyUsedConnections(['Provider2']);
 		assert.ok(!!connections);
@@ -186,7 +186,7 @@ suite('ConnectionStore', () => {
 
 		// Given we save the same connection twice
 		// Then expect the only 1 instance of that connection to be listed in the MRU
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		const cred = Object.assign({}, defaultNamedProfile, { serverName: defaultNamedProfile.serverName + 1 });
 		const connectionProfile = new ConnectionProfile(capabilitiesService, cred);
@@ -208,7 +208,7 @@ suite('ConnectionStore', () => {
 		const credentialsService = new TestCredentialsService();
 
 		// Given we save 1 connection with password and multiple other connections without
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		const integratedCred = Object.assign({}, defaultNamedProfile, {
 			serverName: defaultNamedProfile.serverName + 'Integrated',
@@ -254,7 +254,7 @@ suite('ConnectionStore', () => {
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		await connectionStore.addRecentConnection(defaultNamedProfile);
@@ -271,7 +271,7 @@ suite('ConnectionStore', () => {
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		assert.ok(connectionStore.isPasswordRequired(defaultNamedProfile));
@@ -282,7 +282,7 @@ suite('ConnectionStore', () => {
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		const connectionProfile = new ConnectionProfile(capabilitiesService, defaultNamedProfile);
 
@@ -309,7 +309,7 @@ suite('ConnectionStore', () => {
 
 		capabilitiesService.capabilities[providerName] = { connection: providerCapabilities };
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		const connectionProfile: IConnectionProfile = Object.assign({}, defaultNamedProfile, { providerName: providerName });
 
@@ -324,7 +324,7 @@ suite('ConnectionStore', () => {
 		const password: string = 'asdf!@#$';
 		const connectionProfile: IConnectionProfile = Object.assign({}, defaultNamedProfile, { password });
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		const profile = await connectionStore.saveProfile(connectionProfile);
@@ -338,7 +338,7 @@ suite('ConnectionStore', () => {
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		const group = connectionStore.getGroupFromId('invalidId');
 		assert.equal(group, undefined, 'Returned group was not undefined when there was no group with the given ID');
@@ -370,7 +370,7 @@ suite('ConnectionStore', () => {
 		];
 
 		configurationService.updateValue('datasource.connectionGroups', groups, ConfigurationTarget.USER);
-		let connectionStore = new ConnectionStore(storageService, configurationService,
+		let connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		// If I look up the parent group using its ID, then I get back the correct group
@@ -387,7 +387,7 @@ suite('ConnectionStore', () => {
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 		const profile = deepClone(defaultNamedProfile);
 		profile.options['password'] = profile.password;
@@ -412,7 +412,7 @@ suite('ConnectionStore', () => {
 
 		await credentialsService.saveCredential(credId, password);
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		const passwordProfile = (await connectionStore.addSavedPassword(profile)).profile;
@@ -446,7 +446,7 @@ suite('ConnectionStore', () => {
 
 		configurationService.updateValue('datasource.connectionGroups', groups, ConfigurationTarget.USER);
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		const connectionGroups = connectionStore.getConnectionProfileGroups();
@@ -462,7 +462,7 @@ suite('ConnectionStore', () => {
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		for (let i = 0; i < 5; i++) {
@@ -487,7 +487,7 @@ suite('ConnectionStore', () => {
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
-		const connectionStore = new ConnectionStore(storageService, configurationService,
+		const connectionStore = new ConnectionStoreService(storageService, configurationService,
 			credentialsService, capabilitiesService);
 
 		const parentGroupId = 'parentGroup';
