@@ -54,6 +54,7 @@ export interface IConnectionStoreService {
 	changeGroupIdForConnection(source: ConnectionProfile, targetGroupId: string): Promise<void>;
 	getConnections(): Array<ConnectionProfile>;
 	getGroupFromId(groupId: string): IConnectionProfileGroup;
+	hasRegistersConnections(): boolean;
 }
 
 /**
@@ -350,6 +351,10 @@ export class ConnectionStoreService implements IConnectionStoreService {
 
 	public getConnections(): Array<ConnectionProfile> {
 		return this.connectionConfig.getConnections(true);
+	}
+
+	public hasRegistersConnections(): boolean {
+		return this.connectionConfig.getConnections(true).length > 0;
 	}
 
 	private convertToConnectionGroup(groups: IConnectionProfileGroup[], connections: ConnectionProfile[], parent: ConnectionProfileGroup = undefined): ConnectionProfileGroup[] {

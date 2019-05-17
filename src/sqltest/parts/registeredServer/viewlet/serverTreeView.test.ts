@@ -5,14 +5,13 @@
 
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
-import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 
 import { Tree } from 'vs/base/parts/tree/browser/treeImpl';
 import { TestInstantiationService } from 'vs/platform/instantiation/test/common/instantiationServiceMock';
-import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 
 import * as TypeMoq from 'typemoq';
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { TestConnectionStoreService } from 'sql/platform/connection/test/common/testConnectionStoreService';
 
 suite('ServerTreeView onAddConnectionProfile handler tests', () => {
 
@@ -22,11 +21,11 @@ suite('ServerTreeView onAddConnectionProfile handler tests', () => {
 	let capabilitiesService = new CapabilitiesTestService();
 
 	setup(() => {
-		let instantiationService = new TestInstantiationService();
-		let mockConnectionManagementService = TypeMoq.Mock.ofType(ConnectionManagementService, TypeMoq.MockBehavior.Strict, {}, {}, new TestStorageService());
-		mockConnectionManagementService.setup(x => x.getConnectionGroups()).returns(x => []);
-		mockConnectionManagementService.setup(x => x.hasRegisteredServers()).returns(() => true);
-		serverTreeView = new ServerTreeView(mockConnectionManagementService.object, instantiationService, undefined, undefined, undefined, undefined, capabilitiesService);
+		const instantiationService = new TestInstantiationService();
+		const connectionStoreService = TypeMoq.Mock.ofType(TestConnectionStoreService, TypeMoq.MockBehavior.Strict);
+		connectionStoreService.setup(x => x.hasRegistersConnections()).returns(x => true);
+		connectionStoreService.setup(x => x.getConnectionProfileGroups(false)).returns(x => []);
+		serverTreeView = new ServerTreeView(undefined, instantiationService, undefined, undefined, undefined, undefined, connectionStoreService.object, capabilitiesService);
 		let tree = <Tree>{
 			clearSelection() { },
 			getSelection() { },

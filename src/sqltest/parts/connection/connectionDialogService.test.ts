@@ -5,25 +5,24 @@
 
 import { ConnectionDialogService } from 'sql/workbench/services/connection/browser/connectionDialogService';
 import { ConnectionDialogWidget } from 'sql/workbench/services/connection/browser/connectionDialogWidget';
-import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { ConnectionType, IConnectableInput, IConnectionResult, INewConnectionParams } from 'sql/platform/connection/common/connectionManagement';
 import { ContextKeyServiceStub } from 'sqltest/stubs/contextKeyServiceStub';
 import { ErrorMessageServiceStub } from 'sqltest/stubs/errorMessageServiceStub';
 
 import * as TypeMoq from 'typemoq';
-import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
+import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
 
 suite('ConnectionDialogService tests', () => {
 
 	let connectionDialogService: ConnectionDialogService;
-	let mockConnectionManagementService: TypeMoq.Mock<ConnectionManagementService>;
+	let mockConnectionManagementService: TypeMoq.Mock<TestConnectionManagementService>;
 	let mockConnectionDialog: TypeMoq.Mock<ConnectionDialogWidget>;
 
 	setup(() => {
 		let errorMessageService = getMockErrorMessageService();
 		connectionDialogService = new ConnectionDialogService(undefined, undefined, undefined, errorMessageService.object,
-			undefined, undefined, undefined);
-		mockConnectionManagementService = TypeMoq.Mock.ofType(ConnectionManagementService, TypeMoq.MockBehavior.Strict, {}, {}, new TestStorageService());
+			undefined, undefined, undefined, undefined);
+		mockConnectionManagementService = TypeMoq.Mock.ofType(TestConnectionManagementService, TypeMoq.MockBehavior.Strict);
 		(connectionDialogService as any)._connectionManagementService = mockConnectionManagementService.object;
 		mockConnectionDialog = TypeMoq.Mock.ofType(ConnectionDialogWidget, TypeMoq.MockBehavior.Strict,
 			undefined,

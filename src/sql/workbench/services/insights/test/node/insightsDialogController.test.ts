@@ -6,7 +6,6 @@
 import { InsightsDialogController } from 'sql/workbench/services/insights/node/insightsDialogController';
 import { InsightsDialogModel } from 'sql/workbench/services/insights/common/insightsDialogModel';
 import QueryRunner from 'sql/platform/query/common/queryRunner';
-import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { IInsightsConfigDetails } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
@@ -15,8 +14,8 @@ import { InstantiationService } from 'vs/platform/instantiation/common/instantia
 import * as azdata from 'azdata';
 import { equal } from 'assert';
 import { Mock, MockBehavior, It } from 'typemoq';
-import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 import { Emitter } from 'vs/base/common/event';
+import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
 
 const testData: string[][] = [
 	['1', '2', '3', '4'],
@@ -39,7 +38,7 @@ suite('Insights Dialog Controller Tests', () => {
 		instMoq.setup(x => x.createInstance(It.isValue(QueryRunner), It.isAny()))
 			.returns(() => runner);
 
-		let connMoq = Mock.ofType(ConnectionManagementService, MockBehavior.Strict, {}, {}, new TestStorageService());
+		let connMoq = Mock.ofType(TestConnectionManagementService, MockBehavior.Strict);
 		connMoq.setup(x => x.connect(It.isAny(), It.isAny()))
 			.returns(() => Promise.resolve(undefined));
 

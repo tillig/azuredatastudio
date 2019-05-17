@@ -70,8 +70,7 @@ export class ServerTreeView {
 		this._onSelectionOrFocusChange = new Emitter();
 		this._actionProvider = this._instantiationService.createInstance(ServerTreeActionProvider);
 		capabilitiesService.onCapabilitiesRegistered(() => {
-			const connectionGroups = this.connectionStoreService.getConnectionProfileGroups(false);
-			if (connectionGroups && connectionGroups.length > 0) {
+			if (this.connectionStoreService.hasRegistersConnections()) {
 				this.refreshTree();
 				this._treeSelectionHandler.onTreeActionStateChange(false);
 			}

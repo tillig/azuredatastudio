@@ -6,7 +6,7 @@
 import { ConnectionDialogTestService } from 'sqltest/stubs/connectionDialogTestService';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { ConnectionStatusManager } from 'sql/platform/connection/common/connectionStatusManager';
-import { ConnectionStore } from 'sql/platform/connection/common/connectionStoreService';
+import { ConnectionStoreService } from 'sql/platform/connection/common/connectionStoreService';
 import {
 	INewConnectionParams, ConnectionType,
 	IConnectionCompletionOptions, IConnectionResult,
@@ -38,7 +38,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 	let capabilitiesService: CapabilitiesTestService;
 	let connectionDialogService: TypeMoq.Mock<ConnectionDialogTestService>;
-	let connectionStore: TypeMoq.Mock<ConnectionStore>;
+	let connectionStore: TypeMoq.Mock<ConnectionStoreService>;
 	let workbenchEditorService: TypeMoq.Mock<WorkbenchEditorTestService>;
 	let editorGroupService: TypeMoq.Mock<EditorGroupTestService>;
 	let connectionStatusManager: ConnectionStatusManager;
@@ -81,7 +81,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 		capabilitiesService = new CapabilitiesTestService();
 		connectionDialogService = TypeMoq.Mock.ofType(ConnectionDialogTestService);
-		connectionStore = TypeMoq.Mock.ofType(ConnectionStore, TypeMoq.MockBehavior.Loose, new TestStorageService());
+		connectionStore = TypeMoq.Mock.ofType(ConnectionStoreService, TypeMoq.MockBehavior.Loose, new TestStorageService());
 		workbenchEditorService = TypeMoq.Mock.ofType(WorkbenchEditorTestService);
 		editorGroupService = TypeMoq.Mock.ofType(EditorGroupTestService);
 		connectionStatusManager = new ConnectionStatusManager(capabilitiesService);
@@ -146,9 +146,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 	function createConnectionManagementService(): ConnectionManagementService {
 		let connectionManagementService = new ConnectionManagementService(
-			connectionStore.object,
 			connectionDialogService.object,
-			undefined,
 			undefined,
 			workbenchEditorService.object,
 			undefined,
@@ -160,7 +158,8 @@ suite('SQL ConnectionManagementService tests', () => {
 			resourceProviderStubMock.object,
 			undefined,
 			accountManagementService.object,
-			undefined
+			undefined,
+			connectionStore.object
 		);
 		return connectionManagementService;
 	}

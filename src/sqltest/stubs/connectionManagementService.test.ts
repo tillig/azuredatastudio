@@ -11,7 +11,6 @@ import { ConnectionProfile } from 'sql/platform/connection/common/connectionProf
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 import * as azdata from 'azdata';
 import { Event, Emitter } from 'vs/base/common/event';
-import { isUndefinedOrNull } from 'vs/base/common/types';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 
 // Test stubs for commonly used objects
@@ -163,7 +162,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return new Promise<IConnectionResult>(() => true);
 	}
 
-	disconnectEditor(owner: IConnectableInput): Promise<boolean> {
+	disconnectEditor(owner: IConnectableInput, force?: boolean): Promise<boolean> {
 		return new Promise<boolean>(() => true);
 	}
 

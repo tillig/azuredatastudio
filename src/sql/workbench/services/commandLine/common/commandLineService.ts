@@ -87,7 +87,7 @@ export class CommandLineService implements ICommandLineProcessing {
 			}
 		}
 		let showConnectDialogOnStartup: boolean = this._configurationService.getValue('workbench.showConnectDialogOnStartup');
-		if (showConnectDialogOnStartup && !commandName && !profile && this.connectionStoreService.getConnections().length === 0) {
+		if (showConnectDialogOnStartup && !commandName && !profile && !this.connectionStoreService.hasRegistersConnections()) {
 			// prompt the user for a new connection on startup if no profiles are registered
 			await this._connectionManagementService.showConnectionDialog();
 			return;

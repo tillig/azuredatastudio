@@ -19,12 +19,12 @@ import { IClientSession, ICellModel, INotebookModelOptions } from 'sql/workbench
 import { ClientSession } from 'sql/workbench/parts/notebook/models/clientSession';
 import { CellTypes } from 'sql/workbench/parts/notebook/models/contracts';
 import { Deferred } from 'sql/base/common/promise';
-import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { Memento } from 'vs/workbench/common/memento';
 import { Emitter } from 'vs/base/common/event';
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
-import { TestStorageService, TestLogService } from 'vs/workbench/test/workbenchTestServices';
+import { TestLogService } from 'vs/workbench/test/workbenchTestServices';
+import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
 
 let expectedNotebookContent: nb.INotebookContents = {
 	cells: [{
@@ -76,7 +76,7 @@ let capabilitiesService: TypeMoq.Mock<ICapabilitiesService>;
 suite('notebook model', function (): void {
 	let notebookManagers = [new NotebookManagerStub()];
 	let memento: TypeMoq.Mock<Memento>;
-	let queryConnectionService: TypeMoq.Mock<ConnectionManagementService>;
+	let queryConnectionService: TypeMoq.Mock<TestConnectionManagementService>;
 	let defaultModelOptions: INotebookModelOptions;
 	setup(() => {
 		sessionReady = new Deferred<void>();
@@ -84,8 +84,7 @@ suite('notebook model', function (): void {
 		capabilitiesService = TypeMoq.Mock.ofType(CapabilitiesTestService);
 		memento = TypeMoq.Mock.ofType(Memento, TypeMoq.MockBehavior.Loose, '');
 		memento.setup(x => x.getMemento(TypeMoq.It.isAny())).returns(() => void 0);
-		queryConnectionService = TypeMoq.Mock.ofType(ConnectionManagementService, TypeMoq.MockBehavior.Loose, memento.object, undefined, new TestStorageService());
-		queryConnectionService.callBase = true;
+		queryConnectionService = TypeMoq.Mock.ofType(TestConnectionManagementService, TypeMoq.MockBehavior.Strict);
 		defaultModelOptions = {
 			notebookUri: defaultUri,
 			factory: new ModelFactory(),
