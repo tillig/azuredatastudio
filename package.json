@@ -25,6 +25,8 @@
     "tslint": "node node_modules/tslint/bin/tslint -c tslint-gci.json -p src/tsconfig.json",
     "strict-null-check": "tsc -p src/tsconfig.strictNullChecks.json",
     "strict-null-check-watch": "tsc -p src/tsconfig.strictNullChecks.json --watch",
+    "noUnusedLocals": "tsc -p src/tsconfig.noUnusedLocals.json",
+    "noUnusedLocals-watch": "tsc -p src/tsconfig.noUnusedLocals.json --watch",
     "strict-initialization-watch": "tsc --watch -p src/tsconfig.json --noEmit --strictPropertyInitialization",
     "web": "node scripts/code-web.js"
   },

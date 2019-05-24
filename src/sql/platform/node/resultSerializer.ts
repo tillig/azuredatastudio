@@ -11,7 +11,6 @@ import { SaveResultsRequestParams } from 'azdata';
 import { IQueryManagementService } from 'sql/platform/query/common/queryManagement';
 import { ISaveRequest, SaveFormat } from 'sql/workbench/parts/grid/common/interfaces';
 
-import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { IWorkspaceContextService } from 'vs/platform/workspace/common/workspace';
 import { IWindowsService, IWindowService, FileFilter } from 'vs/platform/windows/common/windows';
 import { Registry } from 'vs/platform/registry/common/platform';
@@ -44,7 +43,6 @@ export class ResultSerializer {
 	private _filePath: string;
 
 	constructor(
-		@IInstantiationService private _instantiationService: IInstantiationService,
 		@IOutputService private _outputService: IOutputService,
 		@IQueryManagementService private _queryManagementService: IQueryManagementService,
 		@IConfigurationService private _workspaceConfigurationService: IConfigurationService,

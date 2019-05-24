@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { SqlExtHostContext, SqlMainContext, ExtHostConnectionManagementShape, MainThreadConnectionManagementShape } from 'sql/workbench/api/node/sqlExtHost.protocol';
+import { SqlMainContext, MainThreadConnectionManagementShape } from 'sql/workbench/api/node/sqlExtHost.protocol';
 import * as azdata from 'azdata';
 import { IExtHostContext } from 'vs/workbench/api/common/extHost.protocol';
 import { extHostNamedCustomer } from 'vs/workbench/api/common/extHostCustomers';
@@ -22,7 +22,6 @@ import { IConnectionDialogService } from 'sql/workbench/services/connection/comm
 @extHostNamedCustomer(SqlMainContext.MainThreadConnectionManagement)
 export class MainThreadConnectionManagement implements MainThreadConnectionManagementShape {
 
-	private _proxy: ExtHostConnectionManagementShape;
 	private _toDispose: IDisposable[];
 
 	constructor(
@@ -33,9 +32,6 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		@IConnectionDialogService private _connectionDialogService: IConnectionDialogService,
 		@ICapabilitiesService private _capabilitiesService: ICapabilitiesService
 	) {
-		if (extHostContext) {
-			this._proxy = extHostContext.getProxy(SqlExtHostContext.ExtHostConnectionManagement);
-		}
 		this._toDispose = [];
 	}
 

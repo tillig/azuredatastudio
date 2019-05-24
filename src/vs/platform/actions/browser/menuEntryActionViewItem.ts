@@ -278,12 +278,12 @@ export class LabeledMenuItemActionItem extends MenuEntryActionViewItem {
 
 	constructor(
 		public _action: MenuItemAction,
-		@IKeybindingService private readonly _labeledkeybindingService: IKeybindingService,
+		@IKeybindingService labeledkeybindingService: IKeybindingService,
 		@INotificationService protected _notificationService: INotificationService,
-		@IContextMenuService private readonly _labeledcontextMenuService: IContextMenuService,
+		@IContextMenuService labeledcontextMenuService: IContextMenuService,
 		private readonly _defaultCSSClassToAdd: string = ''
 	) {
-		super(_action, _labeledkeybindingService, _notificationService, _labeledcontextMenuService);
+		super(_action, labeledkeybindingService, _notificationService, labeledcontextMenuService);
 	}
 
 	updateLabel(): void {

@@ -5,13 +5,13 @@
 
 import { Registry } from 'vs/platform/registry/common/platform';
 import { IConfigurationRegistry, Extensions as ConfigurationExtension } from 'vs/platform/configuration/common/configurationRegistry';
-import { IJSONSchema, IJSONSchemaMap } from 'vs/base/common/jsonSchema';
+import { IJSONSchema } from 'vs/base/common/jsonSchema';
 import * as nls from 'vs/nls';
 import { IExtensionPointUser, ExtensionsRegistry } from 'vs/workbench/services/extensions/common/extensionsRegistry';
 
 import { ProviderProperties } from 'sql/workbench/parts/dashboard/widgets/properties/propertiesWidget.component';
 import { DATABASE_DASHBOARD_TABS } from 'sql/workbench/parts/dashboard/pages/databaseDashboardPage.contribution';
-import { SERVER_DASHBOARD_TABS, SERVER_DASHBOARD_PROPERTIES } from 'sql/workbench/parts/dashboard/pages/serverDashboardPage.contribution';
+import { SERVER_DASHBOARD_TABS } from 'sql/workbench/parts/dashboard/pages/serverDashboardPage.contribution';
 import { DASHBOARD_CONFIG_ID, DASHBOARD_TABS_KEY_PROPERTY } from 'sql/workbench/parts/dashboard/pages/dashboardPageContribution';
 
 export const Extensions = {
@@ -41,7 +41,6 @@ class DashboardRegistry implements IDashboardRegistry {
 	private _properties = new Map<string, ProviderProperties>();
 	private _tabs = new Array<IDashboardTab>();
 	private _configurationRegistry = Registry.as<IConfigurationRegistry>(ConfigurationExtension.Configuration);
-	private _dashboardTabContentSchemaProperties: IJSONSchemaMap = {};
 
 	/**
 	 * Register a dashboard widget

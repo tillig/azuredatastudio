@@ -13,7 +13,7 @@ import * as notebookUtils from '../notebookUtils';
 import { CellTypes, CellType, NotebookChangeType } from 'sql/workbench/parts/notebook/models/contracts';
 import { NotebookModel } from 'sql/workbench/parts/notebook/models/notebookModel';
 import { ICellModel, notebookConstants } from 'sql/workbench/parts/notebook/models/modelInterfaces';
-import { ICellModelOptions, IModelFactory, FutureInternal, CellExecutionState } from './modelInterfaces';
+import { ICellModelOptions, FutureInternal, CellExecutionState } from './modelInterfaces';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { INotificationService, Severity } from 'vs/platform/notification/common/notification';
@@ -40,7 +40,7 @@ export class CellModel implements ICellModel {
 	private _connectionManagementService: IConnectionManagementService;
 	private _stdInHandler: nb.MessageHandler<nb.IStdinMessage>;
 
-	constructor(private factory: IModelFactory, cellData?: nb.ICellContents, private _options?: ICellModelOptions) {
+	constructor(cellData?: nb.ICellContents, private _options?: ICellModelOptions) {
 		this.id = `${modelId++}`;
 		if (cellData) {
 			// Read in contents if available
@@ -335,7 +335,6 @@ export class CellModel implements ICellModel {
 	private handleReply(msg: nb.IShellMessage): void {
 		// TODO #931 we should process this. There can be a payload attached which should be added to outputs.
 		// In all other cases, it is a no-op
-		let output: nb.ICellOutput = msg.content as nb.ICellOutput;
 
 		if (!this._future.inProgress) {
 			this.disposeFuture();
@@ -344,7 +343,6 @@ export class CellModel implements ICellModel {
 
 	private handleIOPub(msg: nb.IIOPubMessage): void {
 		let msgType = msg.header.msg_type;
-		let displayId = this.getDisplayId(msg);
 		let output: nb.ICellOutput;
 		switch (msgType) {
 			case 'execute_result':
@@ -425,11 +423,6 @@ export class CellModel implements ICellModel {
 			}
 			return ret;
 		});
-	}
-
-	private getDisplayId(msg: nb.IIOPubMessage): string | undefined {
-		let transient = (msg.content.transient || {});
-		return transient['display_id'] as string;
 	}
 
 	public setStdInHandler(handler: nb.MessageHandler<nb.IStdinMessage>): void {

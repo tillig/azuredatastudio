@@ -31,7 +31,6 @@ import { QueryResultsEditor } from 'sql/workbench/parts/query/browser/queryResul
 import * as queryContext from 'sql/workbench/parts/query/common/queryContext';
 import { Taskbar, ITaskbarContent } from 'sql/base/browser/ui/taskbar/taskbar';
 import * as actions from 'sql/workbench/parts/query/browser/queryActions';
-import { IRange } from 'vs/editor/common/core/range';
 
 /**
  * Editor that hosts 2 sub-editors: A TextResourceEditor for SQL file editing, and a QueryResultsEditor

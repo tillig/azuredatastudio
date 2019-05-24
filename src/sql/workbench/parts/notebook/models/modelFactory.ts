@@ -12,7 +12,7 @@ import { ClientSession } from './clientSession';
 export class ModelFactory implements IModelFactory {
 
 	public createCell(cell: nb.ICellContents, options: ICellModelOptions): ICellModel {
-		return new CellModel(this, cell, options);
+		return new CellModel(cell, options);
 	}
 
 	public createClientSession(options: IClientSessionOptions): IClientSession {

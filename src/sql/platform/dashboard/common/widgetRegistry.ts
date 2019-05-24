@@ -6,10 +6,7 @@ import { IInsightsConfig } from 'sql/workbench/parts/dashboard/widgets/insights/
 
 import * as platform from 'vs/platform/registry/common/platform';
 import { IJSONSchema, IJSONSchemaMap } from 'vs/base/common/jsonSchema';
-import { IJSONContributionRegistry, Extensions as JSONExtensions } from 'vs/platform/jsonschemas/common/jsonContributionRegistry';
 import * as nls from 'vs/nls';
-
-const contributionRegistry = platform.Registry.as<IJSONContributionRegistry>(JSONExtensions.JSONContribution);
 
 export type WidgetIdentifier = string;
 

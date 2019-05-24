@@ -1,8 +1,8 @@
 {
-	"extends": "./tsconfig.base.json",
+	"extends": "./tsconfig.json",
 	"compilerOptions": {
 		"noEmit": true,
-		"strictNullChecks": true,
+		"noUnusedLocals": true,
 		"moduleResolution": "classic"
 	},
 	"include": [
@@ -16,11 +16,8 @@
 		"./sql/sqlop.proposed.d.ts",
 		"./sql/sqlop.test.d.ts",
 		"./sql/base/**/*.ts",
-		"./sql/platform/angularEventing/**/*.ts",
-		"./sql/platform/clipboard/**/*.ts",
-		"./sql/platform/credentials/**/*.ts",
-		"./sql/platform/theme/**/*.ts",
-		"./sql/platform/telemetry/**/*.ts"
+		"./sql/platform/**/*.ts",
+		"./sql/workbench/**/*.ts"
 	],
 	"exclude": [
 		"node_modules/**"

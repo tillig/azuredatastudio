@@ -41,7 +41,6 @@ import { ExtHostConfiguration, ExtHostConfigProvider } from 'vs/workbench/api/co
 import { ExtHostStorage } from 'vs/workbench/api/common/extHostStorage';
 import * as extHostTypes from 'vs/workbench/api/common/extHostTypes';
 import { ISchemeTransformer } from 'vs/workbench/api/common/extHostLanguageFeatures';
-import { AzureResource } from 'sql/platform/accounts/common/interfaces';
 
 export interface ISqlExtensionApiFactory {
 	vsCodeFactory(extension: IExtensionDescription, registry: ExtensionDescriptionRegistry, configProvider: ExtHostConfigProvider): typeof vscode;

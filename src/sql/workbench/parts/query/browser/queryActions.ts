@@ -422,7 +422,6 @@ export class ListDatabasesActionItem implements IActionViewItem {
 
 	public actionRunner: IActionRunner;
 	private _toDispose: IDisposable[];
-	private _context: any;
 	private _currentDatabaseName: string;
 	private _isConnected: boolean;
 	private _databaseListDropdown: HTMLElement;
@@ -479,7 +478,6 @@ export class ListDatabasesActionItem implements IActionViewItem {
 	}
 
 	public setActionContext(context: any): void {
-		this._context = context;
 	}
 
 	public isEnabled(): boolean {
