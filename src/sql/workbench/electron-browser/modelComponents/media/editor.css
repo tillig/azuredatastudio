@@ -10,7 +10,7 @@ modelview-editor-component {
 }
 
 modelview-diff-editor-component {
-	height: 100%;
+	height: 95%;
 	width : 100%;
 	display: block;
 	overflow: visible !important; /* show overflow so that horizontal scrollbar still shows if there's a title */
