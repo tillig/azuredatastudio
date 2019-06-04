@@ -5,7 +5,6 @@
 import 'vs/css!./media/insightsDialog';
 
 import { Button } from 'sql/base/browser/ui/button/button';
-import { IConnectionProfile } from 'azdata';
 import { Modal } from 'sql/workbench/browser/modal/modal';
 import { IInsightsConfigDetails } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
 import { attachButtonStyler, attachModalDialogStyler, attachTableStyler, attachPanelStyler } from 'sql/platform/theme/common/styler';
@@ -110,7 +109,7 @@ function stateFormatter(row: number, cell: number, value: any, columnDef: Slick.
 
 export class InsightsDialogView extends Modal {
 
-	private _connectionProfile: IConnectionProfile;
+	private _connectionProfile: ConnectionProfile;
 	private _insight: IInsightsConfigDetails;
 	private _splitView: SplitView;
 	private _container: HTMLElement;
@@ -307,7 +306,7 @@ export class InsightsDialogView extends Modal {
 	}
 
 	// insight object
-	public open(input: IInsightsConfigDetails, connectionProfile: IConnectionProfile): void {
+	public open(input: IInsightsConfigDetails, connectionProfile: ConnectionProfile): void {
 		if (types.isUndefinedOrNull(input) || types.isUndefinedOrNull(connectionProfile)) {
 			return;
 		}
@@ -405,7 +404,7 @@ export class InsightsDialogView extends Modal {
 	/**
 	 * Creates the context that should be passed to the action passed on the selected element for the top table
 	 */
-	private topInsightContext(element: ListResource): IConnectionProfile {
+	private topInsightContext(element: ListResource): ConnectionProfile {
 		let database = this._insight.actions.database || this._connectionProfile.databaseName;
 		let server = this._insight.actions.server || this._connectionProfile.serverName;
 		let user = this._insight.actions.user || this._connectionProfile.userName;

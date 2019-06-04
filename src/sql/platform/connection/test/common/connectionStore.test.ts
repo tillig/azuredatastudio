@@ -18,7 +18,7 @@ import { ConfigurationTarget } from 'vs/platform/configuration/common/configurat
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 
 suite('ConnectionStore', () => {
-	let defaultNamedProfile: azdata.IConnectionProfile = deepFreeze({
+	let defaultNamedProfile: ConnectionProfile = deepFreeze({
 		connectionName: 'new name',
 		serverName: 'namedServer',
 		databaseName: 'bcd',
@@ -308,7 +308,7 @@ suite('ConnectionStore', () => {
 
 		const connectionStore = new ConnectionStore(storageService, configurationService,
 			credentialsService, capabilitiesService);
-		const connectionProfile: azdata.IConnectionProfile = Object.assign({}, defaultNamedProfile, { providerName: providerName });
+		const connectionProfile: ConnectionProfile = Object.assign({}, defaultNamedProfile, { providerName: providerName });
 
 		assert.ok(!connectionStore.isPasswordRequired(connectionProfile));
 	});
@@ -319,7 +319,7 @@ suite('ConnectionStore', () => {
 		const credentialsService = new TestCredentialsService();
 
 		const password: string = 'asdf!@#$';
-		const connectionProfile: azdata.IConnectionProfile = Object.assign({}, defaultNamedProfile, { password });
+		const connectionProfile: ConnectionProfile = Object.assign({}, defaultNamedProfile, { password });
 
 		const connectionStore = new ConnectionStore(storageService, configurationService,
 			credentialsService, capabilitiesService);
@@ -496,7 +496,7 @@ suite('ConnectionStore', () => {
 			description: '',
 			parentId: ''
 		};
-		const connection: azdata.IConnectionProfile = {
+		const connection: ConnectionProfile = {
 			options: [],
 			connectionName: '',
 			serverName: 'server1',

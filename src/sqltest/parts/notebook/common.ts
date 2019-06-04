@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { nb, IConnectionProfile } from 'azdata';
+import { nb } from 'azdata';
 
 import { Event, Emitter } from 'vs/base/common/event';
 import { INotebookModel, ICellModel, IClientSession, IDefaultConnection, NotebookContentChange } from 'sql/workbench/parts/notebook/models/modelInterfaces';
@@ -11,6 +11,7 @@ import { NotebookChangeType, CellType } from 'sql/workbench/parts/notebook/model
 import { INotebookManager } from 'sql/workbench/services/notebook/common/notebookService';
 import { ISingleNotebookEditOperation } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { IStandardKernelWithProvider } from 'sql/workbench/parts/notebook/notebookUtils';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export class NotebookModelStub implements INotebookModel {
 	constructor(private _languageInfo?: nb.ILanguageInfo) {
@@ -75,7 +76,7 @@ export class NotebookModelStub implements INotebookModel {
 	changeKernel(displayName: string): void {
 		throw new Error('Method not implemented.');
 	}
-	changeContext(host: string, connection?: IConnectionProfile, hideErrorMessage?: boolean): Promise<void> {
+	changeContext(host: string, connection?: ConnectionProfile, hideErrorMessage?: boolean): Promise<void> {
 		throw new Error('Method not implemented.');
 	}
 	findCellIndex(cellModel: ICellModel): number {

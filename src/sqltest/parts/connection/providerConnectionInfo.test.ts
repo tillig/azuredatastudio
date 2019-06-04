@@ -8,12 +8,13 @@ import * as azdata from 'azdata';
 import * as assert from 'assert';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 suite('SQL ProviderConnectionInfo tests', () => {
 	let msSQLCapabilities: any;
 	let capabilitiesService: CapabilitiesTestService;
 
-	let connectionProfile: azdata.IConnectionProfile = {
+	let connectionProfile: ConnectionProfile = {
 		connectionName: 'name',
 		serverName: 'new server',
 		databaseName: 'database',

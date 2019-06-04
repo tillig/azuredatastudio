@@ -189,7 +189,7 @@ suite('commandLineService tests', () => {
 		connectionManagementService.setup((c) => c.showConnectionDialog()).verifiable(TypeMoq.Times.never());
 		connectionManagementService.setup(c => c.hasRegisteredServers()).returns(() => true).verifiable(TypeMoq.Times.atMostOnce());
 		connectionManagementService.setup(c => c.getConnectionGroups(TypeMoq.It.isAny())).returns(() => []);
-		let originalProfile: azdata.IConnectionProfile = undefined;
+		let originalProfile: ConnectionProfile = undefined;
 		connectionManagementService.setup(c => c.connectIfNotConnected(TypeMoq.It.is<ConnectionProfile>(p => p.serverName === 'myserver' && p.authenticationType === Constants.sqlLogin), 'connection', true))
 			.returns((conn) => {
 				originalProfile = conn;
@@ -242,7 +242,7 @@ suite('commandLineService tests', () => {
 		args.server = 'myserver';
 		connectionManagementService.setup((c) => c.showConnectionDialog()).verifiable(TypeMoq.Times.never());
 		connectionManagementService.setup(c => c.hasRegisteredServers()).returns(() => true).verifiable(TypeMoq.Times.atMostOnce());
-		let originalProfile: azdata.IConnectionProfile = undefined;
+		let originalProfile: ConnectionProfile = undefined;
 		connectionManagementService.setup(c => c.connectIfNotConnected(TypeMoq.It.is<ConnectionProfile>(p => p.serverName === 'myserver'), 'connection', true))
 			.returns((conn) => {
 				originalProfile = conn;
@@ -293,7 +293,7 @@ suite('commandLineService tests', () => {
 		args.database = 'mydatabase';
 		connectionManagementService.setup((c) => c.showConnectionDialog()).verifiable(TypeMoq.Times.never());
 		connectionManagementService.setup(c => c.hasRegisteredServers()).returns(() => true).verifiable(TypeMoq.Times.atMostOnce());
-		let originalProfile: azdata.IConnectionProfile = undefined;
+		let originalProfile: ConnectionProfile = undefined;
 		connectionManagementService.setup(c => c.connectIfNotConnected(TypeMoq.It.is<ConnectionProfile>(p => p.serverName === 'myserver' && p.authenticationType === Constants.integrated), 'connection', true))
 			.returns((conn) => {
 				originalProfile = conn;
@@ -335,7 +335,7 @@ suite('commandLineService tests', () => {
 		args.database = 'mydatabase';
 		connectionManagementService.setup((c) => c.showConnectionDialog()).verifiable(TypeMoq.Times.never());
 		connectionManagementService.setup(c => c.hasRegisteredServers()).returns(() => true).verifiable(TypeMoq.Times.atMostOnce());
-		let originalProfile: azdata.IConnectionProfile = undefined;
+		let originalProfile: ConnectionProfile = undefined;
 		connectionManagementService.setup(c => c.connectIfNotConnected(
 			TypeMoq.It.is<ConnectionProfile>(p => p.serverName === 'myserver' && p.authenticationType === Constants.integrated && p.connectionName === 'Test' && p.id === 'testID'), 'connection', true))
 			.returns((conn) => {
@@ -363,7 +363,7 @@ suite('commandLineService tests', () => {
 		connectionManagementService.setup((c) => c.showConnectionDialog()).verifiable(TypeMoq.Times.never());
 		connectionManagementService.setup(c => c.hasRegisteredServers()).returns(() => true).verifiable(TypeMoq.Times.atMostOnce());
 		connectionManagementService.setup(c => c.getConnectionGroups(TypeMoq.It.isAny())).returns(() => []);
-		let originalProfile: azdata.IConnectionProfile = undefined;
+		let originalProfile: ConnectionProfile = undefined;
 		connectionManagementService.setup(c => c.connectIfNotConnected(TypeMoq.It.is<ConnectionProfile>(p => p.serverName === 'myserver' && p.authenticationType === Constants.sqlLogin), 'connection', true))
 			.returns((conn) => {
 				originalProfile = conn;

@@ -5,7 +5,7 @@
 
 // This code is based on @jupyterlab/packages/apputils/src/clientsession.tsx
 
-import { nb, IConnectionProfile } from 'azdata';
+import { nb } from 'azdata';
 import { URI } from 'vs/base/common/uri';
 import { Event, Emitter } from 'vs/base/common/event';
 import { localize } from 'vs/nls';
@@ -15,6 +15,7 @@ import { Deferred } from 'sql/base/common/promise';
 
 import * as notebookUtils from '../notebookUtils';
 import { INotebookManager } from 'sql/workbench/services/notebook/common/notebookService';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 type KernelChangeHandler = (kernel: nb.IKernelChangedArgs) => Promise<void>;
 /**
@@ -291,7 +292,7 @@ export class ClientSession implements IClientSession {
 		}
 	}
 
-	public async updateConnection(connection: IConnectionProfile): Promise<void> {
+	public async updateConnection(connection: ConnectionProfile): Promise<void> {
 		if (!this.kernel) {
 			// TODO is there any case where skipping causes errors? So far it seems like it gets called twice
 			return;

@@ -5,7 +5,7 @@
 
 // This code is based on @jupyterlab/packages/apputils/src/clientsession.tsx
 
-import { nb, IConnectionProfile } from 'azdata';
+import { nb } from 'azdata';
 import { Event } from 'vs/base/common/event';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { URI } from 'vs/base/common/uri';
@@ -202,7 +202,7 @@ export interface IClientSession extends IDisposable {
 	/**
 	 * Updates the connection
 	 */
-	updateConnection(connection: IConnectionProfile): Promise<void>;
+	updateConnection(connection: ConnectionProfile): Promise<void>;
 
 	/**
 	 * Supports registering a handler to run during kernel change and implement any calls needed to configure
@@ -355,7 +355,7 @@ export interface INotebookModel {
 	/**
 	 * Change the current context (if applicable)
 	 */
-	changeContext(host: string, connection?: IConnectionProfile, hideErrorMessage?: boolean): Promise<void>;
+	changeContext(host: string, connection?: ConnectionProfile, hideErrorMessage?: boolean): Promise<void>;
 
 	/**
 	 * Find a cell's index given its model

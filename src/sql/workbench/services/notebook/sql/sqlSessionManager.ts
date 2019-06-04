@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as os from 'os';
-import { nb, QueryExecuteSubsetResult, IDbColumn, BatchSummary, IResultMessage, ResultSetSummary, IConnectionProfile } from 'azdata';
+import { nb, QueryExecuteSubsetResult, IDbColumn, BatchSummary, IResultMessage, ResultSetSummary } from 'azdata';
 import { localize } from 'vs/nls';
 import { FutureInternal, ILanguageMagic, notebookConstants } from 'sql/workbench/parts/notebook/models/modelInterfaces';
 import QueryRunner from 'sql/platform/query/common/queryRunner';
@@ -91,7 +91,7 @@ export class SqlSessionManager implements nb.SessionManager {
 export class SqlSession implements nb.ISession {
 	private _kernel: SqlKernel;
 	private _defaultKernelLoaded = false;
-	private _currentConnection: IConnectionProfile;
+	private _currentConnection: ConnectionProfile;
 
 	public set defaultKernelLoaded(value) {
 		this._defaultKernelLoaded = value;
@@ -151,7 +151,7 @@ export class SqlSession implements nb.ISession {
 
 class SqlKernel extends Disposable implements nb.IKernel {
 	private _queryRunner: QueryRunner;
-	private _currentConnection: IConnectionProfile;
+	private _currentConnection: ConnectionProfile;
 	private _currentConnectionProfile: ConnectionProfile;
 	static kernelId: number = 0;
 
@@ -226,7 +226,7 @@ class SqlKernel extends Disposable implements nb.IKernel {
 		return info;
 	}
 
-	public set connection(conn: IConnectionProfile) {
+	public set connection(conn: ConnectionProfile) {
 		this._currentConnection = conn;
 		this._currentConnectionProfile = new ConnectionProfile(this._capabilitiesService, this._currentConnection);
 		this._queryRunner = undefined;

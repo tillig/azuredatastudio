@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { extHostNamedCustomer } from 'vs/workbench/api/common/extHostCustomers';
-import { TaskRegistry, ITaskHandlerDescription } from 'sql/platform/tasks/common/tasks';
+import { TaskRegistry } from 'sql/platform/tasks/common/tasks';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { IExtHostContext } from 'vs/workbench/api/common/extHost.protocol';
 
@@ -14,8 +14,6 @@ import {
 	ExtHostTasksShape,
 	MainThreadTasksShape
 } from 'sql/workbench/api/node/sqlExtHost.protocol';
-
-import { IConnectionProfile } from 'azdata';
 
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
@@ -42,7 +40,7 @@ export class MainThreadTasks implements MainThreadTasksShape {
 	$registerTask(id: string): Promise<any> {
 		this._disposables.set(
 			id,
-			TaskRegistry.registerTask(id, (accessor, profile: IConnectionProfile, ...args) => {
+			TaskRegistry.registerTask(id, (accessor, profile: ConnectionProfile, ...args) => {
 				if (profile instanceof ConnectionProfile) {
 					profile = profile.toIConnectionProfile();
 				}

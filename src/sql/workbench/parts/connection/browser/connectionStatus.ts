@@ -8,9 +8,9 @@ import { IDisposable, combinedDisposable } from 'vs/base/common/lifecycle';
 import { IStatusbarItem } from 'vs/workbench/browser/parts/statusbar/statusbar';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
-import { IConnectionProfile } from 'azdata';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
 import * as TaskUtilities from 'sql/workbench/common/taskUtilities';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 // Connection status bar showing the current global connection
 export class ConnectionStatusbarItem implements IStatusbarItem {
@@ -55,7 +55,7 @@ export class ConnectionStatusbarItem implements IStatusbarItem {
 	}
 
 	// Set connection info to connection status bar
-	private _setConnectionText(connectionProfile: IConnectionProfile): void {
+	private _setConnectionText(connectionProfile: ConnectionProfile): void {
 		let text: string = connectionProfile.serverName;
 		if (text) {
 			if (connectionProfile.databaseName && connectionProfile.databaseName !== '') {

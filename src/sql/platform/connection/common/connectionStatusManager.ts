@@ -30,7 +30,7 @@ export class ConnectionStatusManager {
 		return Object.values(this._connections).find((connection: ConnectionManagementInfo) => connection.connectionProfile.id === profileId);
 	}
 
-	public findConnectionProfile(iconnectionProfile: azdata.IConnectionProfile): ConnectionManagementInfo {
+	public findConnectionProfile(iconnectionProfile: ConnectionProfile): ConnectionManagementInfo {
 		const connectionProfile = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnectionProfile);
 		let id = Utils.generateUri(connectionProfile);
 		return this.findConnection(id);
@@ -60,7 +60,7 @@ export class ConnectionStatusManager {
 		return connectionInfoForId ? connectionInfoForId.connectionProfile : undefined;
 	}
 
-	public addConnection(connection: azdata.IConnectionProfile, id: string): ConnectionManagementInfo {
+	public addConnection(connection: ConnectionProfile, id: string): ConnectionManagementInfo {
 		// Always create a copy and save that in the list
 		let connectionProfile = new ConnectionProfile(this._capabilitiesService, connection);
 		let connectionInfo: ConnectionManagementInfo = new ConnectionManagementInfo();
@@ -90,7 +90,7 @@ export class ConnectionStatusManager {
 	 * when the connection is stored, the group id get assigned to the profile and it can change the id
 	 * So for those kind of connections, we need to add the new id and the connection
 	 */
-	public updateConnectionProfile(iconnection: azdata.IConnectionProfile, id: string): string {
+	public updateConnectionProfile(iconnection: ConnectionProfile, id: string): string {
 		const connection = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnection);
 		let newId: string = id;
 		let connectionInfo: ConnectionManagementInfo = this._connections[id];
@@ -156,7 +156,7 @@ export class ConnectionStatusManager {
 		return ownerUriToReturn;
 	}
 
-	public onConnectionChanged(changedConnInfo: azdata.ChangedConnectionInfo): azdata.IConnectionProfile {
+	public onConnectionChanged(changedConnInfo: azdata.ChangedConnectionInfo): ConnectionProfile {
 		let connection = this._connections[changedConnInfo.connectionUri];
 		if (connection && connection.connectionProfile) {
 			connection.connectionProfile.serverName = changedConnInfo.connection.serverName;

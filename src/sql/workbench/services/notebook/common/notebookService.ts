@@ -14,6 +14,7 @@ import { ModelFactory } from 'sql/workbench/parts/notebook/models/modelFactory';
 import { NotebookInput } from 'sql/workbench/parts/notebook/notebookInput';
 import { ISingleNotebookEditOperation } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { ICellModel, INotebookModel, ILanguageMagic } from 'sql/workbench/parts/notebook/models/modelInterfaces';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export const SERVICE_ID = 'notebookService';
 export const INotebookService = createDecorator<INotebookService>(SERVICE_ID);
@@ -109,7 +110,7 @@ export interface INotebookParams extends IBootstrapParams {
 	notebookUri: URI;
 	input: NotebookInput;
 	providerInfo: Promise<IProviderInfo>;
-	profile?: azdata.IConnectionProfile;
+	profile?: ConnectionProfile;
 	modelFactory?: ModelFactory;
 }
 

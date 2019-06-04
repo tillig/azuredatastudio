@@ -15,10 +15,11 @@ import { ErrorMessageServiceStub } from 'sqltest/stubs/errorMessageServiceStub';
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 import { ContextKeyServiceStub } from 'sqltest/stubs/contextKeyServiceStub';
 import { Deferred } from 'sql/base/common/promise';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 // TESTS ///////////////////////////////////////////////////////////////////
 suite('Firewall rule dialog controller tests', () => {
-	let connectionProfile: azdata.IConnectionProfile;
+	let connectionProfile: ConnectionProfile;
 	let account: azdata.Account;
 	let IPAddress = '250.222.155.198';
 	let mockOnAddAccountErrorEvent: Emitter<string>;

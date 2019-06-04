@@ -9,8 +9,8 @@ import { URI } from 'vs/base/common/uri';
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { IModeService } from 'vs/editor/common/services/modeService';
 
-import { IConnectionProfile } from 'azdata';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export class DashboardInput extends EditorInput {
 
@@ -32,7 +32,7 @@ export class DashboardInput extends EditorInput {
 	private _parentContainer: HTMLElement;
 
 	constructor(
-		_connectionProfile: IConnectionProfile,
+		_connectionProfile: ConnectionProfile,
 		@IConnectionManagementService private _connectionService: IConnectionManagementService,
 		@IModeService modeService: IModeService,
 		@IModelService model: IModelService
@@ -135,7 +135,7 @@ export class DashboardInput extends EditorInput {
 		return false;
 	}
 
-	public get connectionProfile(): IConnectionProfile {
+	public get connectionProfile(): ConnectionProfile {
 		return this._connectionService.getConnectionProfile(this._uri);
 	}
 
@@ -157,7 +157,7 @@ export class DashboardInput extends EditorInput {
 	}
 
 	// similar to the default profile match but without databasename
-	public static profileMatches(profile1: IConnectionProfile, profile2: IConnectionProfile): boolean {
+	public static profileMatches(profile1: ConnectionProfile, profile2: ConnectionProfile): boolean {
 		return profile1 && profile2
 			&& profile1.providerName === profile2.providerName
 			&& profile1.serverName === profile2.serverName

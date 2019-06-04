@@ -240,7 +240,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('addConnection should add the new profile to user settings', async () => {
-		let newProfile: azdata.IConnectionProfile = {
+		let newProfile: ConnectionProfile = {
 			serverName: 'new server',
 			databaseName: 'database',
 			userName: 'user',
@@ -270,7 +270,7 @@ suite('ConnectionConfig', () => {
 
 	test('addConnection should not add the new profile to user settings if already exists', async () => {
 		let existingConnection = testConnections[0];
-		let newProfile: azdata.IConnectionProfile = {
+		let newProfile: ConnectionProfile = {
 			serverName: existingConnection.options['serverName'],
 			databaseName: existingConnection.options['databaseName'],
 			userName: existingConnection.options['userName'],
@@ -301,7 +301,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('addConnection should add the new group to user settings if does not exist', async () => {
-		let newProfile: azdata.IConnectionProfile = {
+		let newProfile: ConnectionProfile = {
 			serverName: 'new server',
 			databaseName: 'database',
 			userName: 'user',
@@ -418,7 +418,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('deleteConnection should remove the connection from config', async () => {
-		let newProfile: azdata.IConnectionProfile = {
+		let newProfile: ConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -446,7 +446,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('deleteConnectionGroup should remove the children connections and subgroups from config', async () => {
-		let newProfile: azdata.IConnectionProfile = {
+		let newProfile: ConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -481,7 +481,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('deleteConnection should not throw error for connection not in config', async () => {
-		let newProfile: azdata.IConnectionProfile = {
+		let newProfile: ConnectionProfile = {
 			serverName: 'connectionNotThere',
 			databaseName: 'database',
 			userName: 'user',
@@ -559,7 +559,7 @@ suite('ConnectionConfig', () => {
 
 
 	test('change group for connection with conflict should throw', async () => {
-		let changingProfile: azdata.IConnectionProfile = {
+		let changingProfile: ConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -612,7 +612,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('change group(parent) for connection', async () => {
-		let newProfile: azdata.IConnectionProfile = {
+		let newProfile: ConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',

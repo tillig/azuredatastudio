@@ -14,11 +14,12 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 import { ConnectionOptionSpecialType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 import { ConnectionWidget } from 'sql/workbench/services/connection/browser/connectionWidget';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export class ConnectionController implements IConnectionComponentController {
 	private _connectionManagementService: IConnectionManagementService;
 	private _advancedController: AdvancedPropertiesController;
-	private _model: azdata.IConnectionProfile;
+	private _model: ConnectionProfile;
 	private _providerName: string;
 	protected _callback: IConnectionComponentCallbacks;
 	protected _connectionWidget: ConnectionWidget;
@@ -144,7 +145,7 @@ export class ConnectionController implements IConnectionComponentController {
 		return connectionGroupNames;
 	}
 
-	public initDialog(providers: string[], connectionInfo: azdata.IConnectionProfile): void {
+	public initDialog(providers: string[], connectionInfo: ConnectionProfile): void {
 		this._connectionWidget.updateServerGroup(this.getAllServerGroups(providers));
 		this._model = connectionInfo;
 		this._model.providerName = this._providerName;
@@ -164,7 +165,7 @@ export class ConnectionController implements IConnectionComponentController {
 		return { isValid: this._connectionWidget.connect(this._model), connection: this._model };
 	}
 
-	public fillInConnectionInputs(connectionInfo: azdata.IConnectionProfile): void {
+	public fillInConnectionInputs(connectionInfo: ConnectionProfile): void {
 		this._model = connectionInfo;
 		this._connectionWidget.fillInConnectionInputs(connectionInfo);
 	}

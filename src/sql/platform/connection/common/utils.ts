@@ -3,7 +3,6 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IConnectionProfile } from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 
@@ -114,7 +113,7 @@ export function generateUriWithPrefix(connection: ConnectionProfile, prefix: str
 	return uri;
 }
 
-export function findProfileInGroup(og: IConnectionProfile, groups: ConnectionProfileGroup[]): ConnectionProfile {
+export function findProfileInGroup(og: ConnectionProfile, groups: ConnectionProfileGroup[]): ConnectionProfile {
 	for (let group of groups) {
 		for (let conn of group.connections) {
 			if (conn.id === og.id) {
@@ -133,7 +132,7 @@ export function findProfileInGroup(og: IConnectionProfile, groups: ConnectionPro
 	return undefined;
 }
 
-export function isMaster(profile: IConnectionProfile): boolean {
+export function isMaster(profile: ConnectionProfile): boolean {
 	// TODO: the connection profile should have a property to indicate whether the connection is a server connection or database connection
 	// created issue to track the problem: https://github.com/Microsoft/azuredatastudio/issues/5193.
 	return (profile.providerName.toLowerCase() === 'mssql' && profile.databaseName.toLowerCase() === 'master')

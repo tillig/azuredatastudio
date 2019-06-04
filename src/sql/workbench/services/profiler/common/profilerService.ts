@@ -20,6 +20,7 @@ import { ICommandService } from 'vs/platform/commands/common/commands';
 import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
 import { Memento } from 'vs/workbench/common/memento';
 import { ProfilerFilterDialog } from 'sql/workbench/parts/profiler/browser/profilerFilterDialog';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 class TwoWayMap<T, K> {
 	private forwardMap: Map<T, K>;
@@ -51,7 +52,7 @@ export class ProfilerService implements IProfilerService {
 	private _providers = new Map<string, azdata.ProfilerProvider>();
 	private _idMap = new TwoWayMap<ProfilerSessionID, string>();
 	private _sessionMap = new Map<ProfilerSessionID, IProfilerSession>();
-	private _connectionMap = new Map<ProfilerSessionID, azdata.IConnectionProfile>();
+	private _connectionMap = new Map<ProfilerSessionID, ConnectionProfile>();
 	private _editColumnDialog: ProfilerColumnEditorDialog;
 	private _memento: any;
 	private _context: Memento;
@@ -72,7 +73,7 @@ export class ProfilerService implements IProfilerService {
 		this._providers.set(providerId, provider);
 	}
 
-	public async registerSession(uri: string, connectionProfile: azdata.IConnectionProfile, session: IProfilerSession): Promise<ProfilerSessionID> {
+	public async registerSession(uri: string, connectionProfile: ConnectionProfile, session: IProfilerSession): Promise<ProfilerSessionID> {
 		let options: IConnectionCompletionOptions = {
 			params: { connectionType: ConnectionType.default, runQueryOnCompletion: RunQueryOnConnectionMode.none, input: undefined },
 			saveTheConnection: false,
@@ -201,7 +202,7 @@ export class ProfilerService implements IProfilerService {
 
 	private getMementoKey(ownerUri: string): string {
 		let mementoKey = undefined;
-		let connectionProfile: azdata.IConnectionProfile = this._connectionMap.get(ownerUri);
+		let connectionProfile: ConnectionProfile = this._connectionMap.get(ownerUri);
 		if (connectionProfile) {
 			mementoKey = connectionProfile.serverName;
 		}

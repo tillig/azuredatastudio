@@ -11,6 +11,7 @@ import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/ap
 import * as Constants from 'sql/platform/connection/common/constants';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 type SettableProperty = 'serverName' | 'authenticationType' | 'databaseName' | 'password' | 'connectionName' | 'userName';
 
@@ -25,7 +26,7 @@ export class ProviderConnectionInfo extends Disposable implements azdata.Connect
 
 	public constructor(
 		protected capabilitiesService: ICapabilitiesService,
-		model: string | azdata.IConnectionProfile
+		model: string | ConnectionProfile
 	) {
 		super();
 		// we can't really do a whole lot if we don't have a provider
@@ -57,7 +58,7 @@ export class ProviderConnectionInfo extends Disposable implements azdata.Connect
 	 *
 	 * This handles the case where someone hasn't passed in a valid property bag, but doesn't cause errors when
 	 */
-	private updateSpecialValueType(typeName: SettableProperty, model: azdata.IConnectionProfile): void {
+	private updateSpecialValueType(typeName: SettableProperty, model: ConnectionProfile): void {
 		if (!this[typeName]) {
 			this[typeName] = model[typeName];
 		}

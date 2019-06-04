@@ -19,7 +19,6 @@ import { DASHBOARD_SELECTOR } from 'sql/workbench/parts/dashboard/dashboard.comp
 import { ConnectionContextKey } from 'sql/workbench/parts/connection/common/connectionContextKey';
 import { IDashboardService } from 'sql/platform/dashboard/browser/dashboardService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { IConnectionProfile } from 'azdata';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { CancellationToken } from 'vs/base/common/cancellation';
 import { IStorageService } from 'vs/platform/storage/common/storage';
@@ -59,7 +58,7 @@ export class DashboardEditor extends BaseEditor {
 	 */
 	public focus(): void {
 
-		let profile: IConnectionProfile;
+		let profile: ConnectionProfile;
 		if (this.input.connectionProfile instanceof ConnectionProfile) {
 			profile = this.input.connectionProfile.toIConnectionProfile();
 		} else {
@@ -105,7 +104,7 @@ export class DashboardEditor extends BaseEditor {
 	 */
 	private bootstrapAngular(input: DashboardInput): void {
 		// Get the bootstrap params and perform the bootstrap
-		let profile: IConnectionProfile;
+		let profile: ConnectionProfile;
 		if (input.connectionProfile instanceof ConnectionProfile) {
 			profile = input.connectionProfile.toIConnectionProfile();
 		} else {

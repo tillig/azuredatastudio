@@ -26,8 +26,8 @@ export class BackupUiService implements IBackupUiService {
 	private _connectionUri: string;
 	private static _connectionUniqueId: number = 0;
 
-	private _onShowBackupEvent: Emitter<{ connection: azdata.IConnectionProfile, ownerUri: string }>;
-	public get onShowBackupEvent(): Event<{ connection: azdata.IConnectionProfile, ownerUri: string }> { return this._onShowBackupEvent.event; }
+	private _onShowBackupEvent: Emitter<{ connection: ConnectionProfile, ownerUri: string }>;
+	public get onShowBackupEvent(): Event<{ connection: ConnectionProfile, ownerUri: string }> { return this._onShowBackupEvent.event; }
 
 	constructor(
 		@IInstantiationService private _instantiationService: IInstantiationService,
@@ -36,10 +36,10 @@ export class BackupUiService implements IBackupUiService {
 		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
 		@ICapabilitiesService private readonly capabilitiesService: ICapabilitiesService
 	) {
-		this._onShowBackupEvent = new Emitter<{ connection: azdata.IConnectionProfile, ownerUri: string }>();
+		this._onShowBackupEvent = new Emitter<{ connection: ConnectionProfile, ownerUri: string }>();
 	}
 
-	public showBackup(iconnection: azdata.IConnectionProfile): Promise<any> {
+	public showBackup(iconnection: ConnectionProfile): Promise<any> {
 		const connection = ConnectionProfile.fromIConnectionProfile(this.capabilitiesService, iconnection);
 		let self = this;
 		return new Promise<void>((resolve, reject) => {

@@ -13,7 +13,6 @@ import { ListBox } from 'sql/base/browser/ui/listBox/listBox';
 import { ModalFooterStyle } from 'sql/workbench/browser/modal/modal';
 import { SelectBox } from 'sql/base/browser/ui/selectBox/selectBox';
 import { attachButtonStyler, attachListBoxStyler, attachInputBoxStyler, attachSelectBoxStyler, attachCheckboxStyler } from 'sql/platform/theme/common/styler';
-import { IConnectionProfile } from 'azdata';
 import * as BackupConstants from 'sql/workbench/parts/backup/common/constants';
 import { IBackupService, TaskExecutionMode } from 'sql/platform/backup/common/backupService';
 import * as FileValidationConstants from 'sql/workbench/services/fileBrowser/common/fileValidationServiceConstants';
@@ -32,6 +31,7 @@ import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { ISelectOptionItem } from 'vs/base/browser/ui/selectBox/selectBox';
 import { KeyCode } from 'vs/base/common/keyCodes';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export const BACKUP_SELECTOR: string = 'backup-component';
 
@@ -149,7 +149,7 @@ export class BackupComponent {
 	private _toDispose: lifecycle.IDisposable[] = [];
 	private _advancedHeaderSize = 32;
 
-	private connection: IConnectionProfile;
+	private connection: ConnectionProfile;
 	private databaseName: string;
 	private defaultNewBackupFolder: string;
 	private recoveryModel: string;
@@ -357,7 +357,7 @@ export class BackupComponent {
 		this._backupUiService.onShowBackupDialog();
 	}
 
-	private onGetBackupConfigInfo(param: { connection: IConnectionProfile, ownerUri: string }) {
+	private onGetBackupConfigInfo(param: { connection: ConnectionProfile, ownerUri: string }) {
 		// Show spinner
 		this.showSpinner();
 		this.backupEnabled = false;

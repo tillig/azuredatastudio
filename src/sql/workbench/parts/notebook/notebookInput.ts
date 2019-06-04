@@ -25,6 +25,7 @@ import { UntitledEditorInput } from 'vs/workbench/common/editor/untitledEditorIn
 import { IExtensionService } from 'vs/workbench/services/extensions/common/extensions';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { NotebookChangeType } from 'sql/workbench/parts/notebook/models/contracts';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export type ModeViewSaveHandler = (handle: number) => Thenable<boolean>;
 
@@ -143,7 +144,7 @@ export class NotebookInput extends EditorInput {
 	private _providerId: string;
 	private _providers: string[];
 	private _standardKernels: IStandardKernelWithProvider[];
-	private _connectionProfile: azdata.IConnectionProfile;
+	private _connectionProfile: ConnectionProfile;
 	private _defaultKernel: azdata.nb.IKernelSpec;
 	public hasBootstrapped = false;
 	// Holds the HTML content for the editor when the editor discards this input and loads another
@@ -210,11 +211,11 @@ export class NotebookInput extends EditorInput {
 		};
 	}
 
-	public set connectionProfile(value: azdata.IConnectionProfile) {
+	public set connectionProfile(value: ConnectionProfile) {
 		this._connectionProfile = value;
 	}
 
-	public get connectionProfile(): azdata.IConnectionProfile {
+	public get connectionProfile(): ConnectionProfile {
 		return this._connectionProfile;
 	}
 

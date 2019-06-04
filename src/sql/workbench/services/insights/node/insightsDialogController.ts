@@ -11,7 +11,7 @@ import { IInsightsDialogModel } from 'sql/workbench/services/insights/common/ins
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
 import { resolveQueryFilePath } from 'sql/workbench/services/insights/common/insightsUtils';
 
-import { DbCellValue, IDbColumn, QueryExecuteSubsetResult, IConnectionProfile } from 'azdata';
+import { DbCellValue, IDbColumn, QueryExecuteSubsetResult } from 'azdata';
 
 import Severity from 'vs/base/common/severity';
 import * as types from 'vs/base/common/types';
@@ -44,7 +44,7 @@ export class InsightsDialogController {
 		@ICapabilitiesService private readonly capabilitiesService: ICapabilitiesService
 	) { }
 
-	public async update(input: IInsightsConfigDetails, iconnectionProfile: IConnectionProfile): Promise<void> {
+	public async update(input: IInsightsConfigDetails, iconnectionProfile: ConnectionProfile): Promise<void> {
 		// execute string
 		const connectionProfile = ConnectionProfile.fromIConnectionProfile(this.capabilitiesService, iconnectionProfile);
 		if (typeof input === 'object') {

@@ -25,6 +25,7 @@ import * as TelemetryUtils from 'sql/platform/telemetry/telemetryUtilities';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { invalidProvider } from 'sql/base/common/errors';
 import { ILogService } from 'vs/platform/log/common/log';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export class RestoreService implements IRestoreService {
 
@@ -289,7 +290,7 @@ export class RestoreDialogController implements IRestoreDialogController {
 		});
 	}
 
-	public showDialog(connection: azdata.IConnectionProfile): Promise<void> {
+	public showDialog(connection: ConnectionProfile): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			let result: void;
 

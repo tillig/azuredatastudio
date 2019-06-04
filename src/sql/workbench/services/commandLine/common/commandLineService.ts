@@ -72,7 +72,7 @@ export class CommandLineService implements ICommandLineProcessing {
 	// (serverName, null) => Connect object explorer and open a new query editor if no file names are passed. If file names are passed, connect their editors to the server.
 	// (null, null) => Prompt for a connection unless there are registered servers
 	public async processCommandLine(args: ParsedArgs): Promise<void> {
-		let profile: azdata.IConnectionProfile = undefined;
+		let profile: ConnectionProfile = undefined;
 		let commandName = undefined;
 		if (args) {
 			if (this._commandService) {
@@ -137,7 +137,7 @@ export class CommandLineService implements ICommandLineProcessing {
 	}
 
 	// If an open and connectable query editor exists for the given URI, attach it to the connection profile
-	private async processFile(uriString: string, profile: azdata.IConnectionProfile, warnOnConnectFailure: boolean): Promise<void> {
+	private async processFile(uriString: string, profile: ConnectionProfile, warnOnConnectFailure: boolean): Promise<void> {
 		let activeEditor = this._editorService.editors.filter(v => v.getResource().toString() === uriString).pop();
 		if (activeEditor) {
 			let queryInput = activeEditor as QueryInput;

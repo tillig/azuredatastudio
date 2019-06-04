@@ -19,7 +19,7 @@ import { IScriptingService } from 'sql/platform/scripting/common/scriptingServic
 import { IAngularEventingService } from 'sql/platform/angularEventing/common/angularEventingService';
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
 
-import { ObjectMetadata, IConnectionProfile } from 'azdata';
+import { ObjectMetadata } from 'azdata';
 
 import * as tree from 'vs/base/parts/tree/browser/tree';
 import * as TreeDefaults from 'vs/base/parts/tree/browser/treeDefaults';
@@ -95,7 +95,7 @@ export class ObjectMetadataWrapper implements ObjectMetadata {
 	}
 }
 
-export declare type TreeResource = IConnectionProfile | ObjectMetadataWrapper;
+export declare type TreeResource = ConnectionProfile | ObjectMetadataWrapper;
 
 // Empty class just for tree input
 export class ExplorerModel {
@@ -165,7 +165,7 @@ export class ExplorerController extends TreeDefaults.DefaultController {
 		return true;
 	}
 
-	private handleItemDoubleClick(element: IConnectionProfile): void {
+	private handleItemDoubleClick(element: ConnectionProfile): void {
 		this._progressService.showWhile(this._connectionService.changeDatabase(element.databaseName).then(result => {
 			this._router.navigate(['database-dashboard']);
 		}));
@@ -309,7 +309,7 @@ export class ExplorerFilter implements tree.IFilter {
 	}
 
 	// apply filter to databasename of the profile
-	private _doIsVisibleConnectionProfile(element: IConnectionProfile): boolean {
+	private _doIsVisibleConnectionProfile(element: ConnectionProfile): boolean {
 		if (!this._filterString) {
 			return true;
 		}

@@ -29,7 +29,6 @@ import { NotebookModel } from 'sql/workbench/parts/notebook/models/notebookModel
 import { ModelFactory } from 'sql/workbench/parts/notebook/models/modelFactory';
 import * as notebookUtils from 'sql/workbench/parts/notebook/notebookUtils';
 import { Deferred } from 'sql/base/common/promise';
-import { IConnectionProfile } from 'azdata';
 import { Taskbar } from 'sql/base/browser/ui/taskbar/taskbar';
 import { KernelsDropdown, AttachToDropdown, AddCellAction, TrustedAction, RunAllCellsAction, ClearAllOutputsAction } from 'sql/workbench/parts/notebook/notebookActions';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
@@ -48,6 +47,7 @@ import { toErrorMessage } from 'vs/base/common/errorMessage';
 import { ILogService } from 'vs/platform/log/common/log';
 import { ITextFileService } from 'vs/workbench/services/textfile/common/textfiles';
 import { LabeledMenuItemActionItem, fillInActions } from 'vs/platform/actions/browser/menuEntryActionViewItem';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 
 export const NOTEBOOK_SELECTOR: string = 'notebook-component';
@@ -68,7 +68,7 @@ export class NotebookComponent extends AngularDisposable implements OnInit, OnDe
 	private notebookManagers: INotebookManager[] = [];
 	private _modelReadyDeferred = new Deferred<NotebookModel>();
 	private _modelRegisteredDeferred = new Deferred<NotebookModel>();
-	private profile: IConnectionProfile;
+	private profile: ConnectionProfile;
 	private _trustedAction: TrustedAction;
 	private _runAllCellsAction: RunAllCellsAction;
 	private _providerRelatedActions: IAction[] = [];
@@ -105,7 +105,7 @@ export class NotebookComponent extends AngularDisposable implements OnInit, OnDe
 		this.profile = this.notebookParams ? this.notebookParams.profile : undefined;
 		if (!this.profile) {
 			// Second use global connection if possible
-			let profile: IConnectionProfile = TaskUtilities.getCurrentGlobalConnection(this.objectExplorerService, this.connectionManagementService, this.editorService);
+			let profile: ConnectionProfile = TaskUtilities.getCurrentGlobalConnection(this.objectExplorerService, this.connectionManagementService, this.editorService);
 
 			// TODO use generic method to match kernel with valid connection that's compatible. For now, we only have 1
 			if (profile && profile.providerName) {

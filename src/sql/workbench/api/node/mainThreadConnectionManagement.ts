@@ -58,7 +58,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		return Promise.resolve(this._connectionManagementService.getServerInfo(connectionId));
 	}
 
-	public async $openConnectionDialog(providers: string[], initialConnectionProfile?: azdata.IConnectionProfile, connectionCompletionOptions?: azdata.IConnectionCompletionOptions): Promise<azdata.connection.Connection> {
+	public async $openConnectionDialog(providers: string[], initialConnectionProfile?: ConnectionProfile, connectionCompletionOptions?: azdata.IConnectionCompletionOptions): Promise<azdata.connection.Connection> {
 		// Here we default to ConnectionType.editor which saves the connecton in the connection store by default
 		let connectionType = ConnectionType.editor;
 
@@ -103,7 +103,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		return Promise.resolve(this._connectionManagementService.getConnectionUriFromId(connectionId));
 	}
 
-	private convertConnection(profile: azdata.IConnectionProfile): azdata.connection.Connection {
+	private convertConnection(profile: ConnectionProfile): azdata.connection.Connection {
 		if (!profile) {
 			return undefined;
 		}
@@ -116,7 +116,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		return connection;
 	}
 
-	public $connect(connectionProfile: azdata.IConnectionProfile, saveConnection: boolean = true, showDashboard: boolean = true): Thenable<azdata.ConnectionResult> {
+	public $connect(connectionProfile: ConnectionProfile, saveConnection: boolean = true, showDashboard: boolean = true): Thenable<azdata.ConnectionResult> {
 		let profile = new ConnectionProfile(this._capabilitiesService, connectionProfile);
 		profile.id = generateUuid();
 		return this._connectionManagementService.connectAndSaveProfile(profile, undefined, {

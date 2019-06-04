@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { nb, ServerInfo, IConnectionProfile } from 'azdata';
+import { nb, ServerInfo } from 'azdata';
 
 import { Event, Emitter } from 'vs/base/common/event';
 import { URI } from 'vs/base/common/uri';
@@ -17,6 +17,7 @@ import { ICellModelOptions, IModelFactory, FutureInternal, CellExecutionState } 
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { INotificationService, Severity } from 'vs/platform/notification/common/notification';
 import { Schemas } from 'vs/base/common/network';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 let modelId = 0;
 
 
@@ -522,7 +523,7 @@ export class CellModel implements ICellModel {
 
 	// Get Knox endpoint from IConnectionProfile
 	// TODO: this will be refactored out into the notebooks extension as a contribution point
-	private getKnoxEndpoint(activeConnection: IConnectionProfile): notebookUtils.IEndpoint {
+	private getKnoxEndpoint(activeConnection: ConnectionProfile): notebookUtils.IEndpoint {
 		let endpoint;
 		if (this._connectionManagementService && activeConnection && activeConnection.providerName.toLowerCase() === notebookConstants.SQL_CONNECTION_PROVIDER.toLowerCase()) {
 			let serverInfo: ServerInfo = this._connectionManagementService.getServerInfo(activeConnection.id);

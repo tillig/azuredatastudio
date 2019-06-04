@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { nb, connection, IConnectionProfile } from 'azdata';
+import { nb, connection } from 'azdata';
 
 import { localize } from 'vs/nls';
 import { Event, Emitter } from 'vs/base/common/event';
@@ -75,7 +75,7 @@ export class NotebookModel extends Disposable implements INotebookModel {
 
 	constructor(
 		private _notebookOptions: INotebookModelOptions,
-		public connectionProfile: IConnectionProfile | undefined,
+		public connectionProfile: ConnectionProfile | undefined,
 		@ILogService private readonly logService: ILogService,
 		@INotificationService private readonly notificationService: INotificationService
 	) {
@@ -241,7 +241,7 @@ export class NotebookModel extends Disposable implements INotebookModel {
 		});
 	}
 
-	public get activeConnection(): IConnectionProfile {
+	public get activeConnection(): ConnectionProfile {
 		return this._activeConnection;
 	}
 
@@ -501,7 +501,7 @@ export class NotebookModel extends Disposable implements INotebookModel {
 		};
 	}
 
-	private isValidConnection(profile: IConnectionProfile | connection.Connection) {
+	private isValidConnection(profile: ConnectionProfile | connection.Connection) {
 		let standardKernels = this._notebookOptions.standardKernels.find(kernel => this._defaultKernel && kernel.displayName === this._defaultKernel.display_name);
 		let connectionProviderIds = standardKernels ? standardKernels.connectionProviderIds : undefined;
 		return profile && connectionProviderIds && connectionProviderIds.find(provider => provider === profile.providerName) !== undefined;

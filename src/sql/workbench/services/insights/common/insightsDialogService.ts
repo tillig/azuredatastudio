@@ -6,8 +6,8 @@ import { Event } from 'vs/base/common/event';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 
 import { IInsightsConfigDetails, IInsightsConfig } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
-import { IConnectionProfile } from 'azdata';
 import { BaseActionContext } from 'sql/workbench/common/actions';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export interface IInsightsDialogModel {
 	rows: string[][];
@@ -31,7 +31,7 @@ export const IInsightsDialogService = createDecorator<IInsightsDialogService>('i
 
 export interface IInsightsDialogService {
 	_serviceBrand: any;
-	show(input: IInsightsConfig, connectionProfile: IConnectionProfile): void;
+	show(input: IInsightsConfig, connectionProfile: ConnectionProfile): void;
 	close();
 }
 

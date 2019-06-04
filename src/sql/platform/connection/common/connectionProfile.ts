@@ -20,7 +20,7 @@ import { IConnectionProfileStore } from 'sql/platform/connection/common/connecti
 /**
  * A concrete implementation of an IConnectionProfile with support for profile creation and validation
  */
-export class ConnectionProfile extends ProviderConnectionInfo implements azdata.IConnectionProfile {
+export class ConnectionProfile extends ProviderConnectionInfo {
 
 	public parent: ConnectionProfileGroup = null;
 	private _id: string;
@@ -33,7 +33,7 @@ export class ConnectionProfile extends ProviderConnectionInfo implements azdata.
 
 	public constructor(
 		capabilitiesService: ICapabilitiesService,
-		model: string | azdata.IConnectionProfile
+		model: string | ConnectionProfile
 	) {
 		super(capabilitiesService, model);
 		if (model && !isString(model)) {
@@ -63,7 +63,7 @@ export class ConnectionProfile extends ProviderConnectionInfo implements azdata.
 		this.options['databaseDisplayName'] = this.databaseName;
 	}
 
-	public matches(other: azdata.IConnectionProfile): boolean {
+	public matches(other: ConnectionProfile): boolean {
 		return other
 			&& this.providerName === other.providerName
 			&& this.nullCheckEqualsIgnoreCase(this.serverName, other.serverName)
@@ -173,8 +173,8 @@ export class ConnectionProfile extends ProviderConnectionInfo implements azdata.
 		return super.getOptionsKey();
 	}
 
-	public toIConnectionProfile(): azdata.IConnectionProfile {
-		let result: azdata.IConnectionProfile = {
+	public toIConnectionProfile(): ConnectionProfile {
+		let result: ConnectionProfile = {
 			connectionName: this.connectionName,
 			serverName: this.serverName,
 			databaseName: this.databaseName,
@@ -203,11 +203,11 @@ export class ConnectionProfile extends ProviderConnectionInfo implements azdata.
 	/**
 	 * Returns whether this profile is connected to the default database (it doesn't specify a database to connect to)
 	 */
-	public static isConnectionToDefaultDb(profile: azdata.IConnectionProfile): boolean {
+	public static isConnectionToDefaultDb(profile: ConnectionProfile): boolean {
 		return !profile.databaseName || profile.databaseName.trim() === '';
 	}
 
-	public static fromIConnectionProfile(capabilitiesService: ICapabilitiesService, profile: azdata.IConnectionProfile) {
+	public static fromIConnectionProfile(capabilitiesService: ICapabilitiesService, profile: ConnectionProfile) {
 		if (profile) {
 			if (profile instanceof ConnectionProfile) {
 				return profile;
@@ -237,7 +237,7 @@ export class ConnectionProfile extends ProviderConnectionInfo implements azdata.
 
 	public static convertToProfileStore(
 		capabilitiesService: ICapabilitiesService,
-		connectionProfile: azdata.IConnectionProfile): IConnectionProfileStore {
+		connectionProfile: ConnectionProfile): IConnectionProfileStore {
 		if (connectionProfile) {
 			let connectionInfo = ConnectionProfile.fromIConnectionProfile(capabilitiesService, connectionProfile);
 			let profile: IConnectionProfileStore = {

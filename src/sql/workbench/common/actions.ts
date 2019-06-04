@@ -16,7 +16,7 @@ import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/co
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
 import { IBackupUiService } from 'sql/workbench/services/backup/common/backupUiService';
 
-import { ObjectMetadata, IConnectionProfile } from 'azdata';
+import { ObjectMetadata } from 'azdata';
 
 import { Action } from 'vs/base/common/actions';
 import { IWindowsService } from 'vs/platform/windows/common/windows';
@@ -25,10 +25,11 @@ import { IEditorService } from 'vs/workbench/services/editor/common/editorServic
 import { ServicesAccessor } from 'vs/platform/instantiation/common/instantiation';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export interface BaseActionContext {
 	object?: ObjectMetadata;
-	profile?: IConnectionProfile;
+	profile?: ConnectionProfile;
 }
 
 export interface InsightActionContext extends BaseActionContext {
@@ -54,7 +55,7 @@ export class NewQueryAction extends Task {
 		});
 	}
 
-	public runTask(accessor: ServicesAccessor, profile: IConnectionProfile): Promise<void> {
+	public runTask(accessor: ServicesAccessor, profile: ConnectionProfile): Promise<void> {
 		return TaskUtilities.newQuery(
 			profile,
 			accessor.get<IConnectionManagementService>(IConnectionManagementService),
@@ -237,7 +238,7 @@ export class BackupAction extends Task {
 		});
 	}
 
-	runTask(accessor: ServicesAccessor, profile: IConnectionProfile): void | Promise<void> {
+	runTask(accessor: ServicesAccessor, profile: ConnectionProfile): void | Promise<void> {
 		const configurationService = accessor.get<IConfigurationService>(IConfigurationService);
 		const previewFeaturesEnabled: boolean = configurationService.getValue('workbench')['enablePreviewFeatures'];
 		if (!previewFeaturesEnabled) {
@@ -280,7 +281,7 @@ export class RestoreAction extends Task {
 		});
 	}
 
-	runTask(accessor: ServicesAccessor, profile: IConnectionProfile): void | Promise<void> {
+	runTask(accessor: ServicesAccessor, profile: ConnectionProfile): void | Promise<void> {
 		const configurationService = accessor.get<IConfigurationService>(IConfigurationService);
 		const previewFeaturesEnabled: boolean = configurationService.getValue('workbench')['enablePreviewFeatures'];
 		if (!previewFeaturesEnabled) {

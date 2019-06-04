@@ -6,7 +6,6 @@
 import * as assert from 'assert';
 import * as TypeMoq from 'typemoq';
 import * as azdata from 'azdata';
-import * as vscode from 'vscode';
 
 import { URI, UriComponents } from 'vs/base/common/uri';
 import { IExtHostContext } from 'vs/workbench/api/common/extHost.protocol';
@@ -19,6 +18,7 @@ import { INotebookManagerDetails, INotebookSessionDetails, INotebookKernelDetail
 import { LocalContentManager } from 'sql/workbench/services/notebook/node/localContentManager';
 import { ContextKeyServiceStub } from 'sqltest/stubs/contextKeyServiceStub';
 import { TestLifecycleService } from 'vs/workbench/test/workbenchTestServices';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 suite('MainThreadNotebook Tests', () => {
 
@@ -154,7 +154,7 @@ class ExtHostNotebookStub implements ExtHostNotebookShape {
 	$configureKernel(sessionId: number, kernelInfo: azdata.nb.IKernelSpec): Thenable<void> {
 		throw new Error('Method not implemented.');
 	}
-	$configureConnection(sessionId: number, conneection: azdata.IConnectionProfile): Thenable<void> {
+	$configureConnection(sessionId: number, conneection: ConnectionProfile): Thenable<void> {
 		throw new Error('Method not implemented.');
 	}
 	$getKernelReadyStatus(kernelId: number): Thenable<azdata.nb.IInfoReply> {

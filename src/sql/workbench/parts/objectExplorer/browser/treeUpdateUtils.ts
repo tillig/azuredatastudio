@@ -12,7 +12,6 @@ import { NodeType } from 'sql/workbench/parts/objectExplorer/common/nodeType';
 
 import { TreeNode } from 'sql/workbench/parts/objectExplorer/common/treeNode';
 import * as errors from 'vs/base/common/errors';
-import { IConnectionProfile } from 'azdata';
 
 export interface IExpandableTree extends ITree {
 	// {{SQL CARBON EDIT }}	- add back deleted VS Code tree methods
@@ -147,7 +146,7 @@ export class TreeUpdateUtils {
 	}
 
 	public static connectIfNotConnected(
-		connection: IConnectionProfile,
+		connection: ConnectionProfile,
 		options: IConnectionCompletionOptions,
 		connectionManagementService: IConnectionManagementService,
 		tree: ITree): Promise<ConnectionProfile> {
@@ -208,7 +207,7 @@ export class TreeUpdateUtils {
 	 * @param connectionManagementService Connection management service instance
 	 * @param objectExplorerService Object explorer service instance
 	 */
-	public static connectAndCreateOeSession(connection: IConnectionProfile, options: IConnectionCompletionOptions,
+	public static connectAndCreateOeSession(connection: ConnectionProfile, options: IConnectionCompletionOptions,
 		connectionManagementService: IConnectionManagementService, objectExplorerService: IObjectExplorerService, tree: ITree): Promise<boolean> {
 		return new Promise<boolean>((resolve, reject) => {
 			TreeUpdateUtils.connectIfNotConnected(connection, options, connectionManagementService, tree).then(connectedConnection => {

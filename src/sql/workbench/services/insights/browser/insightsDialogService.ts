@@ -6,10 +6,10 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 
 import { InsightsDialogController } from 'sql/workbench/services/insights/node/insightsDialogController';
 import { InsightsDialogView } from 'sql/workbench/services/insights/browser/insightsDialogView';
-import { IConnectionProfile } from 'azdata';
 import { IInsightsConfig } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
 import { IInsightsDialogModel, IInsightsDialogService } from 'sql/workbench/services/insights/common/insightsDialogService';
 import { InsightsDialogModel } from 'sql/workbench/services/insights/common/insightsDialogModel';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export class InsightsDialogService implements IInsightsDialogService {
 	_serviceBrand: any;
@@ -20,7 +20,7 @@ export class InsightsDialogService implements IInsightsDialogService {
 	constructor(@IInstantiationService private _instantiationService: IInstantiationService) { }
 
 	// query string
-	public show(input: IInsightsConfig, connectionProfile: IConnectionProfile): void {
+	public show(input: IInsightsConfig, connectionProfile: ConnectionProfile): void {
 		if (!this._insightsDialogView) {
 			this._insightsDialogModel = new InsightsDialogModel();
 			this._insightsDialogController = this._instantiationService.createInstance(InsightsDialogController, this._insightsDialogModel);

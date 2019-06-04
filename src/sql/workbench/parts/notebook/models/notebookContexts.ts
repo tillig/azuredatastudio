@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { nb, IConnectionProfile } from 'azdata';
+import { nb } from 'azdata';
 
 import { localize } from 'vs/nls';
 import { IDefaultConnection, notebookConstants } from 'sql/workbench/parts/notebook/models/modelInterfaces';
@@ -48,7 +48,7 @@ export class NotebookContexts {
 	 * @param kernelChangedArgs kernel changed args (both old and new kernel info)
 	 * @param profile current connection profile
 	 */
-	public static async getContextsForKernel(connectionService: IConnectionManagementService, connProviderIds: string[], kernelChangedArgs?: nb.IKernelChangedArgs, profile?: IConnectionProfile): Promise<IDefaultConnection> {
+	public static async getContextsForKernel(connectionService: IConnectionManagementService, connProviderIds: string[], kernelChangedArgs?: nb.IKernelChangedArgs, profile?: ConnectionProfile): Promise<IDefaultConnection> {
 		let connections: IDefaultConnection = this.DefaultContext;
 		if (!profile) {
 			if (!kernelChangedArgs || !kernelChangedArgs.newValue ||
@@ -70,7 +70,7 @@ export class NotebookContexts {
 	 * @param apiWrapper ApiWrapper
 	 * @param profile current connection profile
 	 */
-	public static async getActiveContexts(connectionService: IConnectionManagementService, connProviderIds: string[], profile: IConnectionProfile): Promise<IDefaultConnection> {
+	public static async getActiveContexts(connectionService: IConnectionManagementService, connProviderIds: string[], profile: ConnectionProfile): Promise<IDefaultConnection> {
 		let defaultConnection: ConnectionProfile = NotebookContexts.DefaultContext.defaultConnection;
 		let activeConnections: ConnectionProfile[] = await connectionService.getActiveConnections();
 		if (activeConnections && activeConnections.length > 0) {

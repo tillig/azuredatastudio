@@ -556,7 +556,7 @@ export class ConnectionWidget {
 		}
 	}
 
-	public initDialog(connectionInfo: azdata.IConnectionProfile): void {
+	public initDialog(connectionInfo: ConnectionProfile): void {
 		this.fillInConnectionInputs(connectionInfo);
 	}
 
@@ -577,7 +577,7 @@ export class ConnectionWidget {
 		return value ? value : '';
 	}
 
-	public fillInConnectionInputs(connectionInfo: azdata.IConnectionProfile) {
+	public fillInConnectionInputs(connectionInfo: ConnectionProfile) {
 		if (connectionInfo) {
 			this._serverNameInputBox.value = this.getModelValue(connectionInfo.serverName);
 			this._connectionNameInputBox.value = this.getModelValue(connectionInfo.connectionName);
@@ -791,7 +791,7 @@ export class ConnectionWidget {
 		return validateServerName && validateUserName && validatePassword && validateAzureAccount;
 	}
 
-	public connect(model: azdata.IConnectionProfile): boolean {
+	public connect(model: ConnectionProfile): boolean {
 		let validInputs = this.validateInputs();
 		if (validInputs) {
 			model.serverName = this.serverName;

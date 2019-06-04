@@ -30,7 +30,7 @@ import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMess
 
 
 export class ObjectExplorerActionsContext implements azdata.ObjectExplorerContext {
-	public connectionProfile: azdata.IConnectionProfile;
+	public connectionProfile: ConnectionProfile;
 	public nodeInfo: azdata.NodeInfo;
 	public isConnectionNode: boolean = false;
 }
@@ -60,7 +60,7 @@ export class OEAction extends ExecuteCommandAction {
 		this._treeSelectionHandler = this._instantiationService.createInstance(TreeSelectionHandler);
 
 
-		let profile: azdata.IConnectionProfile;
+		let profile: ConnectionProfile;
 		if (actionContext instanceof ObjectExplorerActionsContext) {
 			if (actionContext.isConnectionNode) {
 				profile = new ConnectionProfile(this._capabilitiesService, actionContext.connectionProfile);
@@ -115,7 +115,7 @@ export class ManageConnectionAction extends Action {
 
 	private async doManage(actionContext: ObjectExplorerActionsContext): Promise<boolean> {
 		let treeNode: TreeNode = undefined;
-		let connectionProfile: azdata.IConnectionProfile = undefined;
+		let connectionProfile: ConnectionProfile = undefined;
 		if (actionContext instanceof ObjectExplorerActionsContext) {
 			// Must use a real connection profile for this action due to lookup
 			connectionProfile = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, actionContext.connectionProfile);
