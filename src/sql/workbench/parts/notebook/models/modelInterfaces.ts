@@ -5,7 +5,7 @@
 
 // This code is based on @jupyterlab/packages/apputils/src/clientsession.tsx
 
-import { nb } from 'azdata';
+import { nb, IConnectionProfile } from 'azdata';
 import { Event } from 'vs/base/common/event';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { URI } from 'vs/base/common/uri';
@@ -13,7 +13,6 @@ import { INotificationService } from 'vs/platform/notification/common/notificati
 
 import { CellType, NotebookChangeType } from 'sql/workbench/parts/notebook/models/contracts';
 import { INotebookManager } from 'sql/workbench/services/notebook/common/notebookService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { ISingleNotebookEditOperation } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { IStandardKernelWithProvider } from 'sql/workbench/parts/notebook/notebookUtils';

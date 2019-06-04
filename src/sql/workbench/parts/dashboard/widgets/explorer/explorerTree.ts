@@ -5,7 +5,6 @@
 
 import { Router } from '@angular/router';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { MetadataType, IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { SingleConnectionManagementService } from 'sql/platform/bootstrap/node/commonServiceInterface.service';
 import {
@@ -20,7 +19,7 @@ import { IScriptingService } from 'sql/platform/scripting/common/scriptingServic
 import { IAngularEventingService } from 'sql/platform/angularEventing/common/angularEventingService';
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
 
-import { ObjectMetadata } from 'azdata';
+import { ObjectMetadata, IConnectionProfile } from 'azdata';
 
 import * as tree from 'vs/base/parts/tree/browser/tree';
 import * as TreeDefaults from 'vs/base/parts/tree/browser/treeDefaults';
@@ -33,6 +32,7 @@ import { $ } from 'vs/base/browser/dom';
 import { ExecuteCommandAction } from 'vs/platform/actions/common/actions';
 import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import { IProgressService } from 'vs/platform/progress/common/progress';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export class ObjectMetadataWrapper implements ObjectMetadata {
 	public metadataType: MetadataType;
@@ -194,7 +194,7 @@ export class ExplorerDataSource implements tree.IDataSource {
 		} else if (element instanceof ExplorerModel) {
 			return ExplorerModel.id;
 		} else {
-			return (element as IConnectionProfile).getOptionsKey();
+			return (element as ConnectionProfile).getOptionsKey();
 		}
 	}
 

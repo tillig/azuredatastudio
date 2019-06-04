@@ -4,15 +4,14 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { IInsightsConfigDetails } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
 import QueryRunner from 'sql/platform/query/common/queryRunner';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { IInsightsDialogModel } from 'sql/workbench/services/insights/common/insightsDialogService';
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
-import { resolveQueryFilePath } from '../common/insightsUtils';
+import { resolveQueryFilePath } from 'sql/workbench/services/insights/common/insightsUtils';
 
-import { DbCellValue, IDbColumn, QueryExecuteSubsetResult } from 'azdata';
+import { DbCellValue, IDbColumn, QueryExecuteSubsetResult, IConnectionProfile } from 'azdata';
 
 import Severity from 'vs/base/common/severity';
 import * as types from 'vs/base/common/types';
@@ -23,10 +22,12 @@ import { IWorkspaceContextService } from 'vs/platform/workspace/common/workspace
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { IConfigurationResolverService } from 'vs/workbench/services/configurationResolver/common/configurationResolver';
 import { ILogService } from 'vs/platform/log/common/log';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
+import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 
 export class InsightsDialogController {
 	private _queryRunner: QueryRunner;
-	private _connectionProfile: IConnectionProfile;
+	private _connectionProfile: ConnectionProfile;
 	private _connectionUri: string;
 	private _columns: IDbColumn[];
 	private _rows: DbCellValue[][];
@@ -39,11 +40,13 @@ export class InsightsDialogController {
 		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
 		@IWorkspaceContextService private _workspaceContextService: IWorkspaceContextService,
 		@IConfigurationResolverService private _configurationResolverService: IConfigurationResolverService,
-		@ILogService private logService: ILogService
+		@ILogService private logService: ILogService,
+		@ICapabilitiesService private readonly capabilitiesService: ICapabilitiesService
 	) { }
 
-	public async update(input: IInsightsConfigDetails, connectionProfile: IConnectionProfile): Promise<void> {
+	public async update(input: IInsightsConfigDetails, iconnectionProfile: IConnectionProfile): Promise<void> {
 		// execute string
+		const connectionProfile = ConnectionProfile.fromIConnectionProfile(this.capabilitiesService, iconnectionProfile);
 		if (typeof input === 'object') {
 			if (connectionProfile === undefined) {
 				this._notificationService.notify({
@@ -100,7 +103,7 @@ export class InsightsDialogController {
 		return Promise.resolve();
 	}
 
-	private async createQuery(queryString: string, connectionProfile: IConnectionProfile): Promise<void> {
+	private async createQuery(queryString: string, connectionProfile: ConnectionProfile): Promise<void> {
 		if (this._queryRunner) {
 			if (!this._queryRunner.hasCompleted) {
 				await this._queryRunner.cancelQuery();
@@ -124,7 +127,7 @@ export class InsightsDialogController {
 		return this._queryRunner.runQuery(queryString);
 	}
 
-	private async createNewConnection(connectionProfile: IConnectionProfile): Promise<void> {
+	private async createNewConnection(connectionProfile: ConnectionProfile): Promise<void> {
 		// determine if we need to create a new connection
 		if (!this._connectionProfile || connectionProfile.getOptionsKey() !== this._connectionProfile.getOptionsKey()) {
 			if (this._connectionProfile) {

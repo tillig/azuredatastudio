@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 
 import * as types from 'vs/base/common/types';
 import { ILocalizedString, MenuRegistry, ICommandAction } from 'vs/platform/actions/common/actions';

@@ -8,7 +8,7 @@ import * as TypeMoq from 'typemoq';
 import * as TaskUtilities from 'sql/workbench/common/taskUtilities';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
 import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { WorkbenchEditorTestService } from 'sqltest/stubs/workbenchEditorTestService';
 import { URI } from 'vs/base/common/uri';

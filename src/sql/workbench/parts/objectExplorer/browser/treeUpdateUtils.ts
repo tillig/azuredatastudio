@@ -12,7 +12,7 @@ import { NodeType } from 'sql/workbench/parts/objectExplorer/common/nodeType';
 
 import { TreeNode } from 'sql/workbench/parts/objectExplorer/common/treeNode';
 import * as errors from 'vs/base/common/errors';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 
 export interface IExpandableTree extends ITree {
 	// {{SQL CARBON EDIT }}	- add back deleted VS Code tree methods

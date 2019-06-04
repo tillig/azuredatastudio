@@ -6,7 +6,6 @@
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import * as TaskUtilities from 'sql/workbench/common/taskUtilities';
 import { IQueryEditorService } from 'sql/workbench/services/queryEditor/common/queryEditorService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { IInsightsConfig } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
 import { IScriptingService } from 'sql/platform/scripting/common/scriptingService';
 import { IRestoreDialogController } from 'sql/platform/restore/common/restoreService';
@@ -17,7 +16,7 @@ import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/co
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
 import { IBackupUiService } from 'sql/workbench/services/backup/common/backupUiService';
 
-import { ObjectMetadata } from 'azdata';
+import { ObjectMetadata, IConnectionProfile } from 'azdata';
 
 import { Action } from 'vs/base/common/actions';
 import { IWindowsService } from 'vs/platform/windows/common/windows';

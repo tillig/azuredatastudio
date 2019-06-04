@@ -8,7 +8,6 @@ import {
 	ProfilerSessionID, IProfilerSession, IProfilerService, IProfilerViewTemplate, IProfilerSessionTemplate,
 	PROFILER_SETTINGS, IProfilerSettings
 } from './interfaces';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ProfilerInput } from 'sql/workbench/parts/profiler/browser/profilerInput';
 import { ProfilerColumnEditorDialog } from 'sql/workbench/parts/profiler/browser/profilerColumnEditorDialog';
 
@@ -52,7 +51,7 @@ export class ProfilerService implements IProfilerService {
 	private _providers = new Map<string, azdata.ProfilerProvider>();
 	private _idMap = new TwoWayMap<ProfilerSessionID, string>();
 	private _sessionMap = new Map<ProfilerSessionID, IProfilerSession>();
-	private _connectionMap = new Map<ProfilerSessionID, IConnectionProfile>();
+	private _connectionMap = new Map<ProfilerSessionID, azdata.IConnectionProfile>();
 	private _editColumnDialog: ProfilerColumnEditorDialog;
 	private _memento: any;
 	private _context: Memento;
@@ -73,7 +72,7 @@ export class ProfilerService implements IProfilerService {
 		this._providers.set(providerId, provider);
 	}
 
-	public async registerSession(uri: string, connectionProfile: IConnectionProfile, session: IProfilerSession): Promise<ProfilerSessionID> {
+	public async registerSession(uri: string, connectionProfile: azdata.IConnectionProfile, session: IProfilerSession): Promise<ProfilerSessionID> {
 		let options: IConnectionCompletionOptions = {
 			params: { connectionType: ConnectionType.default, runQueryOnCompletion: RunQueryOnConnectionMode.none, input: undefined },
 			saveTheConnection: false,
@@ -202,7 +201,7 @@ export class ProfilerService implements IProfilerService {
 
 	private getMementoKey(ownerUri: string): string {
 		let mementoKey = undefined;
-		let connectionProfile: IConnectionProfile = this._connectionMap.get(ownerUri);
+		let connectionProfile: azdata.IConnectionProfile = this._connectionMap.get(ownerUri);
 		if (connectionProfile) {
 			mementoKey = connectionProfile.serverName;
 		}

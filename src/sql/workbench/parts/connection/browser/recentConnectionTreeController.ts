@@ -14,8 +14,8 @@ import { IConnectionManagementService } from 'sql/platform/connection/common/con
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IAction } from 'vs/base/common/actions';
 import { Event, Emitter } from 'vs/base/common/event';
-import mouse = require('vs/base/browser/mouseEvent');
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import * as mouse from 'vs/base/browser/mouseEvent';
+import { IConnectionProfile } from 'azdata';
 
 export class RecentConnectionActionsProvider extends ContributableActionProvider {
 	private _onRecentConnectionRemoved = new Emitter<void>();

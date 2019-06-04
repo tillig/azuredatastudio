@@ -5,7 +5,7 @@
 
 // This code is based on @jupyterlab/packages/apputils/src/clientsession.tsx
 
-import { nb } from 'azdata';
+import { nb, IConnectionProfile } from 'azdata';
 import { URI } from 'vs/base/common/uri';
 import { Event, Emitter } from 'vs/base/common/event';
 import { localize } from 'vs/nls';
@@ -15,7 +15,6 @@ import { Deferred } from 'sql/base/common/promise';
 
 import * as notebookUtils from '../notebookUtils';
 import { INotebookManager } from 'sql/workbench/services/notebook/common/notebookService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
 type KernelChangeHandler = (kernel: nb.IKernelChangedArgs) => Promise<void>;
 /**

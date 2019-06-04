@@ -9,7 +9,6 @@ import { SelectBox } from 'sql/base/browser/ui/selectBox/selectBox';
 import { InputBox } from 'sql/base/browser/ui/inputBox/inputBox';
 import * as DialogHelper from 'sql/workbench/browser/modal/dialogHelper';
 import { IConnectionComponentCallbacks } from 'sql/workbench/services/connection/browser/connectionDialogService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionOptionSpecialType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import * as Constants from 'sql/platform/connection/common/constants';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
@@ -22,7 +21,6 @@ import { IContextViewService } from 'vs/platform/contextview/browser/contextView
 import { localize } from 'vs/nls';
 import * as DOM from 'vs/base/browser/dom';
 import { IThemeService } from 'vs/platform/theme/common/themeService';
-import { OS, OperatingSystem } from 'vs/base/common/platform';
 import { IClipboardService } from 'vs/platform/clipboard/common/clipboardService';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { ILayoutService } from 'vs/platform/layout/browser/layoutService';
@@ -139,7 +137,7 @@ export class CmsConnectionWidget extends ConnectionWidget {
 		return this._serverDescriptionInputBox.value;
 	}
 
-	public connect(model: IConnectionProfile): boolean {
+	public connect(model: azdata.IConnectionProfile): boolean {
 		let validInputs = super.connect(model);
 		if (this._serverDescriptionInputBox) {
 			model.options.registeredServerDescription = this._serverDescriptionInputBox.value;

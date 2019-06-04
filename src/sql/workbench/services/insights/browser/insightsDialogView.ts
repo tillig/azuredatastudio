@@ -5,7 +5,7 @@
 import 'vs/css!./media/insightsDialog';
 
 import { Button } from 'sql/base/browser/ui/button/button';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { Modal } from 'sql/workbench/browser/modal/modal';
 import { IInsightsConfigDetails } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
 import { attachButtonStyler, attachModalDialogStyler, attachTableStyler, attachPanelStyler } from 'sql/platform/theme/common/styler';

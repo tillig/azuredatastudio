@@ -8,7 +8,6 @@ import * as azdata from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ConnectionStore } from 'sql/platform/connection/common/connectionStore';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { TestConfigurationService } from 'sql/platform/connection/test/common/testConfigurationService';
 import { TestCredentialsService } from 'sql/platform/credentials/test/common/testCredentialsService';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
@@ -19,7 +18,7 @@ import { ConfigurationTarget } from 'vs/platform/configuration/common/configurat
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 
 suite('ConnectionStore', () => {
-	let defaultNamedProfile: IConnectionProfile = deepFreeze({
+	let defaultNamedProfile: azdata.IConnectionProfile = deepFreeze({
 		connectionName: 'new name',
 		serverName: 'namedServer',
 		databaseName: 'bcd',
@@ -29,8 +28,6 @@ suite('ConnectionStore', () => {
 		savePassword: true,
 		groupId: '',
 		groupFullName: '',
-		getOptionsKey: undefined,
-		matches: undefined,
 		providerName: 'MSSQL',
 		options: {},
 		saveProfile: true,
@@ -311,7 +308,7 @@ suite('ConnectionStore', () => {
 
 		const connectionStore = new ConnectionStore(storageService, configurationService,
 			credentialsService, capabilitiesService);
-		const connectionProfile: IConnectionProfile = Object.assign({}, defaultNamedProfile, { providerName: providerName });
+		const connectionProfile: azdata.IConnectionProfile = Object.assign({}, defaultNamedProfile, { providerName: providerName });
 
 		assert.ok(!connectionStore.isPasswordRequired(connectionProfile));
 	});
@@ -322,7 +319,7 @@ suite('ConnectionStore', () => {
 		const credentialsService = new TestCredentialsService();
 
 		const password: string = 'asdf!@#$';
-		const connectionProfile: IConnectionProfile = Object.assign({}, defaultNamedProfile, { password });
+		const connectionProfile: azdata.IConnectionProfile = Object.assign({}, defaultNamedProfile, { password });
 
 		const connectionStore = new ConnectionStore(storageService, configurationService,
 			credentialsService, capabilitiesService);

@@ -10,7 +10,7 @@ import { IConnectionManagementService } from 'sql/platform/connection/common/con
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { IQueryEditorService } from 'sql/workbench/services/queryEditor/common/queryEditorService';
 import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import * as TaskUtilities from 'sql/workbench/common/taskUtilities';
 import { ITree } from 'vs/base/parts/tree/browser/tree';
@@ -151,8 +151,6 @@ export class AddServerAction extends Action {
 			groupId: undefined,
 			groupFullName: element.fullName,
 			savePassword: undefined,
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: '',
 			options: {},
 			saveProfile: true,

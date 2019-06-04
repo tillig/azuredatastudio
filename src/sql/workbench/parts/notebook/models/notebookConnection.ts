@@ -5,7 +5,7 @@
 
 import { localize } from 'vs/nls';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 
 export namespace constants {
 	export const userPropName = 'user';

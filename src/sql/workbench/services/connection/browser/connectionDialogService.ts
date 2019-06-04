@@ -11,7 +11,7 @@ import { ConnectionDialogWidget, OnShowUIResponse } from 'sql/workbench/services
 import { ConnectionController } from 'sql/workbench/services/connection/browser/connectionController';
 import * as WorkbenchUtils from 'sql/workbench/common/sqlWorkbenchUtils';
 import * as Constants from 'sql/platform/connection/common/constants';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { entries } from 'sql/base/common/objects';

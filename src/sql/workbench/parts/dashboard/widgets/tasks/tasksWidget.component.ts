@@ -13,7 +13,7 @@ import { Component, Inject, forwardRef, ViewChild, OnInit, ElementRef } from '@a
 import { DashboardWidget, IDashboardWidget, WidgetConfig, WIDGET_CONFIG } from 'sql/workbench/parts/dashboard/common/dashboardWidget';
 import { CommonServiceInterface } from 'sql/platform/bootstrap/node/commonServiceInterface.service';
 import { TaskRegistry } from 'sql/platform/tasks/common/tasks';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 
 /* VS imports */
 import * as themeColors from 'vs/workbench/common/theme';

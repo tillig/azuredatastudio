@@ -21,7 +21,6 @@ import { UntitledEditorModel } from 'vs/workbench/common/editor/untitledEditorMo
 import { Schemas } from 'vs/base/common/network';
 import { ITextFileService, ISaveOptions, StateChange } from 'vs/workbench/services/textfile/common/textfiles';
 import { LocalContentManager } from 'sql/workbench/services/notebook/node/localContentManager';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { UntitledEditorInput } from 'vs/workbench/common/editor/untitledEditorInput';
 import { IExtensionService } from 'vs/workbench/services/extensions/common/extensions';
 import { IDisposable } from 'vs/base/common/lifecycle';
@@ -144,7 +143,7 @@ export class NotebookInput extends EditorInput {
 	private _providerId: string;
 	private _providers: string[];
 	private _standardKernels: IStandardKernelWithProvider[];
-	private _connectionProfile: IConnectionProfile;
+	private _connectionProfile: azdata.IConnectionProfile;
 	private _defaultKernel: azdata.nb.IKernelSpec;
 	public hasBootstrapped = false;
 	// Holds the HTML content for the editor when the editor discards this input and loads another
@@ -211,11 +210,11 @@ export class NotebookInput extends EditorInput {
 		};
 	}
 
-	public set connectionProfile(value: IConnectionProfile) {
+	public set connectionProfile(value: azdata.IConnectionProfile) {
 		this._connectionProfile = value;
 	}
 
-	public get connectionProfile(): IConnectionProfile {
+	public get connectionProfile(): azdata.IConnectionProfile {
 		return this._connectionProfile;
 	}
 

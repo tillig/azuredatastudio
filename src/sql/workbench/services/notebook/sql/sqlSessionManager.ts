@@ -4,9 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as os from 'os';
-import { nb, QueryExecuteSubsetResult, IDbColumn, BatchSummary, IResultMessage, ResultSetSummary } from 'azdata';
+import { nb, QueryExecuteSubsetResult, IDbColumn, BatchSummary, IResultMessage, ResultSetSummary, IConnectionProfile } from 'azdata';
 import { localize } from 'vs/nls';
-import * as strings from 'vs/base/common/strings';
 import { FutureInternal, ILanguageMagic, notebookConstants } from 'sql/workbench/parts/notebook/models/modelInterfaces';
 import QueryRunner from 'sql/platform/query/common/queryRunner';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
@@ -16,9 +15,7 @@ import { Deferred } from 'sql/base/common/promise';
 import { Disposable } from 'vs/base/common/lifecycle';
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { escape } from 'sql/base/common/strings';
-import { elapsedTimeLabel } from 'sql/workbench/parts/query/common/localizedConstants';
 import * as notebookUtils from 'sql/workbench/parts/notebook/notebookUtils';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';

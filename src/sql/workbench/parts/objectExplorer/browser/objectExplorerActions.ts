@@ -24,7 +24,6 @@ import { IScriptingService } from 'sql/platform/scripting/common/scriptingServic
 import { IQueryEditorService } from 'sql/workbench/services/queryEditor/common/queryEditorService';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
 import * as Constants from 'sql/platform/connection/common/constants';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMessageService';
@@ -61,7 +60,7 @@ export class OEAction extends ExecuteCommandAction {
 		this._treeSelectionHandler = this._instantiationService.createInstance(TreeSelectionHandler);
 
 
-		let profile: IConnectionProfile;
+		let profile: azdata.IConnectionProfile;
 		if (actionContext instanceof ObjectExplorerActionsContext) {
 			if (actionContext.isConnectionNode) {
 				profile = new ConnectionProfile(this._capabilitiesService, actionContext.connectionProfile);
@@ -116,7 +115,7 @@ export class ManageConnectionAction extends Action {
 
 	private async doManage(actionContext: ObjectExplorerActionsContext): Promise<boolean> {
 		let treeNode: TreeNode = undefined;
-		let connectionProfile: IConnectionProfile = undefined;
+		let connectionProfile: azdata.IConnectionProfile = undefined;
 		if (actionContext instanceof ObjectExplorerActionsContext) {
 			// Must use a real connection profile for this action due to lookup
 			connectionProfile = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, actionContext.connectionProfile);

@@ -5,7 +5,7 @@
 
 import { Emitter } from 'vs/base/common/event';
 
-import { ISelectionData } from 'azdata';
+import { ISelectionData, IConnectionProfile } from 'azdata';
 
 import {
 	IConnectionManagementService,
@@ -23,14 +23,13 @@ import { QueryInput } from 'sql/workbench/parts/query/common/queryInput';
 import { QueryEditor } from 'sql/workbench/parts/query/browser/queryEditor';
 import { QueryModelService } from 'sql/platform/query/common/queryModelService';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
 import { TestThemeService } from 'sqltest/stubs/themeTestService';
 import { ConfigurationService } from 'vs/platform/configuration/node/configurationService';
 
 import * as TypeMoq from 'typemoq';
 import * as assert from 'assert';
-import { TestStorageService, TestContextService } from 'vs/workbench/test/workbenchTestServices';
+import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 import { MockContextKeyService } from 'vs/platform/keybinding/test/common/mockKeybindingService';
 
 let none: void;

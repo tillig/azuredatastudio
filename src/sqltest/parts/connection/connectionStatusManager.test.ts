@@ -7,14 +7,13 @@ import * as assert from 'assert';
 import * as azdata from 'azdata';
 import { ConnectionStatusManager } from 'sql/platform/connection/common/connectionStatusManager';
 import * as Utils from 'sql/platform/connection/common/utils';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 let connections: ConnectionStatusManager;
 let capabilitiesService: CapabilitiesTestService;
 let connectionProfileObject: ConnectionProfile;
-let connectionProfile: IConnectionProfile = {
+let connectionProfile: azdata.IConnectionProfile = {
 	connectionName: 'new name',
 	serverName: 'new server',
 	databaseName: 'database',
@@ -24,14 +23,12 @@ let connectionProfile: IConnectionProfile = {
 	savePassword: true,
 	groupFullName: 'g2/g2-2',
 	groupId: 'group id',
-	getOptionsKey: () => 'connection1',
-	matches: undefined,
 	providerName: 'MSSQL',
 	options: {},
 	saveProfile: true,
 	id: undefined
 };
-let editorConnectionProfile: IConnectionProfile = {
+let editorConnectionProfile: azdata.IConnectionProfile = {
 	connectionName: 'new name',
 	serverName: 'new server',
 	databaseName: 'database',
@@ -41,14 +38,12 @@ let editorConnectionProfile: IConnectionProfile = {
 	savePassword: true,
 	groupFullName: 'g2/g2-2',
 	groupId: 'group id',
-	getOptionsKey: () => 'connection2',
-	matches: undefined,
 	providerName: 'MSSQL',
 	options: {},
 	saveProfile: true,
 	id: undefined
 };
-let connectionProfileWithoutDbName: IConnectionProfile = {
+let connectionProfileWithoutDbName: azdata.IConnectionProfile = {
 	connectionName: 'new name',
 	serverName: 'new server',
 	databaseName: '',
@@ -58,8 +53,6 @@ let connectionProfileWithoutDbName: IConnectionProfile = {
 	savePassword: true,
 	groupFullName: 'g2/g2-2',
 	groupId: 'group id',
-	getOptionsKey: () => 'connection1',
-	matches: undefined,
 	providerName: 'MSSQL',
 	options: {},
 	saveProfile: true,
@@ -75,7 +68,7 @@ suite('SQL ConnectionStatusManager tests', () => {
 		capabilitiesService = new CapabilitiesTestService();
 		connectionProfileObject = new ConnectionProfile(capabilitiesService, connectionProfile);
 		connections = new ConnectionStatusManager(capabilitiesService);
-		connection1Id = Utils.generateUri(connectionProfile);
+		connection1Id = Utils.generateUri(connectionProfileObject);
 		connection2Id = 'connection2Id';
 		connection3Id = 'connection3Id';
 		connections.addConnection(connectionProfile, connection1Id);
@@ -164,10 +157,11 @@ suite('SQL ConnectionStatusManager tests', () => {
 		let expectedConnectionId = 'new id';
 		connections.addConnection(connectionProfile, connection1Id);
 
-		let updatedConnection = Object.assign({}, connectionProfile, { groupId: expected, getOptionsKey: () => connectionProfile.getOptionsKey() + expected, id: expectedConnectionId });
+		let updatedConnection = Object.assign({}, connectionProfile, { groupId: expected, id: expectedConnectionId });
+		let updatedConnectionProfile = new ConnectionProfile(capabilitiesService, updatedConnection);
 		let actualId = connections.updateConnectionProfile(updatedConnection, connection1Id);
 
-		let newId = Utils.generateUri(updatedConnection);
+		let newId = Utils.generateUri(updatedConnectionProfile);
 		let actual = connections.getConnectionProfile(newId).groupId;
 		let actualConnectionId = connections.getConnectionProfile(newId).id;
 		assert.equal(actual, expected);

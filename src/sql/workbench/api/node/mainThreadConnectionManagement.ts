@@ -11,7 +11,6 @@ import { IConnectionManagementService, ConnectionType } from 'sql/platform/conne
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import * as TaskUtilities from 'sql/workbench/common/taskUtilities';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { dispose, IDisposable } from 'vs/base/common/lifecycle';
 import { isUndefinedOrNull } from 'vs/base/common/types';
 import { generateUuid } from 'vs/base/common/uuid';
@@ -59,7 +58,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		return Promise.resolve(this._connectionManagementService.getServerInfo(connectionId));
 	}
 
-	public async $openConnectionDialog(providers: string[], initialConnectionProfile?: IConnectionProfile, connectionCompletionOptions?: azdata.IConnectionCompletionOptions): Promise<azdata.connection.Connection> {
+	public async $openConnectionDialog(providers: string[], initialConnectionProfile?: azdata.IConnectionProfile, connectionCompletionOptions?: azdata.IConnectionCompletionOptions): Promise<azdata.connection.Connection> {
 		// Here we default to ConnectionType.editor which saves the connecton in the connection store by default
 		let connectionType = ConnectionType.editor;
 
@@ -104,7 +103,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		return Promise.resolve(this._connectionManagementService.getConnectionUriFromId(connectionId));
 	}
 
-	private convertConnection(profile: IConnectionProfile): azdata.connection.Connection {
+	private convertConnection(profile: azdata.IConnectionProfile): azdata.connection.Connection {
 		if (!profile) {
 			return undefined;
 		}
@@ -117,7 +116,7 @@ export class MainThreadConnectionManagement implements MainThreadConnectionManag
 		return connection;
 	}
 
-	public $connect(connectionProfile: IConnectionProfile, saveConnection: boolean = true, showDashboard: boolean = true): Thenable<azdata.ConnectionResult> {
+	public $connect(connectionProfile: azdata.IConnectionProfile, saveConnection: boolean = true, showDashboard: boolean = true): Thenable<azdata.ConnectionResult> {
 		let profile = new ConnectionProfile(this._capabilitiesService, connectionProfile);
 		profile.id = generateUuid();
 		return this._connectionManagementService.connectAndSaveProfile(profile, undefined, {

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { DataService } from 'sql/workbench/parts/grid/services/dataService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { IContextKeyService } from 'vs/platform/contextkey/common/contextkey';
 import { ConnectionContextKey } from 'sql/workbench/parts/connection/common/connectionContextKey';
 import { IBootstrapParams } from 'sql/platform/bootstrap/node/bootstrapService';

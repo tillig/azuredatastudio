@@ -15,7 +15,6 @@ import { OptionsDialog } from 'sql/workbench/browser/modal/optionsDialog';
 import { RestoreDialog } from 'sql/workbench/parts/restore/browser/restoreDialog';
 import * as ConnectionConstants from 'sql/platform/connection/common/constants';
 import { MssqlRestoreInfo } from 'sql/platform/restore/common/mssqlRestoreInfo';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ProviderConnectionInfo } from 'sql/platform/connection/common/providerConnectionInfo';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
@@ -290,7 +289,7 @@ export class RestoreDialogController implements IRestoreDialogController {
 		});
 	}
 
-	public showDialog(connection: IConnectionProfile): Promise<void> {
+	public showDialog(connection: azdata.IConnectionProfile): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			let result: void;
 

@@ -29,7 +29,7 @@ import { NotebookModel } from 'sql/workbench/parts/notebook/models/notebookModel
 import { ModelFactory } from 'sql/workbench/parts/notebook/models/modelFactory';
 import * as notebookUtils from 'sql/workbench/parts/notebook/notebookUtils';
 import { Deferred } from 'sql/base/common/promise';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { Taskbar } from 'sql/base/browser/ui/taskbar/taskbar';
 import { KernelsDropdown, AttachToDropdown, AddCellAction, TrustedAction, RunAllCellsAction, ClearAllOutputsAction } from 'sql/workbench/parts/notebook/notebookActions';
 import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';

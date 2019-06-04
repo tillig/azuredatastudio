@@ -6,7 +6,6 @@
 import * as azdata from 'azdata';
 import * as TypeMoq from 'typemoq';
 import { Emitter } from 'vs/base/common/event';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { FirewallRuleDialog } from 'sql/platform/accounts/browser/firewallRuleDialog';
 import { FirewallRuleViewModel } from 'sql/platform/accounts/common/firewallRuleViewModel';
 import { FirewallRuleDialogController } from 'sql/platform/accounts/browser/firewallRuleDialogController';
@@ -19,7 +18,7 @@ import { Deferred } from 'sql/base/common/promise';
 
 // TESTS ///////////////////////////////////////////////////////////////////
 suite('Firewall rule dialog controller tests', () => {
-	let connectionProfile: IConnectionProfile;
+	let connectionProfile: azdata.IConnectionProfile;
 	let account: azdata.Account;
 	let IPAddress = '250.222.155.198';
 	let mockOnAddAccountErrorEvent: Emitter<string>;
@@ -86,8 +85,6 @@ suite('Firewall rule dialog controller tests', () => {
 			savePassword: true,
 			groupFullName: 'g2/g2-2',
 			groupId: 'group id',
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,

@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 
@@ -87,7 +87,7 @@ export function parseNumAsTimeString(value: number, includeFraction: boolean = t
 	return tempVal > 0 && includeFraction ? rs + '.' + mss : rs;
 }
 
-export function generateUri(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection' | 'notebook'): string {
+export function generateUri(connection: ConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection' | 'notebook'): string {
 	let prefix = purpose ? uriPrefixes[purpose] : uriPrefixes.default;
 	let uri = generateUriWithPrefix(connection, prefix);
 
@@ -107,7 +107,7 @@ export function getUriPrefix(ownerUri: string): string {
 	return prefix;
 }
 
-export function generateUriWithPrefix(connection: IConnectionProfile, prefix: string): string {
+export function generateUriWithPrefix(connection: ConnectionProfile, prefix: string): string {
 	let id = connection.getOptionsKey();
 	let uri = prefix + (id ? id : connection.serverName + ':' + connection.databaseName);
 

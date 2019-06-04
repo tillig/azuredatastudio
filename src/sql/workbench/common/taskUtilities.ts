@@ -5,7 +5,6 @@
 
 import * as os from 'os';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import {
 	IConnectableInput, IConnectionManagementService,
 	IConnectionCompletionOptions, ConnectionType,
@@ -87,7 +86,7 @@ export function GetScriptOperationName(operation: ScriptOperation) {
 /**
  * Select the top rows from an object
  */
-export function scriptSelect(connectionProfile: IConnectionProfile, metadata: azdata.ObjectMetadata, connectionService: IConnectionManagementService, queryEditorService: IQueryEditorService, scriptingService: IScriptingService): Promise<void> {
+export function scriptSelect(connectionProfile: azdata.IConnectionProfile, metadata: azdata.ObjectMetadata, connectionService: IConnectionManagementService, queryEditorService: IQueryEditorService, scriptingService: IScriptingService): Promise<void> {
 	return new Promise<void>((resolve, reject) => {
 		connectionService.connectIfNotConnected(connectionProfile).then(connectionResult => {
 			let paramDetails: azdata.ScriptingParamDetails = getScriptingParamDetails(connectionService, connectionResult, metadata);
@@ -122,7 +121,7 @@ export function scriptSelect(connectionProfile: IConnectionProfile, metadata: az
 /**
  * Opens a new Edit Data session
  */
-export function scriptEditSelect(connectionProfile: IConnectionProfile, metadata: azdata.ObjectMetadata, connectionService: IConnectionManagementService, queryEditorService: IQueryEditorService, scriptingService: IScriptingService): Promise<void> {
+export function scriptEditSelect(connectionProfile: azdata.IConnectionProfile, metadata: azdata.ObjectMetadata, connectionService: IConnectionManagementService, queryEditorService: IQueryEditorService, scriptingService: IScriptingService): Promise<void> {
 	return new Promise<void>((resolve, reject) => {
 		connectionService.connectIfNotConnected(connectionProfile).then(connectionResult => {
 			let paramDetails: azdata.ScriptingParamDetails = getScriptingParamDetails(connectionService, connectionResult, metadata);
@@ -157,7 +156,7 @@ export function scriptEditSelect(connectionProfile: IConnectionProfile, metadata
 /**
  * Script the object as a statement based on the provided action (except Select)
  */
-export function script(connectionProfile: IConnectionProfile, metadata: azdata.ObjectMetadata,
+export function script(connectionProfile: azdata.IConnectionProfile, metadata: azdata.ObjectMetadata,
 	connectionService: IConnectionManagementService,
 	queryEditorService: IQueryEditorService,
 	scriptingService: IScriptingService,
@@ -215,7 +214,7 @@ export function script(connectionProfile: IConnectionProfile, metadata: azdata.O
 }
 
 export function newQuery(
-	connectionProfile: IConnectionProfile,
+	connectionProfile: azdata.IConnectionProfile,
 	connectionService: IConnectionManagementService,
 	queryEditorService: IQueryEditorService,
 	objectExplorerService: IObjectExplorerService,
@@ -284,7 +283,7 @@ export function replaceConnection(oldUri: string, newUri: string, connectionServ
 	});
 }
 
-export function showBackup(connection: IConnectionProfile, backupUiService: IBackupUiService): Promise<void> {
+export function showBackup(connection: azdata.IConnectionProfile, backupUiService: IBackupUiService): Promise<void> {
 	return new Promise<void>((resolve) => {
 		backupUiService.showBackup(connection).then(() => {
 			resolve(void 0);
@@ -292,7 +291,7 @@ export function showBackup(connection: IConnectionProfile, backupUiService: IBac
 	});
 }
 
-export function showRestore(connection: IConnectionProfile, restoreDialogService: IRestoreDialogController): Promise<void> {
+export function showRestore(connection: azdata.IConnectionProfile, restoreDialogService: IRestoreDialogController): Promise<void> {
 	return new Promise<void>((resolve) => {
 		restoreDialogService.showDialog(connection).then(() => {
 			resolve(void 0);
@@ -300,7 +299,7 @@ export function showRestore(connection: IConnectionProfile, restoreDialogService
 	});
 }
 
-export function openInsight(query: IInsightsConfig, profile: IConnectionProfile, insightDialogService: IInsightsDialogService) {
+export function openInsight(query: IInsightsConfig, profile: azdata.IConnectionProfile, insightDialogService: IInsightsDialogService) {
 	insightDialogService.show(query, profile);
 }
 
@@ -311,8 +310,8 @@ export function openInsight(query: IInsightsConfig, profile: IConnectionProfile,
  *
  * @param topLevelOnly If true, only return top-level (i.e. connected) Object Explorer connections instead of database connections when appropriate
 */
-export function getCurrentGlobalConnection(objectExplorerService: IObjectExplorerService, connectionManagementService: IConnectionManagementService, workbenchEditorService: IEditorService, topLevelOnly: boolean = false): IConnectionProfile {
-	let connection: IConnectionProfile;
+export function getCurrentGlobalConnection(objectExplorerService: IObjectExplorerService, connectionManagementService: IConnectionManagementService, workbenchEditorService: IEditorService, topLevelOnly: boolean = false): azdata.IConnectionProfile {
+	let connection: azdata.IConnectionProfile;
 
 	let objectExplorerSelection = objectExplorerService.getSelectedProfileAndDatabase();
 	if (objectExplorerSelection) {

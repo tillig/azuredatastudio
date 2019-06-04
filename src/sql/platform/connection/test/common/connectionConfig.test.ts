@@ -6,10 +6,9 @@
 import * as assert from 'assert';
 import * as azdata from 'azdata';
 import { ICapabilitiesService, ProviderFeatures } from 'sql/platform/capabilities/common/capabilitiesService';
-import { ConnectionConfig, ISaveGroupResult } from 'sql/platform/connection/common/connectionConfig';
+import { ConnectionConfig, ISaveGroupResult, IConnectionProfileStore } from 'sql/platform/connection/common/connectionConfig';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup, IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
-import { IConnectionProfile, IConnectionProfileStore } from 'sql/platform/connection/common/interfaces';
 import { TestConfigurationService } from 'sql/platform/connection/test/common/testConfigurationService';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
@@ -241,7 +240,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('addConnection should add the new profile to user settings', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'new server',
 			databaseName: 'database',
 			userName: 'user',
@@ -250,8 +249,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: undefined,
 			groupId: undefined,
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -273,7 +270,7 @@ suite('ConnectionConfig', () => {
 
 	test('addConnection should not add the new profile to user settings if already exists', async () => {
 		let existingConnection = testConnections[0];
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: existingConnection.options['serverName'],
 			databaseName: existingConnection.options['databaseName'],
 			userName: existingConnection.options['userName'],
@@ -282,8 +279,6 @@ suite('ConnectionConfig', () => {
 			groupId: existingConnection.groupId,
 			savePassword: true,
 			groupFullName: undefined,
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -306,7 +301,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('addConnection should add the new group to user settings if does not exist', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'new server',
 			databaseName: 'database',
 			userName: 'user',
@@ -315,8 +310,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g2/g2-2',
 			groupId: undefined,
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -425,7 +418,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('deleteConnection should remove the connection from config', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -434,8 +427,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -455,7 +446,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('deleteConnectionGroup should remove the children connections and subgroups from config', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -464,8 +455,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -492,7 +481,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('deleteConnection should not throw error for connection not in config', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'connectionNotThere',
 			databaseName: 'database',
 			userName: 'user',
@@ -501,8 +490,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'newid',
-			getOptionsKey: undefined,
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -572,7 +559,7 @@ suite('ConnectionConfig', () => {
 
 
 	test('change group for connection with conflict should throw', async () => {
-		let changingProfile: IConnectionProfile = {
+		let changingProfile: azdata.IConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -581,8 +568,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: () => { return 'connectionId'; },
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -598,8 +583,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'test',
 			groupId: 'test',
-			getOptionsKey: () => { return 'connectionId'; },
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,
@@ -629,7 +612,7 @@ suite('ConnectionConfig', () => {
 	});
 
 	test('change group(parent) for connection', async () => {
-		let newProfile: IConnectionProfile = {
+		let newProfile: azdata.IConnectionProfile = {
 			serverName: 'server3',
 			databaseName: 'database',
 			userName: 'user',
@@ -638,8 +621,6 @@ suite('ConnectionConfig', () => {
 			savePassword: true,
 			groupFullName: 'g3',
 			groupId: 'g3',
-			getOptionsKey: () => { return 'connectionId'; },
-			matches: undefined,
 			providerName: 'MSSQL',
 			options: {},
 			saveProfile: true,

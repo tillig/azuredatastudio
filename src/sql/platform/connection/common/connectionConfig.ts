@@ -7,7 +7,7 @@ import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilit
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup, IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { UNSAVED_GROUP_ID } from 'sql/platform/connection/common/constants';
-import { IConnectionProfile, IConnectionProfileStore } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { generateUuid } from 'vs/base/common/uuid';
 import * as nls from 'vs/nls';
@@ -19,6 +19,14 @@ const CONNECTIONS_CONFIG_KEY = 'datasource.connections';
 export interface ISaveGroupResult {
 	groups: IConnectionProfileGroup[];
 	newGroupId: string;
+}
+
+export interface IConnectionProfileStore {
+	options: { [key: string]: string };
+	groupId: string;
+	providerName: string;
+	savePassword: boolean;
+	id: string;
 }
 
 /**

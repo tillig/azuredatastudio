@@ -8,7 +8,6 @@ import { InsightsDialogModel } from 'sql/workbench/services/insights/common/insi
 import QueryRunner from 'sql/platform/query/common/queryRunner';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { IInsightsConfigDetails } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 
@@ -51,10 +50,11 @@ suite('Insights Dialog Controller Tests', () => {
 			connMoq.object,
 			undefined,
 			undefined,
+			undefined,
 			undefined
 		);
 
-		let profile: IConnectionProfile = {
+		let profile: azdata.IConnectionProfile = {
 			connectionName: 'newname',
 			serverName: 'server',
 			databaseName: 'database',
@@ -64,8 +64,6 @@ suite('Insights Dialog Controller Tests', () => {
 			savePassword: true,
 			groupFullName: '',
 			groupId: '',
-			getOptionsKey: () => '',
-			matches: undefined,
 			providerName: '',
 			saveProfile: true,
 			id: '',

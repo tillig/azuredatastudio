@@ -9,7 +9,7 @@ import { URI } from 'vs/base/common/uri';
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { IModeService } from 'vs/editor/common/services/modeService';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 
 export class DashboardInput extends EditorInput {

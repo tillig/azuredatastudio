@@ -6,7 +6,7 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 
 import { InsightsDialogController } from 'sql/workbench/services/insights/node/insightsDialogController';
 import { InsightsDialogView } from 'sql/workbench/services/insights/browser/insightsDialogView';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { IInsightsConfig } from 'sql/workbench/parts/dashboard/widgets/insights/interfaces';
 import { IInsightsDialogModel, IInsightsDialogService } from 'sql/workbench/services/insights/common/insightsDialogService';
 import { InsightsDialogModel } from 'sql/workbench/services/insights/common/insightsDialogModel';

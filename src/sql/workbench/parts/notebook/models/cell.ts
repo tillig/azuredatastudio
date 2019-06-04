@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { nb, ServerInfo } from 'azdata';
+import { nb, ServerInfo, IConnectionProfile } from 'azdata';
 
 import { Event, Emitter } from 'vs/base/common/event';
 import { URI } from 'vs/base/common/uri';
@@ -15,7 +15,6 @@ import { NotebookModel } from 'sql/workbench/parts/notebook/models/notebookModel
 import { ICellModel, notebookConstants } from 'sql/workbench/parts/notebook/models/modelInterfaces';
 import { ICellModelOptions, IModelFactory, FutureInternal, CellExecutionState } from './modelInterfaces';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { INotificationService, Severity } from 'vs/platform/notification/common/notification';
 import { Schemas } from 'vs/base/common/network';
 let modelId = 0;

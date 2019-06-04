@@ -20,7 +20,6 @@ import { IObjectExplorerService } from 'sql/workbench/services/objectExplorer/co
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { ICommandService } from 'vs/platform/commands/common/commands';
 import { ipcRenderer as ipc } from 'electron';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IStatusbarService } from 'vs/platform/statusbar/common/statusbar';
 import { localize } from 'vs/nls';
@@ -73,7 +72,7 @@ export class CommandLineService implements ICommandLineProcessing {
 	// (serverName, null) => Connect object explorer and open a new query editor if no file names are passed. If file names are passed, connect their editors to the server.
 	// (null, null) => Prompt for a connection unless there are registered servers
 	public async processCommandLine(args: ParsedArgs): Promise<void> {
-		let profile: IConnectionProfile = undefined;
+		let profile: azdata.IConnectionProfile = undefined;
 		let commandName = undefined;
 		if (args) {
 			if (this._commandService) {
@@ -138,7 +137,7 @@ export class CommandLineService implements ICommandLineProcessing {
 	}
 
 	// If an open and connectable query editor exists for the given URI, attach it to the connection profile
-	private async processFile(uriString: string, profile: IConnectionProfile, warnOnConnectFailure: boolean): Promise<void> {
+	private async processFile(uriString: string, profile: azdata.IConnectionProfile, warnOnConnectFailure: boolean): Promise<void> {
 		let activeEditor = this._editorService.editors.filter(v => v.getResource().toString() === uriString).pop();
 		if (activeEditor) {
 			let queryInput = activeEditor as QueryInput;

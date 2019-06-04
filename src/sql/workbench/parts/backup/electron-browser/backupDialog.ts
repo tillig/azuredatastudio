@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Modal } from 'sql/workbench/browser/modal/modal';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { BackupModule } from 'sql/workbench/parts/backup/electron-browser/backup.module';
 import { BACKUP_SELECTOR } from 'sql/workbench/parts/backup/electron-browser/backup.component';
 import { attachModalDialogStyler } from 'sql/platform/theme/common/styler';

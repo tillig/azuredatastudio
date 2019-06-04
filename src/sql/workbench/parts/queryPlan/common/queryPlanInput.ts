@@ -5,7 +5,7 @@
 
 import { EditorInput, EditorModel } from 'vs/workbench/common/editor';
 import { UntitledEditorInput } from 'vs/workbench/common/editor/untitledEditorInput';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 
 export class QueryPlanInput extends EditorInput {

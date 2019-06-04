@@ -11,7 +11,6 @@ import { Checkbox } from 'sql/base/browser/ui/checkbox/checkbox';
 import { InputBox } from 'sql/base/browser/ui/inputBox/inputBox';
 import * as DialogHelper from 'sql/workbench/browser/modal/dialogHelper';
 import { IConnectionComponentCallbacks } from 'sql/workbench/services/connection/browser/connectionDialogService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionOptionSpecialType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import * as Constants from 'sql/platform/connection/common/constants';
 import { ConnectionProfileGroup, IConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
@@ -557,7 +556,7 @@ export class ConnectionWidget {
 		}
 	}
 
-	public initDialog(connectionInfo: IConnectionProfile): void {
+	public initDialog(connectionInfo: azdata.IConnectionProfile): void {
 		this.fillInConnectionInputs(connectionInfo);
 	}
 
@@ -578,7 +577,7 @@ export class ConnectionWidget {
 		return value ? value : '';
 	}
 
-	public fillInConnectionInputs(connectionInfo: IConnectionProfile) {
+	public fillInConnectionInputs(connectionInfo: azdata.IConnectionProfile) {
 		if (connectionInfo) {
 			this._serverNameInputBox.value = this.getModelValue(connectionInfo.serverName);
 			this._connectionNameInputBox.value = this.getModelValue(connectionInfo.connectionName);
@@ -792,7 +791,7 @@ export class ConnectionWidget {
 		return validateServerName && validateUserName && validatePassword && validateAzureAccount;
 	}
 
-	public connect(model: IConnectionProfile): boolean {
+	public connect(model: azdata.IConnectionProfile): boolean {
 		let validInputs = this.validateInputs();
 		if (validInputs) {
 			model.serverName = this.serverName;

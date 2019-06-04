@@ -6,7 +6,6 @@
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { IResourceProviderService, IHandleFirewallRuleResult } from 'sql/workbench/services/resourceProvider/common/resourceProviderService';
 import * as TelemetryKeys from 'sql/platform/telemetry/telemetryKeys';
 import * as TelemetryUtils from 'sql/platform/telemetry/telemetryUtilities';
@@ -32,7 +31,7 @@ export class ResourceProviderService implements IResourceProviderService {
 	/**
 	 * Opens the firewall rule dialog
 	 */
-	public showFirewallRuleDialog(connection: IConnectionProfile, ipAddress: string, resourceProviderId: string): Promise<boolean> {
+	public showFirewallRuleDialog(connection: azdata.IConnectionProfile, ipAddress: string, resourceProviderId: string): Promise<boolean> {
 		let self = this;
 		// If the firewall rule dialog hasn't been defined, create a new one
 		if (!self._firewallRuleDialogController) {

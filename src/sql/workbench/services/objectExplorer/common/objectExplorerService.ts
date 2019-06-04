@@ -9,7 +9,6 @@ import { ConnectionProfile } from 'sql/platform/connection/common/connectionProf
 import { IDisposable, dispose } from 'vs/base/common/lifecycle';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { Event, Emitter } from 'vs/base/common/event';
 import * as azdata from 'azdata';
 import * as nls from 'vs/nls';
@@ -58,11 +57,11 @@ export interface IObjectExplorerService {
 
 	registerNodeProvider(expander: azdata.ObjectExplorerNodeProvider): void;
 
-	getObjectExplorerNode(connection: IConnectionProfile): TreeNode;
+	getObjectExplorerNode(connection: azdata.IConnectionProfile): TreeNode;
 
-	updateObjectExplorerNodes(connectionProfile: IConnectionProfile): Promise<void>;
+	updateObjectExplorerNodes(connectionProfile: azdata.IConnectionProfile): Promise<void>;
 
-	deleteObjectExplorerNode(connection: IConnectionProfile): Thenable<void>;
+	deleteObjectExplorerNode(connection: azdata.IConnectionProfile): Thenable<void>;
 
 	onUpdateObjectExplorerNodes: Event<ObjectExplorerNodeEventArgs>;
 
@@ -107,7 +106,7 @@ interface NodeStatus {
 }
 
 export interface ObjectExplorerNodeEventArgs {
-	connection: IConnectionProfile;
+	connection: azdata.IConnectionProfile;
 	errorMessage: string;
 }
 
@@ -181,14 +180,14 @@ export class ObjectExplorerService implements IObjectExplorerService {
 		return this._onSelectionOrFocusChange.event;
 	}
 
-	public updateObjectExplorerNodes(connection: IConnectionProfile): Promise<void> {
+	public updateObjectExplorerNodes(connection: azdata.IConnectionProfile): Promise<void> {
 		return this._connectionManagementService.addSavedPassword(connection).then(withPassword => {
 			let connectionProfile = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, withPassword);
 			return this.updateNewObjectExplorerNode(connectionProfile);
 		});
 	}
 
-	public deleteObjectExplorerNode(connection: IConnectionProfile): Thenable<void> {
+	public deleteObjectExplorerNode(connection: azdata.IConnectionProfile): Thenable<void> {
 		let self = this;
 		let connectionUri = connection.id;
 		let nodeTree = this._activeObjectExplorerNodes[connectionUri];
@@ -297,7 +296,7 @@ export class ObjectExplorerService implements IObjectExplorerService {
 
 	private sendUpdateNodeEvent(connection: ConnectionProfile, errorMessage: string = undefined) {
 		let eventArgs: ObjectExplorerNodeEventArgs = {
-			connection: <IConnectionProfile>connection,
+			connection: <azdata.IConnectionProfile>connection,
 			errorMessage: errorMessage
 		};
 		this._onUpdateObjectExplorerNodes.fire(eventArgs);
@@ -321,7 +320,7 @@ export class ObjectExplorerService implements IObjectExplorerService {
 		});
 	}
 
-	public getObjectExplorerNode(connection: IConnectionProfile): TreeNode {
+	public getObjectExplorerNode(connection: azdata.IConnectionProfile): TreeNode {
 		return this._activeObjectExplorerNodes[connection.id];
 	}
 

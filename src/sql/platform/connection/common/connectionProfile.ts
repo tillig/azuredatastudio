@@ -6,7 +6,6 @@
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import * as azdata from 'azdata';
 import { ProviderConnectionInfo } from 'sql/platform/connection/common/providerConnectionInfo';
-import * as interfaces from 'sql/platform/connection/common/interfaces';
 import { equalsIgnoreCase } from 'vs/base/common/strings';
 import { generateUuid } from 'vs/base/common/uuid';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
@@ -14,13 +13,14 @@ import { isString } from 'vs/base/common/types';
 import { deepClone } from 'vs/base/common/objects';
 import { ConnectionOptionSpecialType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import * as Constants from 'sql/platform/connection/common/constants';
+import { IConnectionProfileStore } from 'sql/platform/connection/common/connectionConfig';
 
 // Concrete implementation of the IConnectionProfile interface
 
 /**
  * A concrete implementation of an IConnectionProfile with support for profile creation and validation
  */
-export class ConnectionProfile extends ProviderConnectionInfo implements interfaces.IConnectionProfile {
+export class ConnectionProfile extends ProviderConnectionInfo implements azdata.IConnectionProfile {
 
 	public parent: ConnectionProfileGroup = null;
 	private _id: string;
@@ -63,7 +63,7 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 		this.options['databaseDisplayName'] = this.databaseName;
 	}
 
-	public matches(other: interfaces.IConnectionProfile): boolean {
+	public matches(other: azdata.IConnectionProfile): boolean {
 		return other
 			&& this.providerName === other.providerName
 			&& this.nullCheckEqualsIgnoreCase(this.serverName, other.serverName)
@@ -173,14 +173,12 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 		return super.getOptionsKey();
 	}
 
-	public toIConnectionProfile(): interfaces.IConnectionProfile {
-		let result: interfaces.IConnectionProfile = {
+	public toIConnectionProfile(): azdata.IConnectionProfile {
+		let result: azdata.IConnectionProfile = {
 			connectionName: this.connectionName,
 			serverName: this.serverName,
 			databaseName: this.databaseName,
 			authenticationType: this.authenticationType,
-			getOptionsKey: this.getOptionsKey,
-			matches: undefined,
 			groupId: this.groupId,
 			groupFullName: this.groupFullName,
 			password: this.password,
@@ -220,7 +218,7 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 		return undefined;
 	}
 
-	public static createFromStoredProfile(profile: interfaces.IConnectionProfileStore, capabilitiesService: ICapabilitiesService): ConnectionProfile {
+	public static createFromStoredProfile(profile: IConnectionProfileStore, capabilitiesService: ICapabilitiesService): ConnectionProfile {
 		let connectionInfo = new ConnectionProfile(capabilitiesService, profile.providerName);
 		connectionInfo.options = profile.options;
 
@@ -239,10 +237,10 @@ export class ConnectionProfile extends ProviderConnectionInfo implements interfa
 
 	public static convertToProfileStore(
 		capabilitiesService: ICapabilitiesService,
-		connectionProfile: interfaces.IConnectionProfile): interfaces.IConnectionProfileStore {
+		connectionProfile: azdata.IConnectionProfile): IConnectionProfileStore {
 		if (connectionProfile) {
 			let connectionInfo = ConnectionProfile.fromIConnectionProfile(capabilitiesService, connectionProfile);
-			let profile: interfaces.IConnectionProfileStore = {
+			let profile: IConnectionProfileStore = {
 				options: {},
 				groupId: connectionProfile.groupId,
 				providerName: connectionInfo.providerName,

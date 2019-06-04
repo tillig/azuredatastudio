@@ -9,7 +9,6 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 import * as azdata from 'azdata';
 
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import * as ConnectionUtils from 'sql/platform/connection/common/utils';
 import { ProviderConnectionInfo } from 'sql/platform/connection/common/providerConnectionInfo';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
@@ -17,6 +16,7 @@ import { BackupDialog } from 'sql/workbench/parts/backup/electron-browser/backup
 import { OptionsDialog } from 'sql/workbench/browser/modal/optionsDialog';
 import { IBackupService, TaskExecutionMode } from 'sql/platform/backup/common/backupService';
 import { IBackupUiService } from 'sql/workbench/services/backup/common/backupUiService';
+import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 
 export class BackupUiService implements IBackupUiService {
 	public _serviceBrand: any;
@@ -26,19 +26,21 @@ export class BackupUiService implements IBackupUiService {
 	private _connectionUri: string;
 	private static _connectionUniqueId: number = 0;
 
-	private _onShowBackupEvent: Emitter<{ connection: IConnectionProfile, ownerUri: string }>;
-	public get onShowBackupEvent(): Event<{ connection: IConnectionProfile, ownerUri: string }> { return this._onShowBackupEvent.event; }
+	private _onShowBackupEvent: Emitter<{ connection: azdata.IConnectionProfile, ownerUri: string }>;
+	public get onShowBackupEvent(): Event<{ connection: azdata.IConnectionProfile, ownerUri: string }> { return this._onShowBackupEvent.event; }
 
 	constructor(
 		@IInstantiationService private _instantiationService: IInstantiationService,
 		@ICapabilitiesService private _capabilitiesService: ICapabilitiesService,
 		@IBackupService private _disasterRecoveryService: IBackupService,
-		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService
+		@IConnectionManagementService private _connectionManagementService: IConnectionManagementService,
+		@ICapabilitiesService private readonly capabilitiesService: ICapabilitiesService
 	) {
-		this._onShowBackupEvent = new Emitter<{ connection: IConnectionProfile, ownerUri: string }>();
+		this._onShowBackupEvent = new Emitter<{ connection: azdata.IConnectionProfile, ownerUri: string }>();
 	}
 
-	public showBackup(connection: IConnectionProfile): Promise<any> {
+	public showBackup(iconnection: azdata.IConnectionProfile): Promise<any> {
+		const connection = ConnectionProfile.fromIConnectionProfile(this.capabilitiesService, iconnection);
 		let self = this;
 		return new Promise<void>((resolve, reject) => {
 			self.showBackupDialog(connection).then(() => {
@@ -58,7 +60,7 @@ export class BackupUiService implements IBackupUiService {
 		}
 	}
 
-	public showBackupDialog(connection: IConnectionProfile): Promise<void> {
+	public showBackupDialog(connection: ConnectionProfile): Promise<void> {
 		let self = this;
 		self._connectionUri = ConnectionUtils.generateUri(connection);
 		self._currentProvider = connection.providerName;

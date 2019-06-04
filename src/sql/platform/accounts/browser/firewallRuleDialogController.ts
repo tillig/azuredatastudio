@@ -8,7 +8,6 @@ import Severity from 'vs/base/common/severity';
 import { localize } from 'vs/nls';
 import * as azdata from 'azdata';
 
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { FirewallRuleDialog } from 'sql/platform/accounts/browser/firewallRuleDialog';
 import { IAccountManagementService, AzureResource } from 'sql/platform/accounts/common/interfaces';
 import { IResourceProviderService } from 'sql/workbench/services/resourceProvider/common/resourceProviderService';
@@ -18,7 +17,7 @@ import { IErrorMessageService } from 'sql/platform/errorMessage/common/errorMess
 export class FirewallRuleDialogController {
 
 	private _firewallRuleDialog: FirewallRuleDialog;
-	private _connection: IConnectionProfile;
+	private _connection: azdata.IConnectionProfile;
 	private _resourceProviderId: string;
 
 	private _addAccountErrorTitle = localize('firewallDialog.addAccountErrorTitle', 'Error adding account');
@@ -36,7 +35,7 @@ export class FirewallRuleDialogController {
 	/**
 	 * Open firewall rule dialog
 	 */
-	public openFirewallRuleDialog(connection: IConnectionProfile, ipAddress: string, resourceProviderId: string): Promise<boolean> {
+	public openFirewallRuleDialog(connection: azdata.IConnectionProfile, ipAddress: string, resourceProviderId: string): Promise<boolean> {
 		if (!this._firewallRuleDialog) {
 			this._firewallRuleDialog = this._instantiationService.createInstance(FirewallRuleDialog);
 			this._firewallRuleDialog.onCancel(this.handleOnCancel, this);

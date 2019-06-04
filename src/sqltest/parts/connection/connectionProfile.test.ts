@@ -4,18 +4,18 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { IConnectionProfile, IConnectionProfileStore } from 'sql/platform/connection/common/interfaces';
 import * as azdata from 'azdata';
 import * as assert from 'assert';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
+import { IConnectionProfileStore } from 'sql/platform/connection/common/connectionConfig';
 
 suite('SQL ConnectionProfileInfo tests', () => {
 	let msSQLCapabilities: ConnectionProviderProperties;
 	let capabilitiesService: CapabilitiesTestService;
 
-	let connectionProfile: IConnectionProfile = {
+	let connectionProfile: azdata.IConnectionProfile = {
 		connectionName: 'new name',
 		serverName: 'new server',
 		databaseName: 'database',
@@ -25,8 +25,6 @@ suite('SQL ConnectionProfileInfo tests', () => {
 		savePassword: true,
 		groupFullName: 'g2/g2-2',
 		groupId: 'group id',
-		getOptionsKey: undefined,
-		matches: undefined,
 		providerName: 'MSSQL',
 		options: {},
 		saveProfile: true,
@@ -216,6 +214,6 @@ suite('SQL ConnectionProfileInfo tests', () => {
 	});
 
 	test('an empty connection profile does not cause issues', () => {
-		assert.doesNotThrow(() => new ConnectionProfile(capabilitiesService, {} as IConnectionProfile));
+		assert.doesNotThrow(() => new ConnectionProfile(capabilitiesService, {} as azdata.IConnectionProfile));
 	});
 });

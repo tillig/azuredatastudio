@@ -6,12 +6,10 @@
 import { IConnectionManagementService, IConnectableInput, IConnectionCompletionOptions, IConnectionCallbacks, IConnectionResult, INewConnectionParams }
 	from 'sql/platform/connection/common/connectionManagement';
 import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 import * as azdata from 'azdata';
 import { Event, Emitter } from 'vs/base/common/event';
-import { isUndefinedOrNull } from 'vs/base/common/types';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 
 // Test stubs for commonly used objects
@@ -41,7 +39,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 
 	}
 
-	showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void> {
+	showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: azdata.IConnectionProfile, connectionResult?: IConnectionResult): Promise<void> {
 		return undefined;
 	}
 
@@ -141,25 +139,25 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return false;
 	}
 
-	isProfileConnected(connectionProfile: IConnectionProfile): boolean {
+	isProfileConnected(connectionProfile: azdata.IConnectionProfile): boolean {
 		return false;
 	}
 
-	isProfileConnecting(connectionProfile: IConnectionProfile): boolean {
+	isProfileConnecting(connectionProfile: azdata.IConnectionProfile): boolean {
 		return false;
 	}
 
-	findExistingConnection(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile {
+	findExistingConnection(connection: azdata.IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile {
 		return undefined;
 	}
 
-	connect(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {
+	connect(connection: azdata.IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {
 		return new Promise<IConnectionResult>((resolve, reject) => {
 			resolve({ connected: true, errorMessage: undefined, errorCode: undefined, callStack: undefined });
 		});
 	}
 
-	connectAndSaveProfile(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {
+	connectAndSaveProfile(connection: azdata.IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {
 		return new Promise<IConnectionResult>(() => true);
 	}
 
@@ -167,7 +165,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return new Promise<boolean>(() => true);
 	}
 
-	disconnect(connection: IConnectionProfile);
+	disconnect(connection: azdata.IConnectionProfile);
 	disconnect(uri: string);
 	disconnect(input: any): Promise<boolean> {
 		return new Promise<boolean>((resolve, reject) => {
@@ -175,7 +173,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		});
 	}
 
-	getConnectionProfile(fileUri: string): IConnectionProfile {
+	getConnectionProfile(fileUri: string): azdata.IConnectionProfile {
 		return undefined;
 	}
 
@@ -183,15 +181,15 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return undefined;
 	}
 
-	addSavedPassword(connectionProfile: IConnectionProfile): Promise<IConnectionProfile> {
-		return new Promise<IConnectionProfile>(() => connectionProfile);
+	addSavedPassword(connectionProfile: azdata.IConnectionProfile): Promise<azdata.IConnectionProfile> {
+		return new Promise<azdata.IConnectionProfile>(() => connectionProfile);
 	}
 
 	public listDatabases(connectionUri: string): Thenable<azdata.ListDatabasesResult> {
 		return Promise.resolve(undefined);
 	}
 
-	cancelConnection(connection: IConnectionProfile): Thenable<boolean> {
+	cancelConnection(connection: azdata.IConnectionProfile): Thenable<boolean> {
 		return undefined;
 	}
 
@@ -240,7 +238,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return [];
 	}
 
-	connectIfNotConnected(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection', saveConnection: boolean = false): Promise<string> {
+	connectIfNotConnected(connection: azdata.IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection', saveConnection: boolean = false): Promise<string> {
 		return undefined;
 	}
 
@@ -252,7 +250,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return undefined;
 	}
 
-	removeConnectionProfileCredentials(profile: IConnectionProfile): IConnectionProfile {
+	removeConnectionProfileCredentials(profile: azdata.IConnectionProfile): azdata.IConnectionProfile {
 		return undefined;
 	}
 
@@ -276,7 +274,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return undefined;
 	}
 
-	getConnectionProfileById(profileId: string): IConnectionProfile {
+	getConnectionProfileById(profileId: string): azdata.IConnectionProfile {
 		return undefined;
 	}
 

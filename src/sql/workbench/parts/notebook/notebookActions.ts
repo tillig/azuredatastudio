@@ -12,9 +12,9 @@ import { INotificationService, Severity, INotificationActions } from 'vs/platfor
 
 import { SelectBox, ISelectBoxOptionsWithLabel } from 'sql/base/browser/ui/selectBox/selectBox';
 import { INotebookModel } from 'sql/workbench/parts/notebook/models/modelInterfaces';
-import { CellType, CellTypes } from 'sql/workbench/parts/notebook/models/contracts';
+import { CellType } from 'sql/workbench/parts/notebook/models/contracts';
 import { NotebookComponent } from 'sql/workbench/parts/notebook/notebook.component';
-import { getErrorMessage, getServerFromFormattedAttachToName, getDatabaseFromFormattedAttachToName } from 'sql/workbench/parts/notebook/notebookUtils';
+import { getErrorMessage } from 'sql/workbench/parts/notebook/notebookUtils';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
@@ -365,7 +365,7 @@ export class AttachToDropdown extends SelectBox {
 
 	private updateAttachToDropdown(model: INotebookModel): void {
 		if (this.model.connectionProfile && this.model.connectionProfile.serverName) {
-			let connectionUri = generateUri(this.model.connectionProfile, 'notebook');
+			let connectionUri = generateUri(ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, this.model.connectionProfile), 'notebook');
 			this.model.notebookOptions.connectionService.connect(this.model.connectionProfile, connectionUri).then(result => {
 				if (result.connected) {
 					let connectionProfile = new ConnectionProfile(this._capabilitiesService, result.connectionProfile);

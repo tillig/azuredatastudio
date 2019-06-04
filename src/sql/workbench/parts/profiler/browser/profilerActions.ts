@@ -9,7 +9,7 @@ import { ProfilerInput } from 'sql/workbench/parts/profiler/browser/profilerInpu
 import { Task } from 'sql/platform/tasks/common/tasks';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { IConnectionManagementService, IConnectionCompletionOptions } from 'sql/platform/connection/common/connectionManagement';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 
 import { Action } from 'vs/base/common/actions';
 import * as nls from 'vs/nls';

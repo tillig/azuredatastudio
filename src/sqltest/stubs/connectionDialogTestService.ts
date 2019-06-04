@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { INewConnectionParams, IConnectionResult, IConnectionManagementService, IConnectionCompletionOptions } from 'sql/platform/connection/common/connectionManagement';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
+import { IConnectionProfile } from 'azdata';
 import { IConnectionDialogService } from 'sql/workbench/services/connection/common/connectionDialogService';
 
 export class ConnectionDialogTestService implements IConnectionDialogService {

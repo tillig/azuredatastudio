@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { ProviderConnectionInfo } from 'sql/platform/connection/common/providerConnectionInfo';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import * as azdata from 'azdata';
 import * as assert from 'assert';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
@@ -14,7 +13,7 @@ suite('SQL ProviderConnectionInfo tests', () => {
 	let msSQLCapabilities: any;
 	let capabilitiesService: CapabilitiesTestService;
 
-	let connectionProfile: IConnectionProfile = {
+	let connectionProfile: azdata.IConnectionProfile = {
 		connectionName: 'name',
 		serverName: 'new server',
 		databaseName: 'database',
@@ -24,8 +23,6 @@ suite('SQL ProviderConnectionInfo tests', () => {
 		savePassword: true,
 		groupFullName: 'g2/g2-2',
 		groupId: undefined,
-		getOptionsKey: undefined,
-		matches: undefined,
 		providerName: 'MSSQL',
 		options: undefined,
 		saveProfile: true,

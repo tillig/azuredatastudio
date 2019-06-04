@@ -3,13 +3,12 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { nb } from 'azdata';
+import { nb, IConnectionProfile } from 'azdata';
 
 import { localize } from 'vs/nls';
 import { IDefaultConnection, notebookConstants } from 'sql/workbench/parts/notebook/models/modelInterfaces';
 import { IConnectionManagementService } from 'sql/platform/connection/common/connectionManagement';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
 export class NotebookContexts {
 	private static MSSQL_PROVIDER = 'MSSQL';

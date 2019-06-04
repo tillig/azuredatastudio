@@ -5,7 +5,6 @@
 
 import * as azdata from 'azdata';
 import { IHandleFirewallRuleResult, IResourceProviderService } from 'sql/workbench/services/resourceProvider/common/resourceProviderService';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
 export class ResourceProviderStub implements IResourceProviderService {
 	_serviceBrand: any;
@@ -26,7 +25,7 @@ export class ResourceProviderStub implements IResourceProviderService {
 		return undefined;
 	}
 
-	showFirewallRuleDialog(connection: IConnectionProfile, ipAddress: string, resourceProviderId: string): Promise<boolean> {
+	showFirewallRuleDialog(connection: azdata.IConnectionProfile, ipAddress: string, resourceProviderId: string): Promise<boolean> {
 		return undefined;
 	}
 }

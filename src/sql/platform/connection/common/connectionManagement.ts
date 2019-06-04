@@ -8,7 +8,6 @@ import { Event } from 'vs/base/common/event';
 import * as azdata from 'azdata';
 import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 import { IServerGroupDialogCallbacks } from 'sql/platform/serverGroup/common/serverGroupController';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
@@ -51,13 +50,13 @@ export interface IConnectionResult {
 	errorCode: number;
 	callStack: string;
 	errorHandled?: boolean;
-	connectionProfile?: IConnectionProfile;
+	connectionProfile?: azdata.IConnectionProfile;
 }
 
 export interface IConnectionCallbacks {
 	onConnectStart(): void;
 	onConnectReject(error?: string): void;
-	onConnectSuccess(params: INewConnectionParams, profile: IConnectionProfile): void;
+	onConnectSuccess(params: INewConnectionParams, profile: azdata.IConnectionProfile): void;
 	onDisconnect(): void;
 	onConnectCanceled(): void;
 }
@@ -70,7 +69,7 @@ export interface IConnectionManagementService {
 	_serviceBrand: any;
 
 	// Event Emitters
-	onAddConnectionProfile: Event<IConnectionProfile>;
+	onAddConnectionProfile: Event<azdata.IConnectionProfile>;
 	onDeleteConnectionProfile: Event<void>;
 	onConnect: Event<IConnectionParams>;
 	onDisconnect: Event<IConnectionParams>;
@@ -80,7 +79,7 @@ export interface IConnectionManagementService {
 	/**
 	 * Opens the connection dialog to create new connection
 	 */
-	showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void>;
+	showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: azdata.IConnectionProfile, connectionResult?: IConnectionResult): Promise<void>;
 
 	/**
 	 * Opens the add server group dialog
@@ -95,25 +94,25 @@ export interface IConnectionManagementService {
 	/**
 	 * Load the password and opens a new connection
 	 */
-	connect(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
+	connect(connection: azdata.IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
 
 	/**
 	 * Opens a new connection and save the profile in settings
 	 */
-	connectAndSaveProfile(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
+	connectAndSaveProfile(connection: azdata.IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
 
 	/**
 	 * Finds existing connection for given profile and purpose is any exists.
 	 * The purpose is connection by default
 	 */
-	findExistingConnection(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile;
+	findExistingConnection(connection: azdata.IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection'): ConnectionProfile;
 
 	/**
 	 * If there's already a connection for given profile and purpose, returns the ownerUri for the connection
 	 * otherwise tries to make a connection and returns the owner uri when connection is complete
 	 * The purpose is connection by default
 	 */
-	connectIfNotConnected(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection', saveConnection?: boolean): Promise<string>;
+	connectIfNotConnected(connection: azdata.IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection', saveConnection?: boolean): Promise<string>;
 
 	/**
 	 * Adds the successful connection to MRU and send the connection error back to the connection handler for failed connections
@@ -130,7 +129,7 @@ export interface IConnectionManagementService {
 
 	clearRecentConnectionsList(): void;
 
-	clearRecentConnection(connectionProfile: IConnectionProfile): void;
+	clearRecentConnection(connectionProfile: azdata.IConnectionProfile): void;
 
 	getActiveConnections(providers?: string[]): ConnectionProfile[];
 
@@ -146,9 +145,9 @@ export interface IConnectionManagementService {
 
 	getAdvancedProperties(): azdata.ConnectionOption[];
 
-	getConnectionUri(connectionProfile: IConnectionProfile): string;
+	getConnectionUri(connectionProfile: azdata.IConnectionProfile): string;
 
-	getFormattedUri(uri: string, connectionProfile: IConnectionProfile): string;
+	getFormattedUri(uri: string, connectionProfile: azdata.IConnectionProfile): string;
 
 	getConnectionUriFromId(connectionId: string): string;
 
@@ -157,12 +156,12 @@ export interface IConnectionManagementService {
 	/**
 	 * Returns true if the connection profile is connected
 	 */
-	isProfileConnected(connectionProfile: IConnectionProfile): boolean;
+	isProfileConnected(connectionProfile: azdata.IConnectionProfile): boolean;
 
 	/**
 	 * Returns true if the connection profile is connecting
 	 */
-	isProfileConnecting(connectionProfile: IConnectionProfile): boolean;
+	isProfileConnecting(connectionProfile: azdata.IConnectionProfile): boolean;
 
 	isRecent(connectionProfile: ConnectionProfile): boolean;
 
@@ -170,11 +169,11 @@ export interface IConnectionManagementService {
 
 	disconnectEditor(owner: IConnectableInput, force?: boolean): Promise<boolean>;
 
-	disconnect(connection: IConnectionProfile): Promise<void>;
+	disconnect(connection: azdata.IConnectionProfile): Promise<void>;
 
 	disconnect(ownerUri: string): Promise<void>;
 
-	addSavedPassword(connectionProfile: IConnectionProfile): Promise<IConnectionProfile>;
+	addSavedPassword(connectionProfile: azdata.IConnectionProfile): Promise<azdata.IConnectionProfile>;
 
 	listDatabases(connectionUri: string): Thenable<azdata.ListDatabasesResult>;
 
@@ -187,7 +186,7 @@ export interface IConnectionManagementService {
 
 	editGroup(group: ConnectionProfileGroup): Promise<void>;
 
-	getConnectionProfile(fileUri: string): IConnectionProfile;
+	getConnectionProfile(fileUri: string): azdata.IConnectionProfile;
 
 	getConnectionInfo(fileUri: string): ConnectionManagementInfo;
 
@@ -196,7 +195,7 @@ export interface IConnectionManagementService {
 	/**
 	 * Cancels the connection
 	 */
-	cancelConnection(connection: IConnectionProfile): Thenable<boolean>;
+	cancelConnection(connection: azdata.IConnectionProfile): Thenable<boolean>;
 
 	/**
 	 * Changes the database for an active connection
@@ -208,7 +207,7 @@ export interface IConnectionManagementService {
 	 */
 	cancelEditorConnection(owner: IConnectableInput): Thenable<boolean>;
 
-	showDashboard(connection: IConnectionProfile): Thenable<boolean>;
+	showDashboard(connection: azdata.IConnectionProfile): Thenable<boolean>;
 
 	closeDashboard(uri: string): void;
 
@@ -216,7 +215,7 @@ export interface IConnectionManagementService {
 
 	hasRegisteredServers(): boolean;
 
-	canChangeConnectionConfig(profile: IConnectionProfile, newGroupID: string): boolean;
+	canChangeConnectionConfig(profile: azdata.IConnectionProfile, newGroupID: string): boolean;
 
 	getTabColorForUri(uri: string): string;
 
@@ -246,7 +245,7 @@ export interface IConnectionManagementService {
 	 * @param profile The connection profile to remove passwords from
 	 * @returns A copy of the connection profile with passwords removed
 	 */
-	removeConnectionProfileCredentials(profile: IConnectionProfile): IConnectionProfile;
+	removeConnectionProfileCredentials(profile: azdata.IConnectionProfile): azdata.IConnectionProfile;
 
 	/**
 	 * Get the credentials for a connected connection profile, as they would appear in the options dictionary
@@ -277,7 +276,7 @@ export interface IConnectionManagementService {
 	/**
 	 * Get connection profile by id
 	 */
-	getConnectionProfileById(profileId: string): IConnectionProfile;
+	getConnectionProfileById(profileId: string): azdata.IConnectionProfile;
 
 	getProviderProperties(providerName: string): ConnectionProviderProperties;
 
@@ -305,7 +304,7 @@ export interface IConnectableInput {
 	uri: string;
 	onConnectStart(): void;
 	onConnectReject(error?: string): void;
-	onConnectSuccess(params: INewConnectionParams, profile: IConnectionProfile): void;
+	onConnectSuccess(params: INewConnectionParams, profile: azdata.IConnectionProfile): void;
 	onDisconnect(): void;
 	onConnectCanceled(): void;
 }
@@ -335,5 +334,5 @@ export enum TaskStatus {
 
 export interface IConnectionParams {
 	connectionUri: string;
-	connectionProfile: IConnectionProfile;
+	connectionProfile: azdata.IConnectionProfile;
 }

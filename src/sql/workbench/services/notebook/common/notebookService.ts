@@ -11,7 +11,6 @@ import { URI } from 'vs/base/common/uri';
 import { IBootstrapParams } from 'sql/platform/bootstrap/node/bootstrapService';
 import { RenderMimeRegistry } from 'sql/workbench/parts/notebook/outputs/registry';
 import { ModelFactory } from 'sql/workbench/parts/notebook/models/modelFactory';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { NotebookInput } from 'sql/workbench/parts/notebook/notebookInput';
 import { ISingleNotebookEditOperation } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { ICellModel, INotebookModel, ILanguageMagic } from 'sql/workbench/parts/notebook/models/modelInterfaces';
@@ -110,7 +109,7 @@ export interface INotebookParams extends IBootstrapParams {
 	notebookUri: URI;
 	input: NotebookInput;
 	providerInfo: Promise<IProviderInfo>;
-	profile?: IConnectionProfile;
+	profile?: azdata.IConnectionProfile;
 	modelFactory?: ModelFactory;
 }
 

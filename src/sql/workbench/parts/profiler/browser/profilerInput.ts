@@ -6,14 +6,12 @@
 import { TableDataView } from 'sql/base/browser/ui/table/tableDataView';
 import { IProfilerSession, IProfilerService, ProfilerSessionID, IProfilerViewTemplate, ProfilerFilter } from 'sql/workbench/services/profiler/common/interfaces';
 import { ProfilerState } from 'sql/workbench/parts/profiler/common/profilerState';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
 import * as azdata from 'azdata';
 import * as nls from 'vs/nls';
 
 import { EditorInput, ConfirmResult } from 'vs/workbench/common/editor';
 import { IEditorModel } from 'vs/platform/editor/common/editor';
-import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { INotificationService } from 'vs/platform/notification/common/notification';
 import { Event, Emitter } from 'vs/base/common/event';
 import { generateUuid } from 'vs/base/common/uuid';
@@ -43,8 +41,7 @@ export class ProfilerInput extends EditorInput implements IProfilerSession {
 	private _filter: ProfilerFilter = { clauses: [] };
 
 	constructor(
-		public connection: IConnectionProfile,
-		@IInstantiationService private _instantiationService: IInstantiationService,
+		public connection: azdata.IConnectionProfile,
 		@IProfilerService private _profilerService: IProfilerService,
 		@INotificationService private _notificationService: INotificationService,
 		@IDialogService private _dialogService: IDialogService

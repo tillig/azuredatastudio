@@ -11,7 +11,6 @@ import {
 	IConnectionParams, IConnectionResult, RunQueryOnConnectionMode
 } from 'sql/platform/connection/common/connectionManagement';
 import { ConnectionStore } from 'sql/platform/connection/common/connectionStore';
-import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 import * as Utils from 'sql/platform/connection/common/utils';
 import * as Constants from 'sql/platform/connection/common/constants';
@@ -48,7 +47,6 @@ import { IQuickInputService } from 'vs/platform/quickinput/common/quickInput';
 import { IConnectionDialogService } from 'sql/workbench/services/connection/common/connectionDialogService';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { ILogService } from 'vs/platform/log/common/log';
-import * as interfaces from './interfaces';
 import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
 import { Memento } from 'vs/workbench/common/memento';
 
@@ -63,7 +61,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 	private _connectionStatusManager = new ConnectionStatusManager(this._capabilitiesService);
 
-	private _onAddConnectionProfile = new Emitter<IConnectionProfile>();
+	private _onAddConnectionProfile = new Emitter<azdata.IConnectionProfile>();
 	private _onDeleteConnectionProfile = new Emitter<void>();
 	private _onConnect = new Emitter<IConnectionParams>();
 	private _onDisconnect = new Emitter<IConnectionParams>();
@@ -128,7 +126,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	// Event Emitters
-	public get onAddConnectionProfile(): Event<IConnectionProfile> {
+	public get onAddConnectionProfile(): Event<azdata.IConnectionProfile> {
 		return this._onAddConnectionProfile.event;
 	}
 
@@ -182,7 +180,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * @param params Include the uri, type of connection
 	 * @param model the existing connection profile to create a new one from
 	 */
-	public showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void> {
+	public showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: azdata.IConnectionProfile, connectionResult?: IConnectionResult): Promise<void> {
 		let self = this;
 		return new Promise<void>((resolve, reject) => {
 			if (!params) {
@@ -232,7 +230,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * Load the password for the profile
 	 * @param connectionProfile Connection Profile
 	 */
-	public async addSavedPassword(connectionProfile: IConnectionProfile): Promise<IConnectionProfile> {
+	public async addSavedPassword(connectionProfile: azdata.IConnectionProfile): Promise<azdata.IConnectionProfile> {
 		await this.fillInAzureTokenIfNeeded(connectionProfile);
 		return this._connectionStore.addSavedPassword(connectionProfile).then(result => result.profile);
 	}
@@ -255,7 +253,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * @param owner of the connection. Can be the editors
 	 * @param options to use after the connection is complete
 	 */
-	private tryConnect(connection: IConnectionProfile, owner: IConnectableInput, options?: IConnectionCompletionOptions): Promise<IConnectionResult> {
+	private tryConnect(connection: azdata.IConnectionProfile, owner: IConnectableInput, options?: IConnectionCompletionOptions): Promise<IConnectionResult> {
 		let self = this;
 		return new Promise<IConnectionResult>((resolve, reject) => {
 			// Load the password if it's not already loaded
@@ -303,7 +301,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * otherwise does nothing
 	 */
 	private showConnectionDialogOnError(
-		connection: IConnectionProfile,
+		connection: azdata.IConnectionProfile,
 		owner: IConnectableInput,
 		connectionResult: IConnectionResult,
 		options?: IConnectionCompletionOptions): Promise<IConnectionResult> {
@@ -334,7 +332,8 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * @param options to be used after the connection is completed
 	 * @param callbacks to call after the connection is completed
 	 */
-	public connect(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {
+	public connect(iconnection: azdata.IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult> {
+		const connection = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnection);
 		if (!uri) {
 			uri = Utils.generateUri(connection);
 		}
@@ -363,8 +362,9 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * otherwise tries to make a connection and returns the owner uri when connection is complete
 	 * The purpose is connection by default
 	 */
-	public connectIfNotConnected(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection' | 'notebook', saveConnection: boolean = false): Promise<string> {
+	public connectIfNotConnected(iconnection: azdata.IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection' | 'notebook', saveConnection: boolean = false): Promise<string> {
 		return new Promise<string>((resolve, reject) => {
+			const connection = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnection);
 			let ownerUri: string = Utils.generateUri(connection, purpose);
 			if (this._connectionStatusManager.isConnected(ownerUri)) {
 				resolve(this._connectionStatusManager.getOriginalOwnerUri(ownerUri));
@@ -394,7 +394,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * This method doesn't load the password because it only gets called from the
 	 * connection dialog and password should be already in the profile
 	 */
-	public connectAndSaveProfile(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks):
+	public connectAndSaveProfile(connection: azdata.IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks):
 		Promise<IConnectionResult> {
 		if (!options) {
 			options = {
@@ -411,8 +411,9 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return this.connectWithOptions(connection, uri, options, callbacks);
 	}
 
-	private connectWithOptions(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks):
+	private connectWithOptions(iconnection: azdata.IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks):
 		Promise<IConnectionResult> {
+		const connection = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnection);
 		connection.options['groupId'] = connection.groupId;
 		connection.options['databaseDisplayName'] = connection.databaseName;
 
@@ -496,7 +497,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	private handleConnectionError(connection: IConnectionProfile, uri: string, options: IConnectionCompletionOptions, callbacks: IConnectionCallbacks, connectionResult: IConnectionResult) {
+	private handleConnectionError(connection: azdata.IConnectionProfile, uri: string, options: IConnectionCompletionOptions, callbacks: IConnectionCallbacks, connectionResult: IConnectionResult) {
 		return new Promise<IConnectionResult>((resolve, reject) => {
 			let connectionNotAcceptedError = nls.localize('connectionNotAcceptedError', 'Connection Not Accepted');
 			if (options.showFirewallRuleOnError && connectionResult.errorCode) {
@@ -526,7 +527,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	private handleFirewallRuleError(connection: IConnectionProfile, connectionResult: IConnectionResult): Promise<boolean> {
+	private handleFirewallRuleError(connection: azdata.IConnectionProfile, connectionResult: IConnectionResult): Promise<boolean> {
 		return new Promise<boolean>((resolve, reject) => {
 			this._resourceProviderService.handleFirewallRule(connectionResult.errorCode, connectionResult.errorMessage, connection.providerName).then(response => {
 				if (response.canHandleFirewallRule) {
@@ -560,7 +561,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		let iconProvider = this._iconProviders.get(connectionManagementInfo.providerId);
 		if (iconProvider) {
 			let serverInfo: azdata.ServerInfo = this.getServerInfo(connectionProfile.id);
-			let profile: interfaces.IConnectionProfile = connectionProfile.toIConnectionProfile();
+			let profile: azdata.IConnectionProfile = connectionProfile.toIConnectionProfile();
 			iconProvider.getConnectionIconId(profile, serverInfo).then(iconId => {
 				if (iconId && this._mementoObj && this._mementoContext) {
 					if (!this._mementoObj.CONNECTION_ICON_ID) {
@@ -582,11 +583,11 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return this._mementoObj.CONNECTION_ICON_ID[connectionId];
 	}
 
-	public showDashboard(connection: IConnectionProfile): Thenable<boolean> {
+	public showDashboard(connection: azdata.IConnectionProfile): Thenable<boolean> {
 		return this.showDashboardForConnectionManagementInfo(connection);
 	}
 
-	private showDashboardForConnectionManagementInfo(connectionProfile: IConnectionProfile): Thenable<boolean> {
+	private showDashboardForConnectionManagementInfo(connectionProfile: azdata.IConnectionProfile): Thenable<boolean> {
 		// if dashboard profile is already open, focus on that tab
 		if (!this.focusDashboard(connectionProfile)) {
 			let dashboardInput: DashboardInput = this._instantiationService ? this._instantiationService.createInstance(DashboardInput, connectionProfile) : undefined;
@@ -598,7 +599,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		}
 	}
 
-	private focusDashboard(profile: IConnectionProfile): boolean {
+	private focusDashboard(profile: azdata.IConnectionProfile): boolean {
 		let found: boolean = false;
 		let options = {
 			preserveFocus: false,
@@ -644,7 +645,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return this._connectionStore.clearRecentlyUsed();
 	}
 
-	public clearRecentConnection(connectionProfile: IConnectionProfile): void {
+	public clearRecentConnection(connectionProfile: azdata.IConnectionProfile): void {
 		this._connectionStore.removeRecentConnection(connectionProfile);
 	}
 
@@ -717,7 +718,8 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return false;
 	}
 
-	public getConnectionUri(connectionProfile: IConnectionProfile): string {
+	public getConnectionUri(iconnectionProfile: azdata.IConnectionProfile): string {
+		const connectionProfile = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnectionProfile);
 		return this._connectionStatusManager.getOriginalOwnerUri(Utils.generateUri(connectionProfile));
 	}
 
@@ -725,7 +727,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * Returns a formatted URI in case the database field is empty for the original
 	 * URI, which happens when the connected database is master or the default database
 	 */
-	public getFormattedUri(uri: string, connectionProfile: IConnectionProfile): string {
+	public getFormattedUri(uri: string, connectionProfile: azdata.IConnectionProfile): string {
 		if (this._connectionStatusManager.isDefaultTypeUri(uri)) {
 			return this.getConnectionUri(connectionProfile);
 		} else {
@@ -774,7 +776,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return defaultProvider && this._providers.has(defaultProvider) ? defaultProvider : undefined;
 	}
 
-	private async fillInAzureTokenIfNeeded(connection: IConnectionProfile): Promise<boolean> {
+	private async fillInAzureTokenIfNeeded(connection: azdata.IConnectionProfile): Promise<boolean> {
 		if (connection.authenticationType !== Constants.azureMFA || connection.options['azureAccountToken']) {
 			return true;
 		}
@@ -811,7 +813,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	// Request Senders
-	private async sendConnectRequest(connection: IConnectionProfile, uri: string): Promise<boolean> {
+	private async sendConnectRequest(connection: azdata.IConnectionProfile, uri: string): Promise<boolean> {
 		let connectionInfo = Object.assign({}, {
 			options: connection.options
 		});
@@ -869,7 +871,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	private saveToSettings(id: string, connection: IConnectionProfile): Promise<string> {
+	private saveToSettings(id: string, connection: azdata.IConnectionProfile): Promise<string> {
 
 		return new Promise<string>((resolve, reject) => {
 			this._connectionStore.saveProfile(connection).then(savedProfile => {
@@ -882,7 +884,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	/**
 	 * Add a connection to the active connections list.
 	 */
-	private tryAddActiveConnection(connectionManagementInfo: ConnectionManagementInfo, newConnection: IConnectionProfile, addToMru: boolean): void {
+	private tryAddActiveConnection(connectionManagementInfo: ConnectionManagementInfo, newConnection: azdata.IConnectionProfile, addToMru: boolean): void {
 		if (newConnection && addToMru) {
 			this._connectionStore.addRecentConnection(newConnection)
 				.then(() => {
@@ -907,7 +909,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	private addTelemetryForConnectionDisconnected(connection: IConnectionProfile): void {
+	private addTelemetryForConnectionDisconnected(connection: azdata.IConnectionProfile): void {
 		TelemetryUtils.addTelemetry(this._telemetryService, this.logService, TelemetryKeys.DatabaseDisconnected, {
 			provider: connection.providerName
 		});
@@ -936,11 +938,11 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	}
 
 	public onConnectionChangedNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo): void {
-		let profile: IConnectionProfile = this._connectionStatusManager.onConnectionChanged(changedConnInfo);
+		let profile: azdata.IConnectionProfile = this._connectionStatusManager.onConnectionChanged(changedConnInfo);
 		this._notifyConnectionChanged(profile, changedConnInfo.connectionUri);
 	}
 
-	private _notifyConnectionChanged(profile: IConnectionProfile, connectionUri: string): void {
+	private _notifyConnectionChanged(profile: azdata.IConnectionProfile, connectionUri: string): void {
 		if (profile) {
 			this._onConnectionChanged.fire(<IConnectionParams>{
 				connectionProfile: profile,
@@ -1022,7 +1024,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 */
 
 	// Connect an open URI to a connection profile
-	private createNewConnection(uri: string, connection: IConnectionProfile): Promise<IConnectionResult> {
+	private createNewConnection(uri: string, connection: azdata.IConnectionProfile): Promise<IConnectionResult> {
 		const self = this;
 
 		return new Promise<IConnectionResult>((resolve, reject) => {
@@ -1068,7 +1070,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	private doDisconnect(fileUri: string, connection?: IConnectionProfile): Promise<boolean> {
+	private doDisconnect(fileUri: string, connection?: azdata.IConnectionProfile): Promise<boolean> {
 		const self = this;
 
 		return new Promise<boolean>((resolve, reject) => {
@@ -1097,12 +1099,12 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	public disconnect(connection: IConnectionProfile): Promise<void>;
+	public disconnect(connection: azdata.IConnectionProfile): Promise<void>;
 	public disconnect(ownerUri: string): Promise<void>;
 	public disconnect(input: any): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			let uri: string;
-			let profile: IConnectionProfile;
+			let profile: azdata.IConnectionProfile;
 			if (typeof input === 'object') {
 				uri = Utils.generateUri(input);
 				profile = input;
@@ -1122,7 +1124,8 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		});
 	}
 
-	public cancelConnection(connection: IConnectionProfile): Thenable<boolean> {
+	public cancelConnection(iconnection: azdata.IConnectionProfile): Thenable<boolean> {
+		const connection = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnection);
 		let fileUri = Utils.generateUri(connection);
 		return this.cancelConnectionForUri(fileUri);
 	}
@@ -1166,7 +1169,8 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 	 * Finds existing connection for given profile and purpose is any exists.
 	 * The purpose is connection by default
 	 */
-	public findExistingConnection(connection: IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection' | 'notebook'): ConnectionProfile {
+	public findExistingConnection(iconnection: azdata.IConnectionProfile, purpose?: 'dashboard' | 'insights' | 'connection' | 'notebook'): ConnectionProfile {
+		const connection = ConnectionProfile.fromIConnectionProfile(this._capabilitiesService, iconnection);
 		let connectionUri = Utils.generateUri(connection, purpose);
 		let existingConnection = this._connectionStatusManager.findConnection(connectionUri);
 		if (existingConnection && this._connectionStatusManager.isConnected(connectionUri)) {
@@ -1176,12 +1180,12 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		}
 	}
 
-	public isProfileConnected(connectionProfile: IConnectionProfile): boolean {
+	public isProfileConnected(connectionProfile: azdata.IConnectionProfile): boolean {
 		let connectionManagement = this._connectionStatusManager.findConnectionProfile(connectionProfile);
 		return connectionManagement && !connectionManagement.connecting;
 	}
 
-	public isProfileConnecting(connectionProfile: IConnectionProfile): boolean {
+	public isProfileConnecting(connectionProfile: azdata.IConnectionProfile): boolean {
 		let connectionManagement = this._connectionStatusManager.findConnectionProfile(connectionProfile);
 		return connectionManagement && connectionManagement.connecting;
 	}
@@ -1190,7 +1194,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return this._connectionStatusManager.isConnecting(fileUri);
 	}
 
-	public getConnectionProfile(fileUri: string): IConnectionProfile {
+	public getConnectionProfile(fileUri: string): azdata.IConnectionProfile {
 		return this._connectionStatusManager.isConnected(fileUri) ? this._connectionStatusManager.getConnectionProfile(fileUri) : undefined;
 	}
 
@@ -1310,7 +1314,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return Promise.resolve(undefined);
 	}
 
-	private _notifyDisconnected(connectionProfile: IConnectionProfile, connectionUri: string): void {
+	private _notifyDisconnected(connectionProfile: azdata.IConnectionProfile, connectionUri: string): void {
 		this._onDisconnect.fire(<IConnectionParams>{
 			connectionUri: connectionUri,
 			connectionProfile: connectionProfile
@@ -1347,7 +1351,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return matchingGroup.color;
 	}
 
-	public removeConnectionProfileCredentials(originalProfile: IConnectionProfile): IConnectionProfile {
+	public removeConnectionProfileCredentials(originalProfile: azdata.IConnectionProfile): azdata.IConnectionProfile {
 		return this._connectionStore.getProfileWithoutPassword(originalProfile);
 	}
 
@@ -1380,7 +1384,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 		return serverInfo;
 	}
 
-	public getConnectionProfileById(profileId: string): IConnectionProfile {
+	public getConnectionProfileById(profileId: string): azdata.IConnectionProfile {
 		let profile = this._connectionStatusManager.findConnectionByProfileId(profileId);
 		if (!profile) {
 			return undefined;
