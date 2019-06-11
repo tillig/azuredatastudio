@@ -5,8 +5,16 @@
 
 import { escape } from 'vs/base/common/strings';
 import { localize } from 'vs/nls';
+import product from 'vs/platform/product/node/product';
 
 export function used() {
+}
+
+function getResourceDeploymentLink(): string {
+	// only show the deploy sql link for insider build and dev environment for now
+	// tracking issue: https://github.com/microsoft/azuredatastudio/issues/5987
+	let isStable = product.quality === 'stable';
+	return isStable ? ' ' : `<li><a href="command:azdata.resource.deploy">${escape(localize('welcomePage.deploySQL', "Deploy SQL Server…"))}</a></li>`;
 }
 
 export default () => `
@@ -25,7 +33,7 @@ export default () => `
 						<li><a href="command:workbench.action.files.newUntitledFile">${escape(localize('welcomePage.newQuery', "New query"))}</a></li>
 						<li><a href="command:notebook.command.new">${escape(localize('welcomePage.newNotebook', "New notebook"))}</a></li>
 						<li class="mac-only"><a href="command:workbench.action.files.openLocalFileFolder">${escape(localize('welcomePage.openFileMac', "Open file"))}</a></li>
-						<li class="windows-only linux-only"><a href="command:workbench.action.files.openFile">${escape(localize('welcomePage.openFileLinuxPC', "Open file"))}</a></li>
+						<li class="windows-only linux-only"><a href="command:workbench.action.files.openFile">${escape(localize('welcomePage.openFileLinuxPC', "Open file"))}</a></li>${getResourceDeploymentLink()}
 					</ul>
 				</div>
 				<div class="section recent">
