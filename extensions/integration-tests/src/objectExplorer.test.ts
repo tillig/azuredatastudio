@@ -64,15 +64,8 @@ class ObjectExplorerTester {
 
 	@stressify({ dop: ObjectExplorerTester.ParallelCount })
 	async sqlDbContextMenuTest(): Promise<void> {
-		let server = await getAzureServer();
-		let expectedActions: string[];
-		// Properties comes from the admin-tool-ext-win extension which is for Windows only, so the item won't show up on non-Win32 platforms
-		if (process.platform === 'win32') {
-			expectedActions = ['Manage', 'New Query', 'New Notebook', 'Disconnect', 'Delete Connection', 'Refresh', 'Data-tier Application wizard', 'Launch Profiler', 'Properties'];
-		}
-		else {
-			expectedActions = ['Manage', 'New Query', 'New Notebook', 'Disconnect', 'Delete Connection', 'Refresh', 'Data-tier Application wizard', 'Launch Profiler'];
-		}
+		const server = await getAzureServer();
+		const expectedActions = ['Manage', 'New Query', 'New Notebook', 'Disconnect', 'Delete Connection', 'Refresh', 'Data-tier Application wizard', 'Launch Profiler'];
 		await this.verifyContextMenu(server, expectedActions);
 	}
 
@@ -80,6 +73,7 @@ class ObjectExplorerTester {
 	async standaloneContextMenuTest(): Promise<void> {
 		let server = await getStandaloneServer();
 		let expectedActions: string[] = [];
+		// Properties comes from the admin-tool-ext-win extension which is for Windows only, so the item won't show up on non-Win32 platforms
 		if (process.platform === 'win32') {
 			expectedActions = ['Manage', 'New Query', 'New Notebook', 'Backup', 'Restore', 'Refresh', 'Data-tier Application wizard', 'Schema Compare', 'Import wizard', 'Generate Scripts...', 'Properties'];
 		}
