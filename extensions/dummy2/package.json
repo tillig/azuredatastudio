@@ -1,0 +1,45 @@
+{
+	"name": "dummy2",
+	"displayName": "dummy2",
+	"description": "A sample extension",
+	"version": "0.0.1",
+	"publisher": "Microsoft",
+	"engines": {
+		"vscode": "*",
+		"azdata": "*"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"*",
+		"onCommand:extension.sayHello",
+		"onCommand:extension.showCurrentConnection"
+	],
+	"main": "./out/extension",
+	"contributes": {
+		"views": {
+			"explorer": [
+				{
+					"id": "SampleId",
+					"name": "Sample Explorer"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "extension.sayHello",
+				"title": "Hello World"
+			},
+			{
+				"command": "extension.showCurrentConnection",
+				"title": "Show Current Connection"
+			}
+		]
+	},
+	"devDependencies": {
+		"@types/node": "^12.0.8",
+		"typescript": "^3.5.1",
+		"vscode": "^1.1.34"
+	}
+}
