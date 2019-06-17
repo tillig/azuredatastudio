@@ -33,6 +33,7 @@ import { IAccountManagementService, AzureResource } from 'sql/platform/accounts/
 import { IServerGroupController, IServerGroupDialogCallbacks } from 'sql/platform/serverGroup/common/serverGroupController';
 
 import * as azdata from 'azdata';
+import * as vscode from 'vscode';
 
 import * as nls from 'vs/nls';
 import * as errors from 'vs/base/common/errors';
@@ -60,6 +61,7 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 	private _providers = new Map<string, { onReady: Thenable<azdata.ConnectionProvider>, properties: ConnectionProviderProperties }>();
 	private _iconProviders = new Map<string, azdata.IconProvider>();
+	private _sampleStrProviders = new Map<string, azdata.SampleStrProvider>();
 
 	private _uriToProvider: { [uri: string]: string; } = Object.create(null);
 
@@ -179,6 +181,10 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 
 	public registerIconProvider(providerId: string, iconProvider: azdata.IconProvider): void {
 		this._iconProviders.set(providerId, iconProvider);
+	}
+
+	public registerSampleStrProvider(providerId: string, sampleStrProvider: azdata.SampleStrProvider): void {
+		this._sampleStrProviders.set(providerId, sampleStrProvider);
 	}
 
 	/**
@@ -577,6 +583,11 @@ export class ConnectionManagementService extends Disposable implements IConnecti
 				}
 			});
 		}
+
+		let sampleStrProvider = this._sampleStrProviders.get(connectionManagementInfo.providerId);
+		sampleStrProvider.getSampleStr('Gene').then(sampleStr => {
+			console.log('===================>>>>>>>>>>>>>>> ' + sampleStr);
+		});
 	}
 
 	public getConnectionIconId(connectionId: string): string {

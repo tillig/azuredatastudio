@@ -33,6 +33,7 @@ import { MssqlObjectExplorerNodeProvider, mssqlOutputChannel } from './objectExp
 import { CmsService } from './cms/cmsService';
 import { registerSearchServerCommand } from './objectExplorerNodeProvider/command';
 import { MssqlIconProvider } from './iconProvider';
+import { MssqlSampleStrProvider } from './sampleProvider';
 
 const baseConfig = require('./config.json');
 const outputChannel = vscode.window.createOutputChannel(Constants.serviceName);
@@ -113,6 +114,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<MssqlE
 		azdata.dataprotocol.registerObjectExplorerNodeProvider(nodeProvider);
 		let iconProvider = new MssqlIconProvider();
 		azdata.dataprotocol.registerIconProvider(iconProvider);
+		let sampleStrProvider = new MssqlSampleStrProvider();
+		azdata.dataprotocol.registerSampleStrProvider(sampleStrProvider);
 		cmsService = new CmsService(appContext, languageClient);
 
 		activateSparkFeatures(appContext);

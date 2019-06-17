@@ -142,6 +142,12 @@ export class ExtHostDataProtocol extends ExtHostDataProtocolShape {
 		return rt;
 	}
 
+	$registerSampleStrProvider(provider: azdata.SampleStrProvider): vscode.Disposable {
+		let rt = this.registerProvider(provider, DataProviderType.SampleStrProvider);
+		this._proxy.$registerSampleStrProvider(provider.providerId, provider.handle);
+		return rt;
+	}
+
 	$registerProfilerProvider(provider: azdata.ProfilerProvider): vscode.Disposable {
 		let rt = this.registerProvider(provider, DataProviderType.ProfilerProvider);
 		this._proxy.$registerProfilerProvider(provider.providerId, provider.handle);
@@ -346,6 +352,10 @@ export class ExtHostDataProtocol extends ExtHostDataProtocolShape {
 
 	public $getConnectionIconId(handle: number, connection: azdata.IConnectionProfile, serverInfo: azdata.ServerInfo): Thenable<string> {
 		return this._resolveProvider<azdata.IconProvider>(handle).getConnectionIconId(connection, serverInfo);
+	}
+
+	public $getSampleStr(handle: number, str: string): Thenable<string> {
+		return this._resolveProvider<azdata.SampleStrProvider>(handle).getSampleStr(str);
 	}
 
 	// Metadata handlers

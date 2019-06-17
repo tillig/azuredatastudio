@@ -185,6 +185,8 @@ export interface IConnectionManagementService {
 
 	registerIconProvider(providerId: string, provider: azdata.IconProvider): void;
 
+	registerSampleStrProvider(providerId: string, provider: azdata.SampleStrProvider): void;
+
 	editGroup(group: ConnectionProfileGroup): Promise<void>;
 
 	getConnectionProfile(fileUri: string): IConnectionProfile;

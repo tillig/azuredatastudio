@@ -295,7 +295,8 @@ export enum DataProviderType {
 	DacFxServicesProvider = 'DacFxServicesProvider',
 	SchemaCompareServicesProvider = 'SchemaCompareServicesProvider',
 	ObjectExplorerNodeProvider = 'ObjectExplorerNodeProvider',
-	IconProvider = 'IconProvider'
+	IconProvider = 'IconProvider',
+	SampleStrProvider = 'SampleStrProvider'
 }
 
 export enum DeclarativeDataType {

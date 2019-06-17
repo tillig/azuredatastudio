@@ -28,6 +28,8 @@ declare module 'azdata' {
 
 		export function registerIconProvider(provider: IconProvider): vscode.Disposable;
 
+		export function registerSampleStrProvider(provider: SampleStrProvider): vscode.Disposable;
+
 		export function registerTaskServicesProvider(provider: TaskServicesProvider): vscode.Disposable;
 
 		export function registerFileBrowserProvider(provider: FileBrowserProvider): vscode.Disposable;
@@ -1237,6 +1239,10 @@ declare module 'azdata' {
 
 	export interface IconProvider extends DataProvider {
 		getConnectionIconId(connection: IConnectionProfile, serverInfo: ServerInfo): Thenable<string>;
+	}
+
+	export interface SampleStrProvider extends DataProvider {
+		getSampleStr(str: string): Thenable<string>;
 	}
 
 	// Admin Services interfaces  -----------------------------------------------------------------------
@@ -4018,7 +4024,8 @@ declare module 'azdata' {
 		DacFxServicesProvider = 'DacFxServicesProvider',
 		SchemaCompareServicesProvider = 'SchemaCompareServicesProvider',
 		ObjectExplorerNodeProvider = 'ObjectExplorerNodeProvider',
-		IconProvider = 'IconProvider'
+		IconProvider = 'IconProvider',
+		SampleStrProvider = 'SampleStrProvider'
 	}
 
 	export namespace dataprotocol {

@@ -1599,7 +1599,8 @@ declare module 'sqlops' {
 		DacFxServicesProvider = 'DacFxServicesProvider',
 		SchemaCompareServicesProvider = 'SchemaCompareServicesProvider',
 		ObjectExplorerNodeProvider = 'ObjectExplorerNodeProvider',
-		IconProvider = 'IconProvider'
+		IconProvider = 'IconProvider',
+		SampleStrProvider = 'SampleStrProvider'
 	}
 
 	export namespace dataprotocol {

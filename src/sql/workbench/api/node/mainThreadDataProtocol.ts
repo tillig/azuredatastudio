@@ -291,6 +291,16 @@ export class MainThreadDataProtocol implements MainThreadDataProtocolShape {
 		return undefined;
 	}
 
+	public $registerSampleStrProvider(providerId: string, handle: number): Promise<any> {
+		const self = this;
+		this._connectionManagementService.registerSampleStrProvider(providerId, <azdata.SampleStrProvider>{
+			getSampleStr(str: string): Thenable<string> {
+				return self._proxy.$getSampleStr(handle, str);
+			}
+		});
+		return undefined;
+	}
+
 	public $registerTaskServicesProvider(providerId: string, handle: number): Promise<any> {
 		const self = this;
 		this._taskService.registerProvider(providerId, <azdata.TaskServicesProvider>{

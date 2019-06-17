@@ -41,6 +41,10 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 
 	}
 
+	registerSampleStrProvider(providerId: string, provider: azdata.SampleStrProvider): void {
+
+	}
+
 	showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void> {
 		return undefined;
 	}
