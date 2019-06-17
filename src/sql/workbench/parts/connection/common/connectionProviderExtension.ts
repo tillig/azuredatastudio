@@ -68,6 +68,47 @@ const ConnectionProviderContrib: IJSONSchema = {
 			type: 'string',
 			description: localize('schema.displayName', "Display Name for the provider")
 		},
+		sampleProp: {
+			description: localize('schema.sampleProp', 'sampleProp'),
+			oneOf: [
+				{
+					type: 'array',
+					items: {
+						type: 'object',
+						properties: {
+							id: {
+								type: 'string',
+							},
+							value: {
+								type: 'object',
+								properties: {
+									temp1: {
+										type: 'string',
+									},
+									temp2: {
+										type: 'string',
+									}
+								}
+							}
+						}
+					}
+				},
+				{
+					type: 'object',
+					properties: {
+						temp1: {
+							type: 'string',
+						},
+						temp2: {
+							type: 'string',
+						}
+					}
+				},
+				{
+					type: 'string'
+				}
+			]
+		},
 		iconPath: {
 			description: localize('schema.iconPath', 'Icon path for the server type'),
 			oneOf: [
@@ -166,6 +207,7 @@ ExtensionsRegistry.registerExtensionPoint<ConnectionProviderProperties | Connect
 
 	for (let extension of extensions) {
 		const { value } = extension;
+		let lookup = value;
 		resolveIconPath(extension);
 		if (Array.isArray<ConnectionProviderProperties>(value)) {
 			for (let command of value) {

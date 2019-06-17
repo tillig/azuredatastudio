@@ -443,6 +443,22 @@
             "dark": "resources/dark/sql_bigdata_cluster_inverse.svg"
           }
         }
+	  ],
+	  "sampleProp": [
+        {
+          "id": "id1",
+          "value": {
+            "temp1": "id1_temp1",
+            "temp2": "id1_temp2"
+          }
+        },
+        {
+          "id": "id2",
+          "value": {
+            "temp1": "id2_temp1",
+            "temp2": "id2_temp2"
+          }
+        }
       ],
       "connectionOptions": [
         {

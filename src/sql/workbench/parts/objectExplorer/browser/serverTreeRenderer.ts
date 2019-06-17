@@ -209,7 +209,27 @@ export class ServerTreeRenderer implements IRenderer {
 		badgeRenderer.addBadge(element, badgeToAdd);
 	}
 
+	private getConnProp(connection: ConnectionProfile): string {
+		let providerProperties = this._connectionManagementService.getProviderProperties(connection.providerName);
+		let result: string = undefined;
+		let sampleProp: string | { temp1: string, temp2: string } | { id: string, value: { temp1: string, temp2: string } }[] = providerProperties['sampleProp'];
+		if (Array.isArray(sampleProp)) {
+			for (const e of sampleProp) {
+				if (!e.id || e.id === 'id1') {
+					result = e.value.temp1;
+					break;
+				}
+			}
+		} else if (sampleProp['temp1']) {
+			result = sampleProp['temp1'];
+		} else {
+			result = sampleProp as string;
+		}
+		return result;
+	}
+
 	private renderConnection(connection: ConnectionProfile, templateData: IConnectionTemplateData): void {
+		let temp = this.getConnProp(connection);
 		if (!this._isCompact) {
 			let iconPath: IconPath = this.getIconPath(connection);
 			if (this._connectionManagementService.isConnected(undefined, connection)) {
