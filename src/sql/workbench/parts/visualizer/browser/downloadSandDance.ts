@@ -12,7 +12,7 @@ export class DownloadSandDance {
 	) {
 
 		//  if sanddance is installed {
-			// return;
+		// return;
 		// }
 
 		const downloadSandDanceNotice = localize('downloadSandDance.notice', "The SandDance extension is required to use this feature. Would you like to download the SandDance extension?");
