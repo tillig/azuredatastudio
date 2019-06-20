@@ -118,10 +118,12 @@ export class RunQueryAction extends QueryTaskbarAction {
 			if (this.isConnected(this.editor)) {
 				// If we are already connected, run the query
 				this.runQuery(this.editor);
+				console.log('is connected! ----------------------------------------');
 			} else {
 				// If we are not already connected, prompt for connection and run the query if the
 				// connection succeeds. "runQueryOnCompletion=true" will cause the query to run after connection
 				this.connectEditor(this.editor, RunQueryOnConnectionMode.executeQuery, this.editor.getSelection());
+				console.log('is not connected! -----------------------------------------');
 			}
 		}
 		return Promise.resolve(null);
