@@ -28,6 +28,8 @@ import { SelectBox } from 'sql/base/browser/ui/selectBox/selectBox';
 import { attachEditableDropdownStyler, attachSelectBoxStyler } from 'sql/platform/theme/common/styler';
 import { Dropdown } from 'sql/base/parts/editableDropdown/browser/dropdown';
 
+import { localize } from 'vs/nls';
+
 /**
  * Action class that query-based Actions will extend. This base class automatically handles activating and
  * deactivating the button when a SQL file is opened.
@@ -103,25 +105,30 @@ export class RunQueryAction extends QueryTaskbarAction {
 
 	public static EnabledClass = 'start';
 	public static ID = 'runQueryAction';
+	notificationService: INotificationService;
 
 	constructor(
 		editor: QueryEditor,
 		@IQueryModelService protected readonly queryModelService: IQueryModelService,
-		@IConnectionManagementService connectionManagementService: IConnectionManagementService
+		@IConnectionManagementService connectionManagementService: IConnectionManagementService,
+		@INotificationService notificationService: INotificationService
 	) {
 		super(connectionManagementService, editor, RunQueryAction.ID, RunQueryAction.EnabledClass);
 		this.label = nls.localize('runQueryLabel', 'Run');
+		this.notificationService = notificationService;
 	}
 
 	public run(): Promise<void> {
 		if (!this.editor.isSelectionEmpty()) {
 			if (this.isConnected(this.editor)) {
 				// If we are already connected, run the query
+				this.downloadSandDance();
 				this.runQuery(this.editor);
 				console.log('is connected! ----------------------------------------');
 			} else {
 				// If we are not already connected, prompt for connection and run the query if the
 				// connection succeeds. "runQueryOnCompletion=true" will cause the query to run after connection
+				this.downloadSandDance();
 				this.connectEditor(this.editor, RunQueryOnConnectionMode.executeQuery, this.editor.getSelection());
 				console.log('is not connected! -----------------------------------------');
 			}
@@ -166,6 +173,39 @@ export class RunQueryAction extends QueryTaskbarAction {
 		return selection.startLine === selection.endLine
 			&& selection.startColumn === selection.endColumn;
 	}
+
+	private downloadSandDance(): void {
+
+		const downloadSandDanceNotice = localize('downloadSandDance.notice', "Would you like to visualize your data? The new visualizer feature can be activated by downloading the SandDance extension.");
+		this.notificationService.prompt(
+			Severity.Info,
+			downloadSandDanceNotice,
+			[{
+				label: localize('downloadSandDanceNotice.yes', "Download"),
+				run: () => {
+					// vscode.extensions.getExtension(name/id)
+
+					// configurationService.updateValue('workbench.enablePreviewFeatures', true);
+					// storageService.store(DownloadSandDance.ENABLE_PREVIEW_FEATURES_SHOWN, true, StorageScope.GLOBAL);
+				}
+			}, {
+				label: localize('downloadSandDanceNotice.no', "Dismiss"),
+				run: () => {
+					// Error Message : "You cannot use this feature without downloading the SandDance extension."
+
+					// configuration1Service.updateValue('workbench.enablePreviewFeatures', false);
+				}
+			}, {
+				label: localize('downloadSandDanceNotice.never', "Don't ask again"),
+				run: () => {
+					// configurationService.updateValue('workbench.enablePreviewFeatures', false);
+					// storageService.store(DownloadSandDance.ENABLE_PREVIEW_FEATURES_SHOWN, true, StorageScope.GLOBAL);
+				},
+				//isSecondary: true
+			}]
+		);
+	}
+
 }
 
 /**
@@ -640,5 +680,4 @@ export class ListDatabasesActionItem implements IActionViewItem {
 	public get currentDatabaseName(): string {
 		return this._currentDatabaseName;
 	}
-
 }

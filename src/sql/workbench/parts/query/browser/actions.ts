@@ -223,7 +223,6 @@ export class SandDanceDataAction extends Action {
 	}
 
 	public run(context: IGridActionContext): Promise<boolean> {
-		let DownloadSandDance();
 		const activeEditor = this.editorService.activeControl as QueryEditor;
 		activeEditor.sandDance({ batchId: context.batchId, resultId: context.resultId });
 		return Promise.resolve(true);
