@@ -449,7 +449,7 @@ import 'sql/workbench/parts/dataExplorer/browser/dataExplorerViewlet';
 import 'sql/workbench/parts/dataExplorer/browser/dataExplorerExtensionPoint';
 import 'sql/workbench/parts/dataExplorer/electron-browser/nodeActions.contribution';
 
-import 'sql/platform/telemetry/telemetry.contribution';
+import 'sql/workbench/parts/telemetry/common/telemetry.contribution';
 import 'sql/workbench/api/node/sqlExtHost.contribution';
 import 'sql/workbench/parts/connection/browser/connection.contribution';
 import 'sql/workbench/parts/query/browser/query.contribution';

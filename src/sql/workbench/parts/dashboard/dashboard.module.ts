@@ -20,8 +20,8 @@ import { Registry } from 'vs/platform/registry/common/platform';
 
 /* Telemetry */
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-import * as TelemetryUtils from 'sql/platform/telemetry/telemetryUtilities';
-import * as TelemetryKeys from 'sql/platform/telemetry/telemetryKeys';
+import * as TelemetryUtils from 'sql/platform/telemetry/common/telemetryUtilities';
+import * as TelemetryKeys from 'sql/platform/telemetry/common/telemetryKeys';
 
 /* Services */
 import { BreadcrumbService } from 'sql/workbench/parts/dashboard/services/breadcrumb.service';
