@@ -55,6 +55,7 @@
 				"target": "**/{vs,sql}/base/test/common/**",
 				"restrictions": [
 					"assert",
+					"typemoq",
 					"vs/nls",
 					"**/{vs,sql}/base/common/**",
 					"**/{vs,sql}/base/test/common/**"
@@ -83,6 +84,7 @@
 				"target": "**/{vs,sql}/base/test/browser/**",
 				"restrictions": [
 					"assert",
+					"typemoq",
 					"vs/nls",
 					"**/{vs,sql}/base/{common,browser}/**",
 					"**/{vs,sql}/base/test/{common,browser}/**"
@@ -137,6 +139,86 @@
 					"*", // node modules
 					"@angular/*", // angular
 					"rxjs/*" // rxjs
+				]
+			},
+			{
+				"target": "**/{vs,sql}/platform/*/common/**",
+				"restrictions": [
+					"vs/nls",
+					"**/{vs,sql}/base/common/**",
+					"**/{vs,sql}/base/parts/*/common/**",
+					"**/{vs,sql}/platform/*/common/**"
+				]
+			},
+			{
+				"target": "**/{vs,sql}/platform/*/test/common/**",
+				"restrictions": [
+					"assert",
+					"sinon",
+					"typemoq",
+					"vs/nls",
+					"**/{vs,sql}/base/common/**",
+					"**/{vs,sql}/platform/*/common/**",
+					"**/{vs,sql}/platform/*/test/common/**"
+				]
+			},
+			{
+				"target": "**/{vs,sql}/platform/*/browser/**",
+				"restrictions": [
+					"vs/nls",
+					"vs/css!./**/*",
+					"**/{vs,sql}/base/{common,browser}/**",
+					"**/{vs,sql}/base/parts/*/{common,browser}/**",
+					"**/{vs,sql}/platform/*/{common,browser}/**"
+				]
+			},
+			{
+				"target": "**/{vs,sql}/platform/*/node/**",
+				"restrictions": [
+					"vs/nls",
+					"**/{vs,sql}/base/{common,browser,node}/**",
+					"**/{vs,sql}/base/parts/*/{common,browser,node}/**",
+					"**/{vs,sql}/platform/*/{common,browser,node}/**",
+					"*", // node modules
+					"@angular/*", // angular
+					"rxjs/*" // rxjs
+				]
+			},
+			{
+				"target": "**/{vs,sql}/platform/*/electron-browser/**",
+				"restrictions": [
+					"vs/nls",
+					"vs/css!./**/*",
+					"**/{vs,sql}/base/{common,browser,node}/**",
+					"**/{vs,sql}/base/parts/*/{common,browser,node,electron-browser}/**",
+					"**/{vs,sql}/platform/*/{common,browser,node,electron-browser}/**",
+					"*", // node modules
+					"@angular/*", // angular
+					"rxjs/*" // rxjs
+				]
+			},
+			{
+				"target": "**/{vs,sql}/platform/*/electron-main/**",
+				"restrictions": [
+					"vs/nls",
+					"**/{vs,sql}/base/{common,browser,node}/**",
+					"**/{vs,sql}/base/parts/*/{common,browser,node,electron-browser}/**",
+					"**/{vs,sql}/platform/*/{common,browser,node,electron-main}/**",
+					"*", // node modules
+					"@angular/*", // angular
+					"rxjs/*" // rxjs
+				]
+			},
+			{
+				"target": "**/{vs,sql}/platform/*/test/browser/**",
+				"restrictions": [
+					"assert",
+					"sinon",
+					"typemoq",
+					"vs/nls",
+					"**/{vs,sql}/base/{common,browser}/**",
+					"**/{vs,sql}/platform/*/{common,browser}/**",
+					"**/{vs,sql}/platform/*/test/{common,browser}/**"
 				]
 			}
 		],

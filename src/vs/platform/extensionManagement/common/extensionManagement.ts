@@ -23,6 +23,16 @@ export interface IGalleryExtensionProperties {
 	azDataEngine?: string;
 	localizedLanguages?: string[];
 }
+// {{SQL CARBON EDIT}}
+export const ExtensionsPolicyKey = 'extensions.extensionsPolicy';
+
+// {{SQL CARBON EDIT}}
+export enum ExtensionsPolicy {
+	allowAll = 'allowAll',
+	allowNone = 'allowNone',
+	allowMicrosoft = 'allowMicrosoft'
+}
+// {{SQL CARBON EDIT}} - End
 
 export interface IGalleryExtensionAsset {
 	uri: string;

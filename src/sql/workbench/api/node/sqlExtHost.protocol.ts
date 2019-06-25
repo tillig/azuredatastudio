@@ -26,6 +26,7 @@ import { EditorViewColumn } from 'vs/workbench/api/common/shared/editor';
 import { IUndoStopOptions } from 'vs/workbench/api/common/extHost.protocol';
 import { IExtensionDescription } from 'vs/platform/extensions/common/extensions';
 import { IQueryEvent } from 'sql/platform/query/common/queryModel';
+import { Credential } from 'sql/platform/credentials/common/credentialsService';
 
 export abstract class ExtHostAccountManagementShape {
 	$autoOAuthCancelled(handle: number): Thenable<void> { throw ni(); }
@@ -517,7 +518,7 @@ export abstract class ExtHostResourceProviderShape {
 export abstract class ExtHostCredentialManagementShape {
 	$saveCredential(credentialId: string, password: string): Thenable<boolean> { throw ni(); }
 
-	$readCredential(credentialId: string): Thenable<azdata.Credential> { throw ni(); }
+	$readCredential(credentialId: string): Thenable<Credential> { throw ni(); }
 
 	$deleteCredential(credentialId: string): Thenable<boolean> { throw ni(); }
 }

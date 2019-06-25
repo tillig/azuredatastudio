@@ -18,6 +18,7 @@ import { deepClone, deepFreeze } from 'vs/base/common/objects';
 import { ConfigurationTarget } from 'vs/platform/configuration/common/configuration';
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 import { mssqlProviderName } from 'sql/platform/connection/common/constants';
+import { Credential } from 'sql/platform/credentials/common/credentialsService';
 
 suite('ConnectionStore', () => {
 	let defaultNamedProfile: IConnectionProfile = deepFreeze({
@@ -223,7 +224,7 @@ suite('ConnectionStore', () => {
 		});
 		const connectionProfile = new ConnectionProfile(capabilitiesService, defaultNamedProfile);
 
-		let recentCredential: azdata.Credential;
+		let recentCredential: Credential;
 		credentialsService.onCredential(e => recentCredential = e);
 
 		await connectionStore.addRecentConnection(connectionProfile);

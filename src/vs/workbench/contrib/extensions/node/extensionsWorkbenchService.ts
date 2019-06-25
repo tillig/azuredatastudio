@@ -12,18 +12,17 @@ import { isPromiseCanceledError } from 'vs/base/common/errors';
 import { IDisposable, dispose, Disposable } from 'vs/base/common/lifecycle';
 import { IPager, mapPager, singlePagePager } from 'vs/base/common/paging';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
-// {{SQL CARBON EDIT}}
 import {
 	IExtensionManagementService, IExtensionGalleryService, ILocalExtension, IGalleryExtension, IQueryOptions,
-	InstallExtensionEvent, DidInstallExtensionEvent, DidUninstallExtensionEvent, IExtensionEnablementService, IExtensionIdentifier, EnablementState, IExtensionManagementServerService, IExtensionManagementServer, INSTALL_ERROR_INCOMPATIBLE
-} from 'vs/platform/extensionManagement/common/extensionManagement';
+	InstallExtensionEvent, DidInstallExtensionEvent, DidUninstallExtensionEvent, IExtensionEnablementService, IExtensionIdentifier, EnablementState, IExtensionManagementServerService, IExtensionManagementServer, INSTALL_ERROR_INCOMPATIBLE, ExtensionsPolicyKey, ExtensionsPolicy
+} from 'vs/platform/extensionManagement/common/extensionManagement'; // {{SQL CARBON EDIT}}
 import { getGalleryExtensionTelemetryData, getLocalExtensionTelemetryData, areSameExtensions, getMaliciousExtensionsSet, groupByExtension } from 'vs/platform/extensionManagement/common/extensionManagementUtil';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
 import { IWindowService } from 'vs/platform/windows/common/windows';
 import Severity from 'vs/base/common/severity';
 import { URI } from 'vs/base/common/uri';
-import { IExtension, ExtensionState, IExtensionsWorkbenchService, AutoUpdateConfigurationKey, AutoCheckUpdatesConfigurationKey, ExtensionsPolicyKey, ExtensionsPolicy } from 'vs/workbench/contrib/extensions/common/extensions';
+import { IExtension, ExtensionState, IExtensionsWorkbenchService, AutoUpdateConfigurationKey, AutoCheckUpdatesConfigurationKey } from 'vs/workbench/contrib/extensions/common/extensions';
 import { IEditorService, SIDE_GROUP, ACTIVE_GROUP } from 'vs/workbench/services/editor/common/editorService';
 import { IURLService, IURLHandler } from 'vs/platform/url/common/url';
 import { ExtensionsInput } from 'vs/workbench/contrib/extensions/common/extensionsInput';
@@ -751,7 +750,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 
 	install(extension: string | IExtension): Promise<IExtension> {
 		// {{SQL CARBON EDIT}}
-		let extensionPolicy = this.configurationService.getValue<string>(ExtensionsPolicyKey);
+		const extensionPolicy = this.configurationService.getValue<string>(ExtensionsPolicyKey);
 
 		if (typeof extension === 'string') {
 			return this.installWithProgress(async () => {

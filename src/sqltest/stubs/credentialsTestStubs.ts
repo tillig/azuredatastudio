@@ -4,13 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as azdata from 'azdata';
-import { CredentialManagementEvents, ICredentialsService } from 'sql/platform/credentials/common/credentialsService';
+import { CredentialManagementEvents, ICredentialsService, Credential } from 'sql/platform/credentials/common/credentialsService';
 import { IDisposable } from 'vs/base/common/lifecycle';
 
 export class CredentialsTestProvider implements azdata.CredentialProvider {
 	handle: number;
 
-	public storedCredentials: { [K: string]: azdata.Credential } = {};
+	public storedCredentials: { [K: string]: Credential } = {};
 
 	saveCredential(credentialId: string, password: string): Thenable<boolean> {
 		this.storedCredentials[credentialId] = {
@@ -20,7 +20,7 @@ export class CredentialsTestProvider implements azdata.CredentialProvider {
 		return Promise.resolve(true);
 	}
 
-	readCredential(credentialId: string): Thenable<azdata.Credential> {
+	readCredential(credentialId: string): Thenable<Credential> {
 		return Promise.resolve(this.storedCredentials[credentialId]);
 	}
 
@@ -38,7 +38,7 @@ export class CredentialsTestService implements ICredentialsService {
 		return undefined;
 	}
 
-	readCredential(credentialId: string): Promise<azdata.Credential> {
+	readCredential(credentialId: string): Promise<Credential> {
 		return undefined;
 	}
 

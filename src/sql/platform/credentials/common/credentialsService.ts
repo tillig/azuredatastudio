@@ -5,15 +5,26 @@
 
 import { IDisposable, dispose } from 'vs/base/common/lifecycle';
 import { createDecorator } from 'vs/platform/instantiation/common/instantiation';
-import * as azdata from 'azdata';
 import { Deferred } from 'sql/base/common/promise';
 
 export const SERVICE_ID = 'credentialsService';
 
+export interface Credential {
+	/**
+	 * Unique ID identifying the credential
+	 */
+	credentialId: string;
+
+	/**
+	 * password
+	 */
+	password: string;
+}
+
 export interface CredentialManagementEvents {
 	onSaveCredential(credentialId: string, password: string): Thenable<boolean>;
 
-	onReadCredential(credentialId: string): Thenable<azdata.Credential>;
+	onReadCredential(credentialId: string): Thenable<Credential>;
 
 	onDeleteCredential(credentialId: string): Thenable<boolean>;
 }
@@ -25,7 +36,7 @@ export interface ICredentialsService {
 
 	saveCredential(credentialId: string, password: string): Promise<boolean>;
 
-	readCredential(credentialId: string): Promise<azdata.Credential>;
+	readCredential(credentialId: string): Promise<Credential>;
 
 	deleteCredential(credentialId: string): Promise<boolean>;
 
@@ -64,7 +75,7 @@ export class CredentialsService implements ICredentialsService {
 		return this._onServerEventsReady.promise.then(() => this._serverEvents[this._lastHandle].onSaveCredential(credentialId, password));
 	}
 
-	public readCredential(credentialId: string): Promise<azdata.Credential> {
+	public readCredential(credentialId: string): Promise<Credential> {
 		return this._onServerEventsReady.promise.then(() => this._serverEvents[this._lastHandle].onReadCredential(credentialId));
 	}
 

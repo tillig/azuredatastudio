@@ -3,8 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ICredentialsService, CredentialManagementEvents } from 'sql/platform/credentials/common/credentialsService';
-import { Credential } from 'azdata';
+import { ICredentialsService, CredentialManagementEvents, Credential } from 'sql/platform/credentials/common/credentialsService';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { Emitter } from 'vs/base/common/event';
 

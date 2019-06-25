@@ -11,8 +11,8 @@ import { match } from 'vs/base/common/glob';
 import * as json from 'vs/base/common/json';
 import {
 	IExtensionManagementService, IExtensionGalleryService, IExtensionTipsService, ExtensionRecommendationReason, EXTENSION_IDENTIFIER_PATTERN,
-	IExtensionsConfigContent, RecommendationChangeNotification, IExtensionRecommendation, ExtensionRecommendationSource, InstallOperation
-} from 'vs/platform/extensionManagement/common/extensionManagement';
+	IExtensionsConfigContent, RecommendationChangeNotification, IExtensionRecommendation, ExtensionRecommendationSource, InstallOperation, ExtensionsPolicyKey, ExtensionsPolicy
+} from 'vs/platform/extensionManagement/common/extensionManagement'; // {{SQL CARBON EDIT}}
 import { IModelService } from 'vs/editor/common/services/modelService';
 import { ITextModel } from 'vs/editor/common/model';
 import { IStorageService, StorageScope } from 'vs/platform/storage/common/storage';
@@ -22,8 +22,7 @@ import { ShowRecommendedExtensionsAction, InstallWorkspaceRecommendedExtensionsA
 import Severity from 'vs/base/common/severity';
 import { IWorkspaceContextService, IWorkspaceFolder, IWorkspace, IWorkspaceFoldersChangeEvent, WorkbenchState } from 'vs/platform/workspace/common/workspace';
 import { IFileService } from 'vs/platform/files/common/files';
-// {{SQL CARBON EDIT}}
-import { IExtensionsConfiguration, ConfigurationKey, ShowRecommendationsOnlyOnDemandKey, IExtensionsViewlet, IExtensionsWorkbenchService, EXTENSIONS_CONFIG, ExtensionsPolicyKey, ExtensionsPolicy } from 'vs/workbench/contrib/extensions/common/extensions';
+import { IExtensionsConfiguration, ConfigurationKey, ShowRecommendationsOnlyOnDemandKey, IExtensionsViewlet, IExtensionsWorkbenchService, EXTENSIONS_CONFIG } from 'vs/workbench/contrib/extensions/common/extensions';
 import { IConfigurationService, ConfigurationTarget } from 'vs/platform/configuration/common/configuration';
 import { ITelemetryService } from 'vs/platform/telemetry/common/telemetry';
 import * as pfs from 'vs/base/node/pfs';
@@ -117,7 +116,7 @@ export class ExtensionTipsService extends Disposable implements IExtensionTipsSe
 		super();
 
 		// {{SQL CARBON EDIT}}
-		let extensionPolicy: string = this.configurationService.getValue<string>(ExtensionsPolicyKey);
+		const extensionPolicy: string = this.configurationService.getValue<string>(ExtensionsPolicyKey);
 		if (!this.isEnabled() || extensionPolicy === ExtensionsPolicy.allowNone) {
 			return;
 		}
