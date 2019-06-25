@@ -171,12 +171,12 @@ export class RunQueryAction extends QueryTaskbarAction {
 
 	private downloadSandDance(): void {
 
-		const downloadSandDanceNotice = localize('downloadSandDance.notice', "Would you like to visualize your data? The new visualizer feature can be activated by downloading the SandDance extension.");
+		const downloadSandDanceNotice = nls.localize('downloadSandDance.notice', "Would you like to visualize your data? The new visualizer feature can be activated by downloading the SandDance extension.");
 		this.notificationService.prompt(
 			Severity.Info,
 			downloadSandDanceNotice,
 			[{
-				label: localize('downloadSandDanceNotice.yes', "Download"),
+				label: nls.localize('downloadSandDanceNotice.yes', "Download"),
 				run: () => {
 					// vscode.extensions.getExtension(name/id)
 
@@ -184,14 +184,14 @@ export class RunQueryAction extends QueryTaskbarAction {
 					// storageService.store(DownloadSandDance.ENABLE_PREVIEW_FEATURES_SHOWN, true, StorageScope.GLOBAL);
 				}
 			}, {
-				label: localize('downloadSandDanceNotice.no', "Dismiss"),
+				label: nls.localize('downloadSandDanceNotice.no', "Dismiss"),
 				run: () => {
 					// Error Message : "You cannot use this feature without downloading the SandDance extension."
 
 					// configuration1Service.updateValue('workbench.enablePreviewFeatures', false);
 				}
 			}, {
-				label: localize('downloadSandDanceNotice.never', "Don't ask again"),
+				label: nls.localize('downloadSandDanceNotice.never', "Don't ask again"),
 				run: () => {
 					// configurationService.updateValue('workbench.enablePreviewFeatures', false);
 					// storageService.store(DownloadSandDance.ENABLE_PREVIEW_FEATURES_SHOWN, true, StorageScope.GLOBAL);
