@@ -16,9 +16,9 @@ import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/com
 import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
 import { deepClone, deepFreeze } from 'vs/base/common/objects';
 import { ConfigurationTarget } from 'vs/platform/configuration/common/configuration';
-import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 import { mssqlProviderName } from 'sql/platform/connection/common/constants';
 import { Credential } from 'sql/platform/credentials/common/credentialsService';
+import { IStorageService, StorageScope, InMemoryStorageService } from 'vs/platform/storage/common/storage';
 
 suite('ConnectionStore', () => {
 	let defaultNamedProfile: IConnectionProfile = deepFreeze({
@@ -143,7 +143,7 @@ suite('ConnectionStore', () => {
 		// Given 5 is the max # creds
 		const numCreds = 6;
 
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -170,7 +170,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('getRecentlyUsedConnections should return connection for given provider', () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 		const connectionStore = new ConnectionStore(storageService, configurationService,
@@ -182,7 +182,7 @@ suite('ConnectionStore', () => {
 
 	test('addActiveConnection should add same connection exactly once', async () => {
 
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -205,7 +205,7 @@ suite('ConnectionStore', () => {
 
 		// Setup credential store to capture credentials sent to it
 
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -252,7 +252,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('can clear connections list', async () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -269,7 +269,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('isPasswordRequired should return true for MSSQL SqlLogin', () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -280,7 +280,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('isPasswordRequired should return true for MSSQL SqlLogin for connection profile object', () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -292,7 +292,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('isPasswordRequired should return false if the password is not required in capabilities', () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -319,7 +319,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('saveProfile should save the password after the profile is saved', async () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -336,7 +336,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('getGroupFromId returns undefined when there is no group with the given ID', () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -347,7 +347,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('getGroupFromId returns the group that has the given ID', () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -385,7 +385,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('getProfileWithoutPassword can return the profile without credentials in the password property or options dictionary', () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -403,7 +403,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('addPassword gets the password from the credentials service', async () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -423,7 +423,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('getConnectionProfileGroups', async () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -460,7 +460,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('removing connection correctly removes', async () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
@@ -485,7 +485,7 @@ suite('ConnectionStore', () => {
 	});
 
 	test('getRecentlyUsedConnections correctly fills in group names', async () => {
-		const storageService = new TestStorageService();
+		const storageService = new InMemoryStorageService();
 		const configurationService = new TestConfigurationService();
 		const credentialsService = new TestCredentialsService();
 
