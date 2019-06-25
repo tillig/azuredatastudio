@@ -28,8 +28,6 @@ import { SelectBox } from 'sql/base/browser/ui/selectBox/selectBox';
 import { attachEditableDropdownStyler, attachSelectBoxStyler } from 'sql/platform/theme/common/styler';
 import { Dropdown } from 'sql/base/parts/editableDropdown/browser/dropdown';
 
-import { localize } from 'vs/nls';
-
 /**
  * Action class that query-based Actions will extend. This base class automatically handles activating and
  * deactivating the button when a SQL file is opened.
@@ -124,13 +122,10 @@ export class RunQueryAction extends QueryTaskbarAction {
 				// If we are already connected, run the query
 				this.downloadSandDance();
 				this.runQuery(this.editor);
-				console.log('is connected! ----------------------------------------');
 			} else {
 				// If we are not already connected, prompt for connection and run the query if the
 				// connection succeeds. "runQueryOnCompletion=true" will cause the query to run after connection
-				this.downloadSandDance();
 				this.connectEditor(this.editor, RunQueryOnConnectionMode.executeQuery, this.editor.getSelection());
-				console.log('is not connected! -----------------------------------------');
 			}
 		}
 		return Promise.resolve(null);
