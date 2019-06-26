@@ -1,0 +1,99 @@
+{
+	"name": "aris",
+	"displayName": "%aris.displayName%",
+	"description": "%aris.description%",
+	"version": "0.0.1",
+	"publisher": "Microsoft",
+	"preview": true,
+	"license": "https://raw.githubusercontent.com/Microsoft/azuredatastudio/master/LICENSE.txt",
+	"icon": "images/sqlserver.png",
+	"engines": {
+		"vscode": "*",
+		"azdata": "*"
+	},
+	"activationEvents": [
+		"*"
+	],
+	"forceReload": true,
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Microsoft/azuredatastudio.git"
+	},
+	"main": "./out/extension",
+	"contributes": {
+		"dataExplorer": {
+			"arisResource": [
+				{
+					"id": "arisResourceExplorer",
+					"name": "%aris.resource.explorer.title%"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "aris.resource.registerArisController",
+					"when": "view == arisResourceExplorer",
+					"group": "navigation"
+				}
+			],
+			"view/item/context": [
+				{
+					"command": "bdcControllers.controller.delete",
+					"when": "viewItem == ControllerNode",
+					"group": "navigation@1"
+				},
+				{
+					"command": "bdcControllers.controller.refresh",
+					"when": "viewItem == ControllerNode",
+					"group": "navigation@2"
+				}
+			]
+		},
+		"configuration": {
+			"type": "object",
+			"title": "%aris.title%",
+			"properties": {
+				"bigDataClusterControllers.controllers": {
+					"type": "array"
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "aris.resource.registerArisController",
+				"title": "%aris.resource.registerArisController.title%",
+				"icon": {
+					"light": "resources/light/add.svg",
+					"dark": "resources/dark/add_inverse.svg"
+				}
+			},
+			{
+				"command": "bdcControllers.controller.delete",
+				"title": "%bdcControllers.controller.delete.title%",
+				"when": "viewItem == ControllerNode"
+			},
+			{
+				"command": "bdcControllers.controller.refresh",
+				"title": "%bdcControllers.controller.refresh.title%",
+				"icon": {
+					"light": "resources/light/refresh.svg",
+					"dark": "resources/dark/refresh_inverse.svg"
+				}
+			}
+		]
+	},
+	"dependencies": {
+		"request": "^2.88.0",
+		"vscode-nls": "^4.0.0"
+	},
+	"devDependencies": {
+		"@types/mocha": "^5.2.5",
+		"@types/node": "^12.0.8",
+		"mocha": "^5.2.0",
+		"should": "^13.2.1",
+		"typemoq": "^2.1.0",
+		"typescript": "^3.5.1",
+		"vscode": "^1.1.34"
+	}
+}
