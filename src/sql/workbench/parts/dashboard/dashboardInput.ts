@@ -19,10 +19,10 @@ export class DashboardInput extends EditorInput {
 	public static ID: string = 'workbench.editorinputs.connectiondashboardinputs';
 	public static SCHEMA: string = 'sqldashboard';
 
-	private _initializedPromise: Thenable<void>;
+	private _initializedPromise: Promise<void>;
 	private _onConnectionChanged: IDisposable;
 
-	public get initializedPromise(): Thenable<void> {
+	public get initializedPromise(): Promise<void> {
 		return this._initializedPromise;
 	}
 

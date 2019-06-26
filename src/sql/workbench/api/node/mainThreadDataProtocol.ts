@@ -502,7 +502,7 @@ export class MainThreadDataProtocol implements MainThreadDataProtocolShape {
 	}
 
 	public $onIntelliSenseCacheComplete(handle: number, connectionUri: string): void {
-		this._connectionManagementService.onIntelliSenseCacheComplete(handle, connectionUri);
+		// no op
 	}
 
 	public $onConnectionChangeNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo): void {

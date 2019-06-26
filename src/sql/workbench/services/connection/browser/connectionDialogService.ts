@@ -28,7 +28,6 @@ import * as types from 'vs/base/common/types';
 import { trim } from 'vs/base/common/strings';
 import { localize } from 'vs/nls';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
-import { IWorkbenchLayoutService } from 'vs/workbench/services/layout/browser/layoutService';
 import { CmsConnectionController } from 'sql/workbench/services/connection/browser/cmsConnectionController';
 
 export interface IConnectionValidateResult {
@@ -80,7 +79,6 @@ export class ConnectionDialogService implements IConnectionDialogService {
 	private _connectionManagementService: IConnectionManagementService;
 
 	constructor(
-		@IWorkbenchLayoutService private layoutService: IWorkbenchLayoutService,
 		@IInstantiationService private _instantiationService: IInstantiationService,
 		@ICapabilitiesService private _capabilitiesService: ICapabilitiesService,
 		@IErrorMessageService private _errorMessageService: IErrorMessageService,
@@ -220,7 +218,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		}
 	}
 
-	private handleDefaultOnConnect(params: INewConnectionParams, connection: IConnectionProfile): Thenable<void> {
+	private handleDefaultOnConnect(params: INewConnectionParams, connection: IConnectionProfile): Promise<void> {
 		if (this.ignoreNextConnect) {
 			this._connectionDialog.resetConnection();
 			this._connectionDialog.close();
@@ -276,14 +274,12 @@ export class ConnectionDialogService implements IConnectionDialogService {
 			if (providerName === Constants.cmsProviderName) {
 				this._connectionControllerMap[providerName] =
 					this._instantiationService.createInstance(CmsConnectionController,
-						this._connectionManagementService,
 						this._capabilitiesService.getCapabilities(providerName).connection, {
 							onSetConnectButton: (enable: boolean) => this.handleSetConnectButtonEnable(enable)
 						}, providerName);
 			} else {
 				this._connectionControllerMap[providerName] =
 					this._instantiationService.createInstance(ConnectionController,
-						this._connectionManagementService,
 						this._capabilitiesService.getCapabilities(providerName).connection, {
 							onSetConnectButton: (enable: boolean) => this.handleSetConnectButtonEnable(enable)
 						}, providerName);
@@ -383,7 +379,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		params?: INewConnectionParams,
 		model?: IConnectionProfile,
 		connectionResult?: IConnectionResult,
-		doConnect: boolean = true): Thenable<IConnectionProfile> {
+		doConnect: boolean = true): Promise<IConnectionProfile> {
 
 		if (!doConnect) {
 			this.ignoreNextConnect = true;
@@ -404,7 +400,7 @@ export class ConnectionDialogService implements IConnectionDialogService {
 		params?: INewConnectionParams,
 		model?: IConnectionProfile,
 		connectionResult?: IConnectionResult,
-		connectionOptions?: IConnectionCompletionOptions): Thenable<void> {
+		connectionOptions?: IConnectionCompletionOptions): Promise<void> {
 
 		this._connectionManagementService = connectionManagementService;
 

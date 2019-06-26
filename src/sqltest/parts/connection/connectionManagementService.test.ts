@@ -41,7 +41,6 @@ suite('SQL ConnectionManagementService tests', () => {
 	let connectionDialogService: TypeMoq.Mock<ConnectionDialogTestService>;
 	let connectionStore: TypeMoq.Mock<ConnectionStore>;
 	let workbenchEditorService: TypeMoq.Mock<WorkbenchEditorTestService>;
-	let editorGroupService: TypeMoq.Mock<EditorGroupTestService>;
 	let connectionStatusManager: ConnectionStatusManager;
 	let mssqlConnectionProvider: TypeMoq.Mock<ConnectionProviderStub>;
 	let workspaceConfigurationServiceMock: TypeMoq.Mock<WorkspaceConfigurationTestService>;
@@ -85,7 +84,6 @@ suite('SQL ConnectionManagementService tests', () => {
 		connectionDialogService = TypeMoq.Mock.ofType(ConnectionDialogTestService);
 		connectionStore = TypeMoq.Mock.ofType(ConnectionStore, TypeMoq.MockBehavior.Loose, new TestStorageService());
 		workbenchEditorService = TypeMoq.Mock.ofType(WorkbenchEditorTestService);
-		editorGroupService = TypeMoq.Mock.ofType(EditorGroupTestService);
 		connectionStatusManager = new ConnectionStatusManager(capabilitiesService, new TestLogService(), TestEnvironmentService, new TestNotificationService());
 		mssqlConnectionProvider = TypeMoq.Mock.ofType(ConnectionProviderStub);
 		let resourceProviderStub = new ResourceProviderStub();
@@ -153,7 +151,6 @@ suite('SQL ConnectionManagementService tests', () => {
 			connectionStore.object,
 			undefined,
 			connectionDialogService.object,
-			undefined, // IServerGroupController
 			undefined, // IInstantiationService
 			workbenchEditorService.object,
 			undefined, // ITelemetryService

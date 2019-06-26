@@ -15,6 +15,7 @@ import { IInstantiationService } from 'vs/platform/instantiation/common/instanti
 import { ConnectionOptionSpecialType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 import { ConnectionWidget } from 'sql/workbench/services/connection/browser/connectionWidget';
+import { IServerGroupController } from 'sql/platform/serverGroup/common/serverGroupController';
 
 export class ConnectionController implements IConnectionComponentController {
 	private _connectionManagementService: IConnectionManagementService;
@@ -28,11 +29,13 @@ export class ConnectionController implements IConnectionComponentController {
 	protected _databaseCache = new Map<string, string[]>();
 
 	constructor(
-		connectionManagementService: IConnectionManagementService,
 		connectionProperties: ConnectionProviderProperties,
 		callback: IConnectionComponentCallbacks,
 		providerName: string,
-		@IInstantiationService protected _instantiationService: IInstantiationService) {
+		@IInstantiationService protected readonly _instantiationService: IInstantiationService,
+		@IConnectionManagementService protected readonly connectionManagementService: IConnectionManagementService,
+		@IServerGroupController protected readonly serverGroupController: IServerGroupController
+	) {
 		this._connectionManagementService = connectionManagementService;
 		this._callback = callback;
 		this._providerOptions = connectionProperties.connectionOptions;
@@ -89,7 +92,7 @@ export class ConnectionController implements IConnectionComponentController {
 	}
 
 	protected onCreateNewServerGroup(): void {
-		this._connectionManagementService.showCreateServerGroupDialog({
+		this.serverGroupController.showCreateGroupDialog({
 			onAddGroup: (groupName) => this._connectionWidget.updateServerGroup(this.getAllServerGroups(), groupName),
 			onClose: () => this._connectionWidget.focusOnServerGroup()
 		});

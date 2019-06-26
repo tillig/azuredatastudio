@@ -11,7 +11,6 @@ import { ConnectionProfile } from 'sql/platform/connection/common/connectionProf
 import { ConnectionManagementInfo } from 'sql/platform/connection/common/connectionManagementInfo';
 import * as azdata from 'azdata';
 import { Event, Emitter } from 'vs/base/common/event';
-import { isUndefinedOrNull } from 'vs/base/common/types';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
 
 // Test stubs for commonly used objects
@@ -187,15 +186,15 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return new Promise<IConnectionProfile>(() => connectionProfile);
 	}
 
-	public listDatabases(connectionUri: string): Thenable<azdata.ListDatabasesResult> {
+	public listDatabases(connectionUri: string): Promise<azdata.ListDatabasesResult> {
 		return Promise.resolve(undefined);
 	}
 
-	cancelConnection(connection: IConnectionProfile): Thenable<boolean> {
+	cancelConnection(connection: IConnectionProfile): Promise<boolean> {
 		return undefined;
 	}
 
-	cancelEditorConnection(owner: IConnectableInput): Thenable<boolean> {
+	cancelEditorConnection(owner: IConnectableInput): Promise<boolean> {
 		return undefined;
 	}
 
@@ -206,7 +205,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 	closeDashboard(uri: string): void {
 	}
 
-	changeDatabase(connectionUri: string, databaseName: string): Thenable<boolean> {
+	changeDatabase(connectionUri: string, databaseName: string): Promise<boolean> {
 		return new Promise(() => true);
 	}
 
@@ -244,7 +243,7 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return undefined;
 	}
 
-	rebuildIntelliSenseCache(uri: string): Thenable<void> {
+	rebuildIntelliSenseCache(uri: string): Promise<void> {
 		return undefined;
 	}
 
@@ -264,11 +263,11 @@ export class TestConnectionManagementService implements IConnectionManagementSer
 		return undefined;
 	}
 
-	getConnectionString(connectionId: string): Thenable<string> {
+	getConnectionString(connectionId: string): Promise<string> {
 		return undefined;
 	}
 
-	buildConnectionInfo(connectionString: string, provider?: string): Thenable<azdata.ConnectionInfo> {
+	buildConnectionInfo(connectionString: string, provider?: string): Promise<azdata.ConnectionInfo> {
 		return undefined;
 	}
 

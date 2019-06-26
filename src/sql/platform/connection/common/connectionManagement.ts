@@ -83,16 +83,6 @@ export interface IConnectionManagementService {
 	showConnectionDialog(params?: INewConnectionParams, options?: IConnectionCompletionOptions, model?: IConnectionProfile, connectionResult?: IConnectionResult): Promise<void>;
 
 	/**
-	 * Opens the add server group dialog
-	 */
-	showCreateServerGroupDialog(callbacks?: IServerGroupDialogCallbacks): Promise<void>;
-
-	/**
-	 * Opens the edit server group dialog
-	 */
-	showEditServerGroupDialog(group: ConnectionProfileGroup): Promise<void>;
-
-	/**
 	 * Load the password and opens a new connection
 	 */
 	connect(connection: IConnectionProfile, uri: string, options?: IConnectionCompletionOptions, callbacks?: IConnectionCallbacks): Promise<IConnectionResult>;
@@ -119,8 +109,6 @@ export interface IConnectionManagementService {
 	 * Adds the successful connection to MRU and send the connection error back to the connection handler for failed connections
 	 */
 	onConnectionComplete(handle: number, connectionInfoSummary: azdata.ConnectionInfoSummary): void;
-
-	onIntelliSenseCacheComplete(handle: number, connectionUri: string): void;
 
 	onConnectionChangedNotification(handle: number, changedConnInfo: azdata.ChangedConnectionInfo);
 
@@ -176,7 +164,7 @@ export interface IConnectionManagementService {
 
 	addSavedPassword(connectionProfile: IConnectionProfile): Promise<IConnectionProfile>;
 
-	listDatabases(connectionUri: string): Thenable<azdata.ListDatabasesResult>;
+	listDatabases(connectionUri: string): Promise<azdata.ListDatabasesResult>;
 
 	/**
 	 * Register a connection provider
@@ -196,21 +184,19 @@ export interface IConnectionManagementService {
 	/**
 	 * Cancels the connection
 	 */
-	cancelConnection(connection: IConnectionProfile): Thenable<boolean>;
+	cancelConnection(connection: IConnectionProfile): Promise<boolean>;
 
 	/**
 	 * Changes the database for an active connection
 	 */
-	changeDatabase(connectionUri: string, databaseName: string): Thenable<boolean>;
+	changeDatabase(connectionUri: string, databaseName: string): Promise<boolean>;
 
 	/**
 	 * Cancels the connection for the editor
 	 */
-	cancelEditorConnection(owner: IConnectableInput): Thenable<boolean>;
+	cancelEditorConnection(owner: IConnectableInput): Promise<boolean>;
 
-	showDashboard(connection: IConnectionProfile): Thenable<boolean>;
-
-	closeDashboard(uri: string): void;
+	showDashboard(connection: IConnectionProfile): Promise<boolean>;
 
 	getProviderIdFromUri(ownerUri: string): string;
 
@@ -239,7 +225,7 @@ export interface IConnectionManagementService {
 	/**
 	 * Refresh the IntelliSense cache for the connection with the given URI
 	 */
-	rebuildIntelliSenseCache(uri: string): Thenable<void>;
+	rebuildIntelliSenseCache(uri: string): Promise<void>;
 
 	/**
 	 * Get a copy of the connection profile with its passwords removed
@@ -266,12 +252,12 @@ export interface IConnectionManagementService {
 	/**
 	 * Get the connection string for the provided connection ID
 	 */
-	getConnectionString(connectionId: string, includePassword: boolean): Thenable<string>;
+	getConnectionString(connectionId: string, includePassword: boolean): Promise<string>;
 
 	/**
 	 * Serialize connection string with optional provider
 	 */
-	buildConnectionInfo(connectionString: string, provider?: string): Thenable<azdata.ConnectionInfo>;
+	buildConnectionInfo(connectionString: string, provider?: string): Promise<azdata.ConnectionInfo>;
 
 	providerRegistered(providerId: string): boolean;
 	/**
