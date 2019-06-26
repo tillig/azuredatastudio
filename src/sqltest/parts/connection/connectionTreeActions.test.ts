@@ -12,8 +12,8 @@ import {
 	ActiveConnectionsFilterAction, RecentConnectionsFilterAction
 }
 	from 'sql/workbench/parts/objectExplorer/browser/connectionTreeAction';
-import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
-import { ErrorMessageServiceStub } from 'sqltest/stubs/errorMessageServiceStub';
+import { TestConnectionManagementService } from 'sql/platform/connection/test/common/testConnectionManagementService';
+import { TestErrorMessageService } from 'sql/workbench/services/errorMessage/test/common/errorMessageServiceStub';
 import { InstantiationService } from 'vs/platform/instantiation/common/instantiationService';
 import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
 import * as  LocalizedConstants from 'sql/workbench/parts/connection/common/localizedConstants';
@@ -27,12 +27,12 @@ import Severity from 'vs/base/common/severity';
 import { ObjectExplorerActionsContext, ManageConnectionAction } from 'sql/workbench/parts/objectExplorer/browser/objectExplorerActions';
 import { IConnectionResult, IConnectionParams } from 'sql/platform/connection/common/connectionManagement';
 import { TreeSelectionHandler } from 'sql/workbench/parts/objectExplorer/browser/treeSelectionHandler';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { UNSAVED_GROUP_ID, mssqlProviderName } from 'sql/platform/connection/common/constants';
 import { $ } from 'vs/base/browser/dom';
 
 suite('SQL Connection Tree Action tests', () => {
-	let errorMessageService: TypeMoq.Mock<ErrorMessageServiceStub>;
+	let errorMessageService: TypeMoq.Mock<TestErrorMessageService>;
 	let connectionResult: IConnectionResult = {
 		connected: true,
 		errorMessage: undefined,
@@ -41,7 +41,7 @@ suite('SQL Connection Tree Action tests', () => {
 	};
 	let capabilitiesService = new CapabilitiesTestService();
 	setup(() => {
-		errorMessageService = TypeMoq.Mock.ofType(ErrorMessageServiceStub, TypeMoq.MockBehavior.Loose);
+		errorMessageService = TypeMoq.Mock.ofType(TestErrorMessageService, TypeMoq.MockBehavior.Loose);
 		let nothing: void;
 		errorMessageService.setup(x => x.showDialog(Severity.Error, TypeMoq.It.isAnyString(), TypeMoq.It.isAnyString())).returns(() => nothing);
 	});

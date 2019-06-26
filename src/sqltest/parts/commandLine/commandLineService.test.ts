@@ -12,13 +12,12 @@ import { CommandLineService } from 'sql/workbench/services/commandLine/common/co
 import * as Constants from 'sql/platform/connection/common/constants';
 import { ParsedArgs } from 'vs/platform/environment/common/environment';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { IEditorService } from 'vs/workbench/services/editor/common/editorService';
 import { IConnectionManagementService, IConnectionCompletionOptions, ConnectionType } from 'sql/platform/connection/common/connectionManagement';
-import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
+import { TestConnectionManagementService } from 'sql/platform/connection/test/common/testConnectionManagementService';
 import { ICommandService } from 'vs/platform/commands/common/commands';
 import { TestCommandService } from 'vs/editor/test/browser/editorTestServices';
-import { WorkspaceConfigurationTestService } from 'sqltest/stubs/workspaceConfigurationTestService';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import { assertThrowsAsync } from 'sqltest/utils/testUtils';
 import { IConfigurationService } from 'vs/platform/configuration/common/configuration';
@@ -26,6 +25,7 @@ import { TestEditorService, TestLogService } from 'vs/workbench/test/workbenchTe
 import { QueryInput, QueryEditorState } from 'sql/workbench/parts/query/common/queryInput';
 import { URI } from 'vs/base/common/uri';
 import { ILogService } from 'vs/platform/log/common/log';
+import { TestConfigurationService } from 'vs/platform/configuration/test/common/testConfigurationService';
 
 class TestParsedArgs implements ParsedArgs {
 	[arg: string]: any;
@@ -121,7 +121,7 @@ suite('commandLineService tests', () => {
 	}
 
 	function getConfigurationServiceMock(showConnectDialogOnStartup: boolean): TypeMoq.Mock<IConfigurationService> {
-		let configurationService = TypeMoq.Mock.ofType<IConfigurationService>(WorkspaceConfigurationTestService);
+		let configurationService = TypeMoq.Mock.ofType<IConfigurationService>(TestConfigurationService);
 		configurationService.setup((c) => c.getValue(TypeMoq.It.isAnyString())).returns((config: string) => showConnectDialogOnStartup);
 		return configurationService;
 	}

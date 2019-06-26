@@ -6,7 +6,7 @@
 import * as should from 'should';
 import { IConnectionProfile } from 'azdata';
 
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { formatServerNameWithDatabaseNameForAttachTo, getServerFromFormattedAttachToName, getDatabaseFromFormattedAttachToName } from 'sql/workbench/parts/notebook/notebookUtils';
 import { mssqlProviderName } from 'sql/platform/connection/common/constants';

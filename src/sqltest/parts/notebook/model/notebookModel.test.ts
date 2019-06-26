@@ -22,7 +22,7 @@ import { Deferred } from 'sql/base/common/promise';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { Memento } from 'vs/workbench/common/memento';
 import { Emitter } from 'vs/base/common/event';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { ICapabilitiesService } from 'sql/platform/capabilities/common/capabilitiesService';
 import { TestStorageService, TestLogService } from 'vs/workbench/test/workbenchTestServices';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';

@@ -7,11 +7,11 @@ import { ConnectionDialogService } from 'sql/workbench/services/connection/brows
 import { ConnectionDialogWidget } from 'sql/workbench/services/connection/browser/connectionDialogWidget';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { ConnectionType, IConnectableInput, IConnectionResult, INewConnectionParams } from 'sql/platform/connection/common/connectionManagement';
-import { ContextKeyServiceStub } from 'sqltest/stubs/contextKeyServiceStub';
-import { ErrorMessageServiceStub } from 'sqltest/stubs/errorMessageServiceStub';
+import { TestErrorMessageService } from 'sql/workbench/services/errorMessage/test/common/errorMessageServiceStub';
 
 import * as TypeMoq from 'typemoq';
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
+import { MockContextKeyService } from 'vs/platform/keybinding/test/common/mockKeybindingService';
 
 suite('ConnectionDialogService tests', () => {
 
@@ -34,14 +34,14 @@ suite('ConnectionDialogService tests', () => {
 			undefined,
 			undefined,
 			undefined,
-			new ContextKeyServiceStub()
+			new MockContextKeyService()
 		);
 		mockConnectionDialog.setup(c => c.resetConnection());
 		(connectionDialogService as any)._connectionDialog = mockConnectionDialog.object;
 	});
 
-	function getMockErrorMessageService(): TypeMoq.Mock<ErrorMessageServiceStub> {
-		let mockMessageService = TypeMoq.Mock.ofType(ErrorMessageServiceStub);
+	function getMockErrorMessageService(): TypeMoq.Mock<TestErrorMessageService> {
+		let mockMessageService = TypeMoq.Mock.ofType(TestErrorMessageService);
 		mockMessageService.setup(x => x.showDialog(TypeMoq.It.isAny(), TypeMoq.It.isAny(), TypeMoq.It.isAny()));
 		return mockMessageService;
 	}

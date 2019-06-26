@@ -25,13 +25,13 @@ import { QueryModelService } from 'sql/platform/query/common/queryModelService';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 
-import { TestThemeService } from 'sqltest/stubs/themeTestService';
 import { ConfigurationService } from 'vs/platform/configuration/node/configurationService';
 
 import * as TypeMoq from 'typemoq';
 import * as assert from 'assert';
 import { TestStorageService, TestFileService } from 'vs/workbench/test/workbenchTestServices';
 import { MockContextKeyService } from 'vs/platform/keybinding/test/common/mockKeybindingService';
+import { TestThemeService } from 'vs/platform/theme/test/common/testThemeService';
 
 let none: void;
 

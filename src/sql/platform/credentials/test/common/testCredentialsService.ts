@@ -6,6 +6,31 @@
 import { ICredentialsService, CredentialManagementEvents, Credential } from 'sql/platform/credentials/common/credentialsService';
 import { IDisposable } from 'vs/base/common/lifecycle';
 import { Emitter } from 'vs/base/common/event';
+import { CredentialProvider } from 'sqlops';
+
+export class TestCredentialsProvider implements CredentialProvider {
+	handle: number;
+
+	public storedCredentials: { [K: string]: Credential } = {};
+
+	saveCredential(credentialId: string, password: string): Thenable<boolean> {
+		this.storedCredentials[credentialId] = {
+			credentialId: credentialId,
+			password: password
+		};
+		return Promise.resolve(true);
+	}
+
+	readCredential(credentialId: string): Thenable<Credential> {
+		return Promise.resolve(this.storedCredentials[credentialId]);
+	}
+
+	deleteCredential(credentialId: string): Thenable<boolean> {
+		let exists = this.storedCredentials[credentialId] !== undefined;
+		delete this.storedCredentials[credentialId];
+		return Promise.resolve(exists);
+	}
+}
 
 export class TestCredentialsService implements ICredentialsService {
 	_serviceBrand: any;

@@ -5,12 +5,11 @@
 
 import { OptionsDialog } from 'sql/workbench/browser/modal/optionsDialog';
 import { AdvancedPropertiesController } from 'sql/workbench/parts/connection/browser/advancedPropertiesController';
-import { ContextKeyServiceStub } from 'sqltest/stubs/contextKeyServiceStub';
 import * as azdata from 'azdata';
 import * as TypeMoq from 'typemoq';
 import * as assert from 'assert';
 import { ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
-import { $ } from 'vs/base/browser/dom';
+import { MockContextKeyService } from 'vs/platform/keybinding/test/common/mockKeybindingService';
 
 suite('Advanced properties dialog tests', () => {
 	let advancedController: AdvancedPropertiesController;
@@ -94,7 +93,7 @@ suite('Advanced properties dialog tests', () => {
 			undefined, // Context view service
 			undefined, // instantiation Service
 			undefined, // telemetry service
-			new ContextKeyServiceStub() // contextkeyservice
+			new MockContextKeyService() // contextkeyservice
 		);
 		advanceDialog.setup(x => x.open(TypeMoq.It.isAny(), TypeMoq.It.isAny())).callback(() => {
 			isAdvancedDialogCalled = true;

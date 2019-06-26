@@ -3,7 +3,7 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ConnectionDialogTestService } from 'sqltest/stubs/connectionDialogTestService';
+import { ConnectionDialogTestService } from 'sql/workbench/services/connection/test/common/connectionDialogTestService';
 import { ConnectionManagementService } from 'sql/platform/connection/common/connectionManagementService';
 import { ConnectionStatusManager } from 'sql/platform/connection/common/connectionStatusManager';
 import { ConnectionStore } from 'sql/platform/connection/common/connectionStore';
@@ -16,36 +16,32 @@ import * as Constants from 'sql/platform/connection/common/constants';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { IHandleFirewallRuleResult } from 'sql/workbench/services/resourceProvider/common/resourceProviderService';
 
-import { WorkbenchEditorTestService } from 'sqltest/stubs/workbenchEditorTestService';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
-import { EditorGroupTestService } from 'sqltest/stubs/editorGroupService';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
-import { ConnectionProviderStub } from 'sqltest/stubs/connectionProviderStub';
-import { ResourceProviderStub } from 'sqltest/stubs/resourceProviderServiceStub';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
+import { ConnectionProviderStub } from 'sql/platform/connection/test/common/testConnectionProvider';
+import { TestResourceProviderService } from 'sql/workbench/services/resourceProvider/test/common/testResourceProviderService';
 
 import * as azdata from 'azdata';
-
-import { WorkspaceConfigurationTestService } from 'sqltest/stubs/workspaceConfigurationTestService';
 
 import * as assert from 'assert';
 import * as TypeMoq from 'typemoq';
 import { IConnectionProfileGroup, ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
-import { AccountManagementTestService } from 'sqltest/stubs/accountManagementStubs';
-import { TestStorageService, TestEnvironmentService, TestLogService } from 'vs/workbench/test/workbenchTestServices';
+import { AccountManagementTestService } from 'sql/platform/accounts/test/common/accountManagementStubs';
+import { TestStorageService, TestEnvironmentService, TestLogService, TestEditorService } from 'vs/workbench/test/workbenchTestServices';
 import { TestNotificationService } from 'vs/platform/notification/test/common/testNotificationService';
+import { TestConfigurationService } from 'vs/platform/configuration/test/common/testConfigurationService';
 
 suite('SQL ConnectionManagementService tests', () => {
 
 	let capabilitiesService: CapabilitiesTestService;
 	let connectionDialogService: TypeMoq.Mock<ConnectionDialogTestService>;
 	let connectionStore: TypeMoq.Mock<ConnectionStore>;
-	let workbenchEditorService: TypeMoq.Mock<WorkbenchEditorTestService>;
-	let editorGroupService: TypeMoq.Mock<EditorGroupTestService>;
+	let editorService: TypeMoq.Mock<TestEditorService>;
 	let connectionStatusManager: ConnectionStatusManager;
 	let mssqlConnectionProvider: TypeMoq.Mock<ConnectionProviderStub>;
-	let workspaceConfigurationServiceMock: TypeMoq.Mock<WorkspaceConfigurationTestService>;
-	let resourceProviderStubMock: TypeMoq.Mock<ResourceProviderStub>;
+	let configurationService: TypeMoq.Mock<TestConfigurationService>;
+	let resourceProviderStubMock: TypeMoq.Mock<TestResourceProviderService>;
 	let accountManagementService: TypeMoq.Mock<AccountManagementTestService>;
 
 	let none: void;
@@ -84,11 +80,10 @@ suite('SQL ConnectionManagementService tests', () => {
 		capabilitiesService = new CapabilitiesTestService();
 		connectionDialogService = TypeMoq.Mock.ofType(ConnectionDialogTestService);
 		connectionStore = TypeMoq.Mock.ofType(ConnectionStore, TypeMoq.MockBehavior.Loose, new TestStorageService());
-		workbenchEditorService = TypeMoq.Mock.ofType(WorkbenchEditorTestService);
-		editorGroupService = TypeMoq.Mock.ofType(EditorGroupTestService);
+		editorService = TypeMoq.Mock.ofType(TestEditorService);
 		connectionStatusManager = new ConnectionStatusManager(capabilitiesService, new TestLogService(), TestEnvironmentService, new TestNotificationService());
 		mssqlConnectionProvider = TypeMoq.Mock.ofType(ConnectionProviderStub);
-		let resourceProviderStub = new ResourceProviderStub();
+		let resourceProviderStub = new TestResourceProviderService();
 		resourceProviderStubMock = TypeMoq.Mock.ofInstance(resourceProviderStub);
 		accountManagementService = TypeMoq.Mock.ofType(AccountManagementTestService);
 		let root = new ConnectionProfileGroup(ConnectionProfileGroup.RootGroupName, undefined, ConnectionProfileGroup.RootGroupName, undefined, undefined);
@@ -103,7 +98,7 @@ suite('SQL ConnectionManagementService tests', () => {
 
 		connectionStore.setup(x => x.addRecentConnection(TypeMoq.It.isAny())).returns(() => Promise.resolve());
 		connectionStore.setup(x => x.saveProfile(TypeMoq.It.isAny())).returns(() => Promise.resolve(connectionProfile));
-		workbenchEditorService.setup(x => x.openEditor(undefined, TypeMoq.It.isAny(), TypeMoq.It.isAny())).returns(() => Promise.resolve(undefined));
+		editorService.setup(x => x.openEditor(undefined, TypeMoq.It.isAny(), TypeMoq.It.isAny())).returns(() => Promise.resolve(undefined));
 		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<IConnectionProfile>(
 			c => c.serverName === connectionProfile.serverName))).returns(() => Promise.resolve({ profile: connectionProfile, savedCred: true }));
 		connectionStore.setup(x => x.addSavedPassword(TypeMoq.It.is<IConnectionProfile>(
@@ -139,8 +134,8 @@ suite('SQL ConnectionManagementService tests', () => {
 			});
 
 		// Setup configuration to return a config that can be modified later.
-		workspaceConfigurationServiceMock = TypeMoq.Mock.ofType(WorkspaceConfigurationTestService);
-		workspaceConfigurationServiceMock.setup(x => x.getValue(Constants.sqlConfigSectionName))
+		configurationService = TypeMoq.Mock.ofType(TestConfigurationService);
+		configurationService.setup(x => x.getValue(Constants.sqlConfigSectionName))
 			.returns(() => configResult);
 
 		connectionManagementService = createConnectionManagementService();
@@ -155,9 +150,9 @@ suite('SQL ConnectionManagementService tests', () => {
 			connectionDialogService.object,
 			undefined, // IServerGroupController
 			undefined, // IInstantiationService
-			workbenchEditorService.object,
+			editorService.object,
 			undefined, // ITelemetryService
-			workspaceConfigurationServiceMock.object,
+			configurationService.object,
 			capabilitiesService,
 			undefined, // IQuickInputService
 			undefined, // IStatusbarService
@@ -208,7 +203,7 @@ suite('SQL ConnectionManagementService tests', () => {
 				connectionStore.verify(x => x.saveProfile(TypeMoq.It.isAny()), TypeMoq.Times.once());
 			}
 			if (options.showDashboard) {
-				workbenchEditorService.verify(x => x.openEditor(undefined, TypeMoq.It.isAny(), TypeMoq.It.isAny()), TypeMoq.Times.once());
+				editorService.verify(x => x.openEditor(undefined, TypeMoq.It.isAny(), TypeMoq.It.isAny()), TypeMoq.Times.once());
 			}
 		}
 

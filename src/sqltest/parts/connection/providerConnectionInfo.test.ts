@@ -8,7 +8,7 @@ import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
 import * as azdata from 'azdata';
 import * as assert from 'assert';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { mssqlProviderName } from 'sql/platform/connection/common/constants';
 
 suite('SQL ProviderConnectionInfo tests', () => {

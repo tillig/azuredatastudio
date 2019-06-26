@@ -6,8 +6,23 @@
 import * as azdata from 'azdata';
 import * as TypeMoq from 'typemoq';
 import { JobsRefreshAction, NewJobAction, EditJobAction, RunJobAction, StopJobAction, DeleteJobAction, NewStepAction, DeleteStepAction, NewAlertAction, EditAlertAction, DeleteAlertAction, NewOperatorAction, EditOperatorAction, DeleteOperatorAction, NewProxyAction, EditProxyAction, DeleteProxyAction } from 'sql/platform/jobManagement/common/jobActions';
-import { TestJobManagementView } from 'sqltest/stubs/jobsManagementViewStub';
 import { JobManagementService } from 'sql/platform/jobManagement/common/jobManagementService';
+
+/**
+ * Class to test Job Management Views
+ */
+class TestJobManagementView {
+
+	refreshJobs() { return undefined; }
+
+	openCreateJobDialog() { return undefined; }
+
+	openCreateAlertDialog() { return undefined; }
+
+	openCreateOperatorDialog() { return undefined; }
+
+	openCreateProxyDialog() { return undefined; }
+}
 
 // Mock View Components
 let mockJobsViewComponent: TypeMoq.Mock<TestJobManagementView>;

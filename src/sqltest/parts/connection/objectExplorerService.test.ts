@@ -3,8 +3,8 @@
  *  Licensed under the Source EULA. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { ObjectExplorerProviderTestService } from 'sqltest/stubs/objectExplorerProviderTestService';
-import { TestConnectionManagementService } from 'sqltest/stubs/connectionManagementService.test';
+import { TestObjectExplorerProvider } from 'sql/workbench/services/objectExplorer/test/common/testObjectExplorerProvider';
+import { TestConnectionManagementService } from 'sql/platform/connection/test/common/testConnectionManagementService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { ConnectionProfileGroup } from 'sql/platform/connection/common/connectionProfileGroup';
 import { ObjectExplorerService, NodeExpandInfoWithProviderId } from 'sql/workbench/services/objectExplorer/common/objectExplorerService';
@@ -17,12 +17,12 @@ import * as assert from 'assert';
 import { ServerTreeView } from 'sql/workbench/parts/objectExplorer/browser/serverTreeView';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { Event, Emitter } from 'vs/base/common/event';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { TestLogService } from 'vs/workbench/test/workbenchTestServices';
 import { mssqlProviderName } from 'sql/platform/connection/common/constants';
 
 suite('SQL Object Explorer Service tests', () => {
-	let sqlOEProvider: TypeMoq.Mock<ObjectExplorerProviderTestService>;
+	let sqlOEProvider: TypeMoq.Mock<TestObjectExplorerProvider>;
 	let connectionManagementService: TypeMoq.Mock<TestConnectionManagementService>;
 	let connection: ConnectionProfile;
 	let connectionToFail: ConnectionProfile;
@@ -123,7 +123,7 @@ suite('SQL Object Explorer Service tests', () => {
 			sessionId: failedSessionId
 		};
 
-		sqlOEProvider = TypeMoq.Mock.ofType(ObjectExplorerProviderTestService, TypeMoq.MockBehavior.Loose);
+		sqlOEProvider = TypeMoq.Mock.ofType(TestObjectExplorerProvider, TypeMoq.MockBehavior.Loose);
 		sqlOEProvider.callBase = true;
 
 		let onCapabilitiesRegistered = new Emitter<string>();

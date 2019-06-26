@@ -12,7 +12,7 @@ import { TestInstantiationService } from 'vs/platform/instantiation/test/common/
 import { TestStorageService } from 'vs/workbench/test/workbenchTestServices';
 
 import * as TypeMoq from 'typemoq';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 
 suite('ServerTreeView onAddConnectionProfile handler tests', () => {
 

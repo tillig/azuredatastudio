@@ -8,7 +8,7 @@ import * as azdata from 'azdata';
 import { ConnectionStatusManager } from 'sql/platform/connection/common/connectionStatusManager';
 import * as Utils from 'sql/platform/connection/common/utils';
 import { IConnectionProfile } from 'sql/platform/connection/common/interfaces';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { ConnectionProfile } from 'sql/platform/connection/common/connectionProfile';
 import { TestEnvironmentService, TestLogService } from 'vs/workbench/test/workbenchTestServices';
 import { TestNotificationService } from 'vs/platform/notification/test/common/testNotificationService';

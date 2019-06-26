@@ -13,12 +13,12 @@ import { TestConfigurationService } from 'sql/platform/connection/test/common/te
 import { TestCredentialsService } from 'sql/platform/credentials/test/common/testCredentialsService';
 import { ConnectionOptionSpecialType, ServiceOptionType } from 'sql/workbench/api/common/sqlExtHostTypes';
 import { ConnectionProviderProperties } from 'sql/workbench/parts/connection/common/connectionProviderExtension';
-import { CapabilitiesTestService } from 'sqltest/stubs/capabilitiesTestService';
+import { CapabilitiesTestService } from 'sql/platform/capabilities/test/common/capabilitiesTestService';
 import { deepClone, deepFreeze } from 'vs/base/common/objects';
 import { ConfigurationTarget } from 'vs/platform/configuration/common/configuration';
 import { mssqlProviderName } from 'sql/platform/connection/common/constants';
 import { Credential } from 'sql/platform/credentials/common/credentialsService';
-import { IStorageService, StorageScope, InMemoryStorageService } from 'vs/platform/storage/common/storage';
+import { InMemoryStorageService } from 'vs/platform/storage/common/storage';
 
 suite('ConnectionStore', () => {
 	let defaultNamedProfile: IConnectionProfile = deepFreeze({
